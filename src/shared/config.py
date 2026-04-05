@@ -1,40 +1,193 @@
-from pydantic_settings import BaseSettings
-from typing import Optional
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import field_validator, Field
+from typing import Optional, Dict, Any
+import os
+import json
+import time
+from pathlib import Path
 
+# 导入敏感信息管理器
+try:
+    from .secret_manager import SecretManager
+    secret_manager = SecretManager()
+except ImportError:
+    secret_manager = None
 
 class Settings(BaseSettings):
-    """应用配置"""
-    # 数据库配置
+    """
+    🚀 Ace Agent 全局配置中心 (2026 生产级标准)
+    整合了数据库、安全、Agent 决策及监控链路
+    """
+    
+    # 配置版本管理
+    CONFIG_VERSION: str = "2.0.0"
+    
+    # --- 1. 基础项目配置 ---
+    PROJECT_NAME: str = "big-ai-team"
+    API_V1_STR: str = "/api/v1"
+    LOG_LEVEL: str = Field(default="INFO", pattern="^(DEBUG|INFO|WARNING|ERROR|CRITICAL)$")
+
+    # --- 2. 数据库与缓存配置 ---
     DATABASE_URL: str
-    
-    # Redis配置
     REDIS_URL: str
-    
-    # 安全配置
+
+    # --- 3. 安全与认证配置 ---
     SECRET_KEY: str
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
-    
-    # API配置
-    API_V1_STR: str = "/api/v1"
-    PROJECT_NAME: str = "big-ai-team"
-    
-    # 日志配置
-    LOG_LEVEL: str = "INFO"
-    
-    # 外部服务配置
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=30, ge=1, le=1440)
+
+    # --- 4. AI 与 Agent 核心配置 ---
+    # 外部模型 API
     OPENAI_API_KEY: Optional[str] = None
     LANGSMITH_API_KEY: Optional[str] = None
     
-    # 沙箱配置
+    # Agent 行为控制
+    AGENT_MAX_STEPS: int = Field(default=10, ge=1, le=100)  # 允许 Agent 自适应循环的最大次数
+    AGENT_OUTPUT_DIR: str = "output"  # Agent 生成文档的存放路径
+    AGENT_TIMEOUT: int = Field(default=300, ge=30, le=3600)  # 任务强制超时时间 (秒)
+    AGENT_TEMPERATURE: float = Field(default=0.7, ge=0.0, le=1.0)  # 模型采样温度
+    
+    # 沙箱与执行环境
     E2B_API_KEY: Optional[str] = None
-    
-    # 监控配置
+
+    # --- 5. 链路追踪与监控 ---
     OTEL_EXPORTER_OTLP_ENDPOINT: Optional[str] = None
-    
-    class Config:
-        env_file = ".env"
-        case_sensitive = True
+
+    # --- 6. 环境配置 ---
+    ENV_MODE: str = Field(default="development", pattern="^(development|production|test)$")
+    TIMEZONE: str = "Asia/Shanghai"
+
+    # 模型配置
+    DEFAULT_MODEL_NAME: str = "deepseek-chat"
+    OPENAI_MODEL_NAME: str = "gpt-4o-2026"
+    ANTHROPIC_MODEL_NAME: str = "claude-3-5-sonnet-latest"
+    GEMINI_MODEL_NAME: str = "gemini-1.5-pro"
+    DEEPSEEK_MODEL_NAME: str = "deepseek-chat"
+    ZHIPU_MODEL_NAME: str = "glm-4"
+    MOONSHOT_MODEL_NAME: str = "moonshot-v1-128k"
+
+    # 浏览器配置
+    ACE_PRIVACY_MODE: bool = True
+    ALLOWED_DOMAINS: str = "github.com,google.com,wikipedia.org,arxiv.org"
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=True,
+        extra="allow"
+    )
+
+    @field_validator('DATABASE_URL')
+    def validate_database_url(cls, v):
+        if not v:
+            raise ValueError("DATABASE_URL is required")
+        return v
+
+    @field_validator('REDIS_URL')
+    def validate_redis_url(cls, v):
+        if not v:
+            raise ValueError("REDIS_URL is required")
+        return v
+
+    @field_validator('SECRET_KEY')
+    def validate_secret_key(cls, v):
+        if len(v) < 32:
+            raise ValueError("SECRET_KEY must be at least 32 characters long")
+        return v
+
+    # 获取解密后的敏感信息
+    def get_secret(self, key: str) -> Optional[str]:
+        """
+        获取解密后的敏感信息
+        """
+        if secret_manager:
+            return secret_manager.get_secret(key)
+        return getattr(self, key, None)
 
 
-settings = Settings()
+class ConfigManager:
+    """
+    配置管理器，支持配置热重载和版本管理
+    """
+    def __init__(self):
+        # 根据环境变量加载不同的配置文件
+        env_mode = os.environ.get("ENV_MODE", "development")
+        env_file = f".env.{env_mode}"
+        
+        # 如果环境特定配置文件不存在，使用默认配置文件
+        if not Path(env_file).exists():
+            env_file = ".env"
+        
+        self._env_file = Path(env_file)
+        self._settings = self._load_settings()
+        self._last_load_time = time.time()
+        self._config_file_mtime = self._env_file.stat().st_mtime if self._env_file.exists() else 0
+
+    def _load_settings(self) -> Settings:
+        """
+        加载配置
+        """
+        # 临时设置环境变量，指定配置文件
+        os.environ["PYDANTIC_SETTINGS_ENV_FILE"] = str(self._env_file)
+        return Settings()
+
+    def get_settings(self) -> Settings:
+        """
+        获取配置，支持热重载
+        """
+        # 检查配置文件是否被修改
+        if self._env_file.exists():
+            current_mtime = self._env_file.stat().st_mtime
+            if current_mtime > self._config_file_mtime:
+                self._settings = self._load_settings()
+                self._config_file_mtime = current_mtime
+                self._last_load_time = time.time()
+                print(f"📝 配置文件已更新，重新加载配置 (版本: {self._settings.CONFIG_VERSION})")
+        return self._settings
+
+    def get_config_version(self) -> str:
+        """
+        获取配置版本
+        """
+        return self.get_settings().CONFIG_VERSION
+
+    def export_config(self, path: str) -> None:
+        """
+        导出配置到文件
+        """
+        config_dict = self.get_settings().model_dump()
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(config_dict, f, indent=2, ensure_ascii=False)
+        print(f"📤 配置已导出到 {path}")
+
+    def import_config(self, path: str) -> None:
+        """
+        从文件导入配置
+        """
+        if not Path(path).exists():
+            raise FileNotFoundError(f"配置文件 {path} 不存在")
+        
+        with open(path, "r", encoding="utf-8") as f:
+            config_dict = json.load(f)
+        
+        # 更新环境变量
+        for key, value in config_dict.items():
+            if value is not None:
+                os.environ[key] = str(value)
+        
+        # 重新加载配置
+        self._settings = self._load_settings()
+        self._last_load_time = time.time()
+        print(f"📥 配置已从 {path} 导入")
+
+
+# 实例化配置管理器
+config_manager = ConfigManager()
+
+# 获取配置实例
+settings = config_manager.get_settings()
+
+# 自动创建 Agent 输出目录
+if not os.path.exists(settings.AGENT_OUTPUT_DIR):
+    os.makedirs(settings.AGENT_OUTPUT_DIR)
+    print(f"📁 已创建 Agent 工作目录: {settings.AGENT_OUTPUT_DIR}")
