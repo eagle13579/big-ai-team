@@ -31,7 +31,7 @@ class SecretManager:
                 f.write(key)
             # 设置文件权限，仅允许当前用户访问
             self.key_file.chmod(0o600)
-            print(f"🔑 生成新的密钥文件: {self.key_file}")
+            print(f"[密钥] 生成新的密钥文件: {self.key_file}")
             return key
 
     def encrypt(self, plaintext: str) -> str:
@@ -61,7 +61,7 @@ class SecretManager:
         with open(output_file, "w", encoding="utf-8") as f:
             f.write(encrypted_content)
         
-        print(f"🔒 文件已加密: {input_file} -> {output_file}")
+        print(f"[加密] 文件已加密: {input_file} -> {output_file}")
 
     def decrypt_file(self, input_file: str, output_file: str):
         """
@@ -75,7 +75,7 @@ class SecretManager:
         with open(output_file, "w", encoding="utf-8") as f:
             f.write(decrypted_content)
         
-        print(f"🔓 文件已解密: {input_file} -> {output_file}")
+        print(f"[解密] 文件已解密: {input_file} -> {output_file}")
 
     def encrypt_env_file(self, input_file: str, output_file: str):
         """
