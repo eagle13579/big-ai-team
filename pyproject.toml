@@ -3,6 +3,7 @@ name = "big-ai-team"
 version = "0.1.0"
 description = "2026年AI智能体架构项目"
 authors = ["Your Name <your.email@example.com>"]
+package-mode = false
 readme = "README.md"
 
 [tool.poetry.dependencies]
@@ -17,8 +18,10 @@ alembic = "^1.13.0"
 python-dotenv = "^1.0.0"
 uvicorn = "^0.24.0"
 httpx = "^0.25.0"
-jose = "^3.3.0"
+python-jose = "^3.3.0"
 python-multipart = "^0.0.6"
+agno = "^2.5.14"
+aiohttp = "^3.13.5"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"

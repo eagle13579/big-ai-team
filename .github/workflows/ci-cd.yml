@@ -1,0 +1,53 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, "feature/**" ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    # 核心配置：解决 Pydantic 验证报错
+    env:
+      PYTHONPATH: .
+      LOG_DIR: logs
+      # 修复：SECRET_KEY 必须 > 32 位
+      SECRET_KEY: ci_test_secret_key_fixed_value_at_least_32_chars_long
+      # 修复：提供默认的测试数据库和 Redis 地址，防止 ValidationError
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+      REDIS_URL: redis://localhost:6379/0
+      OPENAI_API_KEY: sk-dummy-key-for-ci
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root
+
+      - name: Run tests
+        run: |
+          mkdir -p logs
+          # 使用 pytest 执行所有测试，-v 显示详细进度
+          poetry run pytest tests/ -v
