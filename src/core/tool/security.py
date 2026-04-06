@@ -76,6 +76,9 @@ class SecurityManager:
                 return False
         return True
 
+# 创建全局安全管理器实例
+security_manager = SecurityManager()
+
 class SecureSandbox:
     """ 
     安全沙箱：具备物理隔离与资源限制 
@@ -133,6 +136,3 @@ class SecureSandbox:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.cleanup()
-
-# 创建全局安全管理器实例
-security_manager = SecurityManager()
