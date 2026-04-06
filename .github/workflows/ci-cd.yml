@@ -9,10 +9,15 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    # 核心配置：解决 Pydantic 验证报错
     env:
       PYTHONPATH: .
       LOG_DIR: logs
-      SECRET_KEY: ci_test_secret_key_fixed_value
+      # 修复：SECRET_KEY 必须 > 32 位
+      SECRET_KEY: ci_test_secret_key_fixed_value_at_least_32_chars_long
+      # 修复：提供默认的测试数据库和 Redis 地址，防止 ValidationError
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+      REDIS_URL: redis://localhost:6379/0
       OPENAI_API_KEY: sk-dummy-key-for-ci
 
     steps:
@@ -32,7 +37,7 @@ jobs:
 
       - name: Load cached venv
         id: cached-poetry-dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: .venv
           key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
@@ -44,4 +49,5 @@ jobs:
       - name: Run tests
         run: |
           mkdir -p logs
+          # 使用 pytest 执行所有测试，-v 显示详细进度
           poetry run pytest tests/ -v
