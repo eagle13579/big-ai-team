@@ -2,176 +2,46 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, "feature/**" ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
-<<<<<<< New base: refactor
-<<<<<<< New base: fea/log
-||||||| Common ancestor
-    # 在这里统一设置测试环境所需的默认变量
     env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
-      REDIS_URL: redis://localhost:6379/0
-      SECRET_KEY: ci_test_secret_key_fixed_value
-      # 如果你的 LLM 集成也需要 API Key 才能启动，建议也加一个模拟值
-      OPENAI_API_KEY: sk-dummy-key-for-ci
-
-=======
-    # 配置测试环境所需的默认环境变量
-||||||| Common ancestor
-    # 配置测试环境所需的默认环境变量
-=======
->>>>>>> Current commit: refactor
-    env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
-      REDIS_URL: redis://localhost:6379/0
-      SECRET_KEY: ci_test_secret_key_fixed_value_long_32_chars
-      OPENAI_API_KEY: sk-dummy-key-for-ci
-      # 核心修复：设置 PYTHONPATH 确保项目根目录下的模块（如 shared）能被找到
       PYTHONPATH: .
+      LOG_DIR: logs
+      SECRET_KEY: ci_test_secret_key_fixed_value
+      OPENAI_API_KEY: sk-dummy-key-for-ci
 
->>>>>>> Current commit: fea/log
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out repository
+        uses: actions/checkout@v4
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-<<<<<<< New base: refactor
-<<<<<<< New base: fea/log
-||||||| Common ancestor
-          # 开启缓存可以显著提升后续 CI 速度
-||||||| Common ancestor
-=======
-          # 使用缓存加快构建速度
->>>>>>> Current commit: refactor
-          cache: 'pip'
 
-=======
-          cache: 'pip'
-
->>>>>>> Current commit: fea/log
       - name: Install Poetry
-        run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v3
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+
       - name: Install dependencies
-<<<<<<< New base: refactor
-        run: poetry install
-||||||| Common ancestor
-        run: poetry install
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root
 
-=======
-        # 核心修复：添加 --no-interaction 提高 CI 稳定性
-        run: poetry install --no-interaction
-
->>>>>>> Current commit: refactor
       - name: Run tests
-<<<<<<< New base: refactor
-<<<<<<< New base: fea/log
-||||||| Common ancestor
-        # 即使某些测试跳过，也建议继续运行后续的 Lint 检查
-=======
-        # 核心业务逻辑测试
->>>>>>> Current commit: fea/log
-        run: poetry run pytest
-||||||| Common ancestor
-        # 核心业务逻辑测试
-        run: poetry run pytest
-
-=======
-        # 运行核心业务逻辑测试
-        run: poetry run pytest tests/unit/test_loop_self_heal.py
-
->>>>>>> Current commit: refactor
-      - name: Run lint
-<<<<<<< New base: fea/log
-        run: poetry run flake8
-||||||| Common ancestor
-        if: always() # 确保即使测试失败，也能看到代码风格错误
-        run: poetry run flake8
-
-=======
-        if: always()
-        # 核心修复：如果没装 flake8，会自动尝试安装并运行，避免 Command not found
         run: |
-          pip install flake8
-          flake8 . --exit-zero
-
->>>>>>> Current commit: fea/log
-      - name: Run type check
-<<<<<<< New base: fea/log
-        run: poetry run mypy
-||||||| Common ancestor
-        if: always()
-        run: poetry run mypy .
-=======
-        if: always()
-<<<<<<< New base: refactor
-        # 修复：使用 || true 允许类型检查不通过时继续执行，避免 226 个错误阻塞构建
-        run: poetry run mypy . || true
->>>>>>> Current commit: fea/log
-||||||| Common ancestor
-        # 修复：使用 || true 允许类型检查不通过时继续执行，避免 226 个错误阻塞构建
-        run: poetry run mypy . || true
-=======
-        # 允许类型检查不通过时继续执行，避免阻塞流程
-        run: |
-          pip install mypy
-          mypy . || true
->>>>>>> Current commit: refactor
-
-  build:
-    needs: test
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
-    steps:
-      - uses: actions/checkout@v4
-<<<<<<< New base: refactor
-||||||| Common ancestor
-      
-=======
-
->>>>>>> Current commit: refactor
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-<<<<<<< New base: refactor
-||||||| Common ancestor
-        
-=======
-
->>>>>>> Current commit: refactor
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-<<<<<<< New base: refactor
-||||||| Common ancestor
-          
-=======
-
->>>>>>> Current commit: refactor
-      - name: Build and push
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: |
-            yourusername/ace-agent:${{ github.ref_name }}
-            yourusername/ace-agent:latest
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    steps:
-      - uses: actions/checkout@v4
-      - name: Deploy to production
-        run: |
-          # 这里可以添加部署脚本，例如使用 SSH 连接到服务器并部署
-          echo "Deploying to production..."
+          mkdir -p logs
+          poetry run pytest tests/ -v
