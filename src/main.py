@@ -15,13 +15,22 @@ from execution.executor import ToolExecutor
 from workflow.loop import ExecutionLoop
 
 # --- 1. 配置生产级日志系统 ---
+import os
+
+# 创建日志目录
+LOG_DIR = "logs"
+os.makedirs(LOG_DIR, exist_ok=True)
+
+# 配置日志
 logging.basicConfig(
     level=getattr(logging, settings.LOG_LEVEL, logging.INFO),
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.StreamHandler(sys.stdout),
-        # 如果需要持久化日志，可以取消下行注释
-        # logging.FileHandler(f"agent_{datetime.now().strftime('%Y%m%d')}.log")
+        logging.StreamHandler(sys.stdout),  # 控制台输出
+        logging.FileHandler(
+            os.path.join(LOG_DIR, f"agent_{datetime.now().strftime('%Y%m%d')}.log"),
+            encoding='utf-8'  # 指定 UTF-8 编码，解决中文乱码问题
+        )  # 文件输出
     ]
 )
 logger = logging.getLogger("AceAgent.Main")

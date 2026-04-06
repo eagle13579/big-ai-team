@@ -1,9 +1,15 @@
-import logging
 import asyncio
 import json
 import os
-from typing import List, Dict, Any, Optional
+import logging
+from typing import Dict, Any, List, Optional
 from datetime import datetime
+
+# 配置日志
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 from pathlib import Path
 
 # 导入配置，用于控制最大步数等参数
