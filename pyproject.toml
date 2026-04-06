@@ -22,6 +22,7 @@ python-jose = "^3.3.0"
 python-multipart = "^0.0.6"
 agno = "^2.5.14"
 aiohttp = "^3.13.5"
+loguru = "^0.7.3"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"
