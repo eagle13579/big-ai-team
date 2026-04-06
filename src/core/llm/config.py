@@ -25,6 +25,7 @@ class LLMConfig(BaseSettings):
     class Config:
         env_file = ".env"
         env_prefix = "LLM_"
+        extra = "ignore"  # 忽略额外的环境变量
 
 
 class LLMProviderConfig(BaseSettings):
