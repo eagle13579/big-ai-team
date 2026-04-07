@@ -150,3 +150,6 @@ __pycache__/
 *.idx
 # 敏感的日志与追踪
 .langsmith/
+docs/
+*.md
+
