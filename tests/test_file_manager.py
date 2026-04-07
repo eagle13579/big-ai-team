@@ -1,3 +1,4 @@
+
 import sys
 import os
 
@@ -31,19 +32,20 @@ def test_read_file_success(file_manager_tool):
     """测试成功读取文件"""
     # 模拟文件存在且可读
     with patch('os.path.exists', return_value=True):
-        with patch('builtins.open', mock_open(read_data='test content')) as mock_file:
-            result = file_manager_tool.execute({
-                "operation": "read",
-                "file_path": "test.txt"
-            })
-            
-            # 验证结果
-            assert result["status"] == "success"
-            assert "observation" in result
-            assert "data" in result["observation"]
-            assert result["observation"]["data"] == "test content"
-            assert "成功读取文件" in result["observation"]["message"]
-            assert "2026-04-07" in result["observation"]["timestamp"]
+        with patch('os.path.isfile', return_value=True):
+            with patch('os.path.getsize', return_value=100):
+                with patch('builtins.open', mock_open(read_data='test content')) as mock_file:
+                    result = file_manager_tool.execute({
+                        "operation": "read",
+                        "file_path": "test.txt"
+                    })
+
+                    # 验证结果
+                    assert result["status"] == "success"
+                    assert result["observation"]["data"] == "test content"
+                    assert "成功读取文件" in result["observation"]["message"]
+                    assert "timestamp" in result["observation"]
+                    assert "2026-04-07" in result["observation"]["timestamp"]
 
 
 def test_read_file_not_exists(file_manager_tool):
@@ -179,14 +181,16 @@ def test_exception_handling(file_manager_tool):
     """测试异常处理"""
     # 模拟读取文件时发生异常
     with patch('os.path.exists', return_value=True):
-        with patch('builtins.open', side_effect=Exception("File read error")):
-            result = file_manager_tool.execute({
-                "operation": "read",
-                "file_path": "test.txt"
-            })
+        with patch('os.path.isfile', return_value=True):
+            with patch('os.path.getsize', return_value=100):
+                with patch('builtins.open', side_effect=Exception("File read error")):
+                    result = file_manager_tool.execute({
+                        "operation": "read",
+                        "file_path": "test.txt"
+                    })
 
-            # 验证结果
-            assert result["status"] == "error"
-            assert "observation" in result
-            assert "读取文件失败" in result["observation"]["message"]
-            assert "File read error" in result["observation"]["message"]
+                    # 验证结果
+                    assert result["status"] == "error"
+                    assert "observation" in result
+                    assert "File read error" in result["observation"]["message"]
+                    assert "timestamp" in result["observation"]

@@ -293,6 +293,7 @@ def test_git_command_error(mock_tool):
 
 def test_security_guard_protected_branch():
     """测试安全防护：操作受保护分支的警告"""
+
     with patch('git.Repo') as mock_repo_class:
         # 创建mock repo实例
         mock_repo = MagicMock()

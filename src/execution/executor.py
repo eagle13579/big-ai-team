@@ -7,7 +7,7 @@ import hashlib
 from typing import Dict, Any, List, Optional, Callable, Awaitable
 from datetime import datetime, timedelta
 from ..shared.config import settings
-from ..skills import skill_registry
+from ..skills import skill_registry, get_all_skills
 
 # 设置日志
 logger = logging.getLogger("AceAgent.Execution")
@@ -87,6 +87,33 @@ class ToolExecutor:
             "delete_file": ["admin"],
             "default": ["admin", "user", "guest"]
         }
+    
+    def _load_skills(self):
+        """加载技能"""
+        try:
+            skills = get_all_skills()
+            for skill_name, skill_class in skills.items():
+                # 根据技能名称创建实例
+                if skill_name == "git_helper":
+                    # GitHelperTool 需要 repo_path 参数
+                    skill_instance = skill_class(repo_path=".")
+                else:
+                    # 其他技能使用默认参数
+                    skill_instance = skill_class()
+                
+                # 包装同步方法为异步
+                def create_async_wrapper(skill):
+                    async def async_execute(args):
+                        loop = asyncio.get_event_loop()
+                        return await loop.run_in_executor(None, skill.execute, args)
+                    return async_execute
+                
+                # 注册技能
+                async_wrapper = create_async_wrapper(skill_instance)
+                self._tool_registry[skill_name] = async_wrapper
+                logger.info(f"🔧 已加载技能: {skill_name}")
+        except Exception as e:
+            logger.error(f"加载技能失败: {str(e)}")
 
     def _ensure_workspace(self):
         """初始化工作目录"""
