@@ -293,6 +293,9 @@ def test_git_command_error(mock_tool):
 
 def test_security_guard_protected_branch():
     """测试安全防护：操作受保护分支的警告"""
+<<<<<<< New base: fix：git_helper
+||||||| Common ancestor
+<<<<<<< New base: fix：ModuleNotFoundError: No module named 'src.skills.git_helper'
     with patch('git.Repo') as mock_repo_class:
         # 创建mock repo实例
         mock_repo = MagicMock()
@@ -347,3 +350,303 @@ def test_invalid_git_repository():
             GitHelperTool(repo_path="/invalid/path")
         
         assert "不是一个有效的 Git 仓库" in str(excinfo.value)
+|||||||
+=======
+import pytest
+from unittest.mock import MagicMock, patch
+from src.skills.git_helper import GitHelperTool, GitAction
+import git
+
+
+@pytest.fixture
+def mock_tool():
+    """创建带有mock的GitHelperTool实例"""
+||||||| Common ancestor
+    tool, mock_repo = mock_tool
+    
+    # 模拟当前分支为main（受保护分支）
+    mock_branch = MagicMock()
+    mock_branch.name = "main"
+    mock_repo.active_branch = mock_branch
+    
+    # 执行push操作
+    result = tool.execute({
+        "action": "push",
+        "remote": "origin",
+        "branch": "main"
+    })
+    
+    # 验证结果
+    assert result["status"] == "success"
+    
+    # 验证安全警告被打印
+    captured = capfd.readouterr()
+    assert "Security Guard" in captured.out
+    assert "protected branch" in captured.out
+    assert "main" in captured.out
+
+
+def test_invalid_git_repository():
+    """测试无效的Git仓库路径"""
+    with patch('git.Repo') as mock_repo_class:
+        # 模拟无效的Git仓库
+        mock_repo_class.side_effect = git.InvalidGitRepositoryError
+        
+        # 验证异常
+        with pytest.raises(Exception) as excinfo:
+            GitHelperTool(repo_path="/invalid/path")
+        
+        assert "不是一个有效的 Git 仓库" in str(excinfo.value)
+|||||||
+=======
+import pytest
+from unittest.mock import MagicMock, patch
+from src.skills.git_helper import GitHelperTool, GitAction
+import git
+
+
+@pytest.fixture
+def mock_tool():
+    """创建带有mock的GitHelperTool实例"""
+=======
+>>>>>>> Current commit: fix：ModuleNotFoundError: No module named 'src.skills.git_helper'
+=======
+<<<<<<< New base: fix：ModuleNotFoundError: No module named 'src.skills.git_helper'
+    with patch('git.Repo') as mock_repo_class:
+        # 创建mock repo实例
+        mock_repo = MagicMock()
+        mock_repo_class.return_value = mock_repo
+        
+        # 模拟active_branch
+        mock_branch = MagicMock()
+        mock_branch.name = "main"
+        mock_repo.active_branch = mock_branch
+        
+        # 模拟commit返回值
+        mock_commit = MagicMock()
+        mock_commit.hexsha = "1234567890abcdef"
+        mock_repo.index = MagicMock()
+        mock_repo.index.commit.return_value = mock_commit
+        
+        # 模拟GitPythonClient的方法
+        class MockGitPythonClient:
+            def __init__(self, repo_path):
+                self.repo = mock_repo
+            
+            def status(self):
+                return {"branch": "main"}
+            
+            def commit(self, message):
+                return {"hexsha": "1234567890abcdef", "message": "提交成功: 1234567"}
+        
+        # 创建工具实例（使用user角色进行测试）
+        tool = GitHelperTool(repo_path="/fake/path", git_client_factory=MockGitPythonClient, user_role="user")
+
+        # 执行commit操作（user角色在受保护分支上执行commit应该被拒绝）
+        result = tool.execute({
+            "action": "commit",
+            "message": "Test commit on main branch"
+        })
+
+        # 验证结果
+        assert result["status"] == "error"
+        assert "observation" in result
+        assert "权限不足" in result["observation"]["message"]
+        assert "main" in result["observation"]["message"]
+
+
+def test_invalid_git_repository():
+    """测试无效的Git仓库路径"""
+    with patch('git.Repo') as mock_repo_class:
+        # 模拟无效的Git仓库
+        mock_repo_class.side_effect = git.InvalidGitRepositoryError
+        
+        # 验证异常
+        with pytest.raises(Exception) as excinfo:
+            GitHelperTool(repo_path="/invalid/path")
+        
+        assert "不是一个有效的 Git 仓库" in str(excinfo.value)
+<<<<<<< New base: fix：git_helper
+|||||||
+=======
+import pytest
+from unittest.mock import MagicMock, patch
+from src.skills.git_helper import GitHelperTool, GitAction
+import git
+
+
+@pytest.fixture
+def mock_tool():
+    """创建带有mock的GitHelperTool实例"""
+||||||| Common ancestor
+    tool, mock_repo = mock_tool
+    
+    # 模拟当前分支为main（受保护分支）
+    mock_branch = MagicMock()
+    mock_branch.name = "main"
+    mock_repo.active_branch = mock_branch
+    
+    # 执行push操作
+    result = tool.execute({
+        "action": "push",
+        "remote": "origin",
+        "branch": "main"
+    })
+    
+    # 验证结果
+    assert result["status"] == "success"
+    
+    # 验证安全警告被打印
+    captured = capfd.readouterr()
+    assert "Security Guard" in captured.out
+    assert "protected branch" in captured.out
+    assert "main" in captured.out
+
+
+def test_invalid_git_repository():
+    """测试无效的Git仓库路径"""
+    with patch('git.Repo') as mock_repo_class:
+        # 模拟无效的Git仓库
+        mock_repo_class.side_effect = git.InvalidGitRepositoryError
+        
+        # 验证异常
+        with pytest.raises(Exception) as excinfo:
+            GitHelperTool(repo_path="/invalid/path")
+        
+        assert "不是一个有效的 Git 仓库" in str(excinfo.value)
+|||||||
+=======
+import pytest
+from unittest.mock import MagicMock, patch
+from src.skills.git_helper import GitHelperTool, GitAction
+import git
+
+
+@pytest.fixture
+def mock_tool():
+    """创建带有mock的GitHelperTool实例"""
+=======
+>>>>>>> Current commit: fix：ModuleNotFoundError: No module named 'src.skills.git_helper'
+>>>>>>> Current commit: fix：git_helper
+    with patch('git.Repo') as mock_repo_class:
+        # 创建mock repo实例
+        mock_repo = MagicMock()
+        mock_repo_class.return_value = mock_repo
+        
+        # 模拟active_branch
+        mock_branch = MagicMock()
+        mock_branch.name = "main"
+        mock_repo.active_branch = mock_branch
+        
+        # 模拟commit返回值
+        mock_commit = MagicMock()
+        mock_commit.hexsha = "1234567890abcdef"
+        mock_repo.index = MagicMock()
+        mock_repo.index.commit.return_value = mock_commit
+        
+        # 模拟GitPythonClient的方法
+        class MockGitPythonClient:
+            def __init__(self, repo_path):
+                self.repo = mock_repo
+            
+            def status(self):
+                return {"branch": "main"}
+            
+            def commit(self, message):
+                return {"hexsha": "1234567890abcdef", "message": "提交成功: 1234567"}
+        
+        # 创建工具实例（使用user角色进行测试）
+        tool = GitHelperTool(repo_path="/fake/path", git_client_factory=MockGitPythonClient, user_role="user")
+
+        # 执行commit操作（user角色在受保护分支上执行commit应该被拒绝）
+        result = tool.execute({
+            "action": "commit",
+            "message": "Test commit on main branch"
+        })
+
+        # 验证结果
+        assert result["status"] == "error"
+        assert "observation" in result
+        assert "权限不足" in result["observation"]["message"]
+        assert "main" in result["observation"]["message"]
+
+
+def test_invalid_git_repository():
+    """测试无效的Git仓库路径"""
+    with patch('git.Repo') as mock_repo_class:
+        # 模拟无效的Git仓库
+        mock_repo_class.side_effect = git.InvalidGitRepositoryError
+        
+        # 验证异常
+        with pytest.raises(Exception) as excinfo:
+            GitHelperTool(repo_path="/invalid/path")
+        
+        assert "不是一个有效的 Git 仓库" in str(excinfo.value)
+||||||| Common ancestor
+|||||||
+=======
+import pytest
+from unittest.mock import MagicMock, patch
+from src.skills.git_helper import GitHelperTool, GitAction
+import git
+
+
+@pytest.fixture
+def mock_tool():
+    """创建带有mock的GitHelperTool实例"""
+    with patch('git.Repo') as mock_repo_class:
+        # 创建mock repo实例
+        mock_repo = MagicMock()
+        mock_repo_class.return_value = mock_repo
+        
+        # 模拟active_branch
+        mock_branch = MagicMock()
+        mock_branch.name = "main"
+        mock_repo.active_branch = mock_branch
+        
+        # 模拟commit返回值
+        mock_commit = MagicMock()
+        mock_commit.hexsha = "1234567890abcdef"
+        mock_repo.index = MagicMock()
+        mock_repo.index.commit.return_value = mock_commit
+        
+        # 模拟GitPythonClient的方法
+        class MockGitPythonClient:
+            def __init__(self, repo_path):
+                self.repo = mock_repo
+            
+            def status(self):
+                return {"branch": "main"}
+            
+            def commit(self, message):
+                return {"hexsha": "1234567890abcdef", "message": "提交成功: 1234567"}
+        
+        # 创建工具实例（使用user角色进行测试）
+        tool = GitHelperTool(repo_path="/fake/path", git_client_factory=MockGitPythonClient, user_role="user")
+
+        # 执行commit操作（user角色在受保护分支上执行commit应该被拒绝）
+        result = tool.execute({
+            "action": "commit",
+            "message": "Test commit on main branch"
+        })
+
+        # 验证结果
+        assert result["status"] == "error"
+        assert "observation" in result
+        assert "权限不足" in result["observation"]["message"]
+        assert "main" in result["observation"]["message"]
+
+
+def test_invalid_git_repository():
+    """测试无效的Git仓库路径"""
+    with patch('git.Repo') as mock_repo_class:
+        # 模拟无效的Git仓库
+        mock_repo_class.side_effect = git.InvalidGitRepositoryError
+        
+        # 验证异常
+        with pytest.raises(Exception) as excinfo:
+            GitHelperTool(repo_path="/invalid/path")
+        
+        assert "不是一个有效的 Git 仓库" in str(excinfo.value)
+=======
+>>>>>>> Current commit: fix：git_helper
