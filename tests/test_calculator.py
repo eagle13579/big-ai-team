@@ -133,3 +133,4 @@ def test_exception_handling(calculator_tool):
     assert result["status"] == "error"
     assert "observation" in result
     assert "操作数必须是数字" in result["observation"]["message"]
+

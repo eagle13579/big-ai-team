@@ -1,5 +1,6 @@
 import uuid
 import logging
+import os
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from typing import Optional, Dict, Any

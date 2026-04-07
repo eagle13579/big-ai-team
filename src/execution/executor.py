@@ -8,6 +8,7 @@ from typing import Dict, Any, List, Optional, Callable, Awaitable
 from datetime import datetime, timedelta
 from ..shared.config import settings
 from ..skills import skill_registry, get_all_skills
+from ..skills import skill_registry
 
 # 设置日志
 logger = logging.getLogger("AceAgent.Execution")
@@ -70,6 +71,9 @@ class ToolExecutor:
             "delete_file": self._delete_file,
             "get_system_status": self._get_system_status
         }
+        
+        # 加载技能
+        self._load_skills()
         
         # 速率限制器
         self._rate_limiters = {

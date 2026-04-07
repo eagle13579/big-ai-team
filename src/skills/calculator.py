@@ -1,5 +1,7 @@
 from typing import Dict, Any, Callable
 from pydantic import BaseModel, Field, field_validator
+from typing import Dict, Any, Type
+from pydantic import BaseModel, Field
 from src.shared.base import BaseSkill
 import math
 
@@ -203,3 +205,4 @@ class CalculatorTool(BaseSkill):
             "power": "^"
         }
         return symbols.get(operation, operation)
+
