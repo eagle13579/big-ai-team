@@ -1,10 +1,4 @@
-<<<<<<< New base: fix：ModuleNotFoundError: No module named 'src.skills.git_helper'
-<<<<<<< New base: GitHelperTool
-<<<<<<< New base: fix：ModuleNotFoundError: No module named 'src.skills.git_helper'
-||||||| Common ancestor
-=======
-<<<<<<< New base: GitHelperTool
->>>>>>> Current commit: GitHelperTool
+
 import sys
 import os
 
@@ -300,9 +294,7 @@ def test_git_command_error(mock_tool):
 
 def test_security_guard_protected_branch():
     """测试安全防护：操作受保护分支的警告"""
-<<<<<<< New base: fix：git_helper
-||||||| Common ancestor
-<<<<<<< New base: fix：ModuleNotFoundError: No module named 'src.skills.git_helper'
+
     with patch('git.Repo') as mock_repo_class:
         # 创建mock repo实例
         mock_repo = MagicMock()
@@ -357,69 +349,7 @@ def test_invalid_git_repository():
             GitHelperTool(repo_path="/invalid/path")
         
         assert "不是一个有效的 Git 仓库" in str(excinfo.value)
-<<<<<<< New base: GitHelperTool
-|||||||
-=======
-import pytest
-from unittest.mock import MagicMock, patch
-from src.skills.git_helper import GitHelperTool, GitAction
-import git
 
-
-@pytest.fixture
-def mock_tool():
-    """创建带有mock的GitHelperTool实例"""
-||||||| Common ancestor
-    tool, mock_repo = mock_tool
-    
-    # 模拟当前分支为main（受保护分支）
-    mock_branch = MagicMock()
-    mock_branch.name = "main"
-    mock_repo.active_branch = mock_branch
-    
-    # 执行push操作
-    result = tool.execute({
-        "action": "push",
-        "remote": "origin",
-        "branch": "main"
-    })
-    
-    # 验证结果
-    assert result["status"] == "success"
-    
-    # 验证安全警告被打印
-    captured = capfd.readouterr()
-    assert "Security Guard" in captured.out
-    assert "protected branch" in captured.out
-    assert "main" in captured.out
-
-
-def test_invalid_git_repository():
-    """测试无效的Git仓库路径"""
-    with patch('git.Repo') as mock_repo_class:
-        # 模拟无效的Git仓库
-        mock_repo_class.side_effect = git.InvalidGitRepositoryError
-        
-        # 验证异常
-        with pytest.raises(Exception) as excinfo:
-            GitHelperTool(repo_path="/invalid/path")
-        
-        assert "不是一个有效的 Git 仓库" in str(excinfo.value)
-|||||||
-=======
-import pytest
-from unittest.mock import MagicMock, patch
-from src.skills.git_helper import GitHelperTool, GitAction
-import git
-
-
-@pytest.fixture
-def mock_tool():
-    """创建带有mock的GitHelperTool实例"""
-=======
->>>>>>> Current commit: fix：ModuleNotFoundError: No module named 'src.skills.git_helper'
-=======
-<<<<<<< New base: fix：ModuleNotFoundError: No module named 'src.skills.git_helper'
     with patch('git.Repo') as mock_repo_class:
         # 创建mock repo实例
         mock_repo = MagicMock()
@@ -474,68 +404,7 @@ def test_invalid_git_repository():
             GitHelperTool(repo_path="/invalid/path")
         
         assert "不是一个有效的 Git 仓库" in str(excinfo.value)
-<<<<<<< New base: fix：git_helper
-|||||||
-=======
-import pytest
-from unittest.mock import MagicMock, patch
-from src.skills.git_helper import GitHelperTool, GitAction
-import git
 
-
-@pytest.fixture
-def mock_tool():
-    """创建带有mock的GitHelperTool实例"""
-||||||| Common ancestor
-    tool, mock_repo = mock_tool
-    
-    # 模拟当前分支为main（受保护分支）
-    mock_branch = MagicMock()
-    mock_branch.name = "main"
-    mock_repo.active_branch = mock_branch
-    
-    # 执行push操作
-    result = tool.execute({
-        "action": "push",
-        "remote": "origin",
-        "branch": "main"
-    })
-    
-    # 验证结果
-    assert result["status"] == "success"
-    
-    # 验证安全警告被打印
-    captured = capfd.readouterr()
-    assert "Security Guard" in captured.out
-    assert "protected branch" in captured.out
-    assert "main" in captured.out
-
-
-def test_invalid_git_repository():
-    """测试无效的Git仓库路径"""
-    with patch('git.Repo') as mock_repo_class:
-        # 模拟无效的Git仓库
-        mock_repo_class.side_effect = git.InvalidGitRepositoryError
-        
-        # 验证异常
-        with pytest.raises(Exception) as excinfo:
-            GitHelperTool(repo_path="/invalid/path")
-        
-        assert "不是一个有效的 Git 仓库" in str(excinfo.value)
-|||||||
-=======
-import pytest
-from unittest.mock import MagicMock, patch
-from src.skills.git_helper import GitHelperTool, GitAction
-import git
-
-
-@pytest.fixture
-def mock_tool():
-    """创建带有mock的GitHelperTool实例"""
-=======
->>>>>>> Current commit: fix：ModuleNotFoundError: No module named 'src.skills.git_helper'
->>>>>>> Current commit: fix：git_helper
     with patch('git.Repo') as mock_repo_class:
         # 创建mock repo实例
         mock_repo = MagicMock()
@@ -590,9 +459,7 @@ def test_invalid_git_repository():
             GitHelperTool(repo_path="/invalid/path")
         
         assert "不是一个有效的 Git 仓库" in str(excinfo.value)
-||||||| Common ancestor
-|||||||
-=======
+
 import pytest
 from unittest.mock import MagicMock, patch
 from src.skills.git_helper import GitHelperTool, GitAction
@@ -656,14 +523,7 @@ def test_invalid_git_repository():
             GitHelperTool(repo_path="/invalid/path")
         
         assert "不是一个有效的 Git 仓库" in str(excinfo.value)
-=======
->>>>>>> Current commit: fix：git_helper
-|||||||
-=======
-||||||| Common ancestor
-<<<<<<< New base: GitHelperTool
-=======
->>>>>>> Current commit: fix：ModuleNotFoundError: No module named 'src.skills.git_helper'
+
 import sys
 import os
 
@@ -959,7 +819,7 @@ def test_git_command_error(mock_tool):
 
 def test_security_guard_protected_branch():
     """测试安全防护：操作受保护分支的警告"""
-<<<<<<< New base: fix：ModuleNotFoundError: No module named 'src.skills.git_helper'
+
     with patch('git.Repo') as mock_repo_class:
         # 创建mock repo实例
         mock_repo = MagicMock()
@@ -1014,11 +874,7 @@ def test_invalid_git_repository():
             GitHelperTool(repo_path="/invalid/path")
         
         assert "不是一个有效的 Git 仓库" in str(excinfo.value)
->>>>>>> Current commit: fix：ModuleNotFoundError: No module named 'src.skills.git_helper'
-||||||| Common ancestor
-=======
-|||||||
-=======
+
 import pytest
 from unittest.mock import MagicMock, patch
 from src.skills.git_helper import GitHelperTool, GitAction
@@ -1028,7 +884,7 @@ import git
 @pytest.fixture
 def mock_tool():
     """创建带有mock的GitHelperTool实例"""
-||||||| Common ancestor
+
     tool, mock_repo = mock_tool
     
     # 模拟当前分支为main（受保护分支）
@@ -1064,14 +920,7 @@ def test_invalid_git_repository():
             GitHelperTool(repo_path="/invalid/path")
         
         assert "不是一个有效的 Git 仓库" in str(excinfo.value)
-<<<<<<< New base: fix：ModuleNotFoundError: No module named 'src.skills.git_helper'
->>>>>>> Current commit: GitHelperTool
->>>>>>> Current commit: GitHelperTool
-||||||| Common ancestor
->>>>>>> Current commit: GitHelperTool
-=======
-|||||||
-=======
+
 import pytest
 from unittest.mock import MagicMock, patch
 from src.skills.git_helper import GitHelperTool, GitAction
@@ -1081,8 +930,7 @@ import git
 @pytest.fixture
 def mock_tool():
     """创建带有mock的GitHelperTool实例"""
-=======
->>>>>>> Current commit: fix：ModuleNotFoundError: No module named 'src.skills.git_helper'
+
     with patch('git.Repo') as mock_repo_class:
         # 创建mock repo实例
         mock_repo = MagicMock()
@@ -1137,4 +985,4 @@ def test_invalid_git_repository():
             GitHelperTool(repo_path="/invalid/path")
         
         assert "不是一个有效的 Git 仓库" in str(excinfo.value)
->>>>>>> Current commit: fix：ModuleNotFoundError: No module named 'src.skills.git_helper'
+

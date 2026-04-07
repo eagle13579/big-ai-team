@@ -142,6 +142,7 @@ vite.config.ts.timestamp-*
 .env
 .venv/
 __pycache__/
+__pycache__/
 *.pyc
 .trae/
 .gitbutler/

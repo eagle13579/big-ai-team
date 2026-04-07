@@ -55,17 +55,17 @@ def safe_json_loads(data: str) -> Optional[Dict[str, Any]]:
 
 
 def sanitize_path(path: str) -> str:
-    """
-    安全处理路径，防止路径穿越攻击
-
+    """安全处理路径
+    
     Args:
         path: 原始路径
-
+    
     Returns:
-        str: 安全处理后的路径
+        安全处理后的路径
     """
-    # 移除路径中的..和其他危险字符
-    path = path.replace("..", "")
+    import os
     # 规范化路径
     path = os.path.normpath(path)
+    # 移除路径中的危险字符
+    path = path.replace('..', '')
     return path
