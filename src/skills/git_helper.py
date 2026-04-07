@@ -14,11 +14,13 @@ logger = logging.getLogger("AceAgent.GitHelper")
 try:
     from src.shared.base import BaseSkill
     from src.shared.utils import sanitize_path
+    from src.execution.sandbox import SecurityManager
 except ImportError:
     # 兼容重构后可能的路径变化
     try:
         from shared.base import BaseSkill
         from shared.utils import sanitize_path
+        from execution.sandbox import SecurityManager
     except ImportError:
         # 如果依然找不到，定义占位符以防止代码崩溃
         class BaseSkill:
@@ -26,6 +28,13 @@ except ImportError:
                 from datetime import datetime
                 return datetime.now().isoformat() + "Z"
         def sanitize_path(p): return p
+        class SecurityManager:
+            def __init__(self, repo_path, protected_branches=None, permission_matrix=None):
+                pass
+            def check_permission(self, action, user_role, branch):
+                return True
+            def validate_input(self, files):
+                return True
 
 # 尝试导入 GitPython
 try:
@@ -59,6 +68,7 @@ class GitRepositoryError(GitHelperError):
     """Git 仓库错误"""
     pass
 
+
 class GitAction(str, Enum):
     """Git 操作类型枚举"""
     STATUS = "status"
@@ -78,6 +88,7 @@ class GitAction(str, Enum):
     HOOKS_READ = "hooks_read"
     HOOKS_WRITE = "hooks_write"
     HOOKS_DELETE = "hooks_delete"
+
 
 class GitArgsSchema(BaseModel):
     """Git 操作的参数校验架构"""
@@ -110,6 +121,7 @@ class GitArgsSchema(BaseModel):
         if action == GitAction.HOOKS_WRITE and not values.get('hook_content'):
             raise ValueError("执行 hooks_write 操作时必须提供钩子内容")
         return values
+
 
 class GitInterface:
     """Git 操作的抽象接口"""
@@ -164,6 +176,7 @@ class GitInterface:
     def hooks_delete(self, hook_name: str) -> Dict[str, Any]:
         """删除钩子"""
         raise NotImplementedError
+
 
 class GitPythonClient(GitInterface):
     """使用 GitPython 实现的 Git 客户端"""
@@ -357,6 +370,7 @@ class GitPythonClient(GitInterface):
         except Exception as e:
             return {"data": None, "message": f"删除钩子失败: {str(e)}"}
 
+
 class SecurityManager:
     """Git 操作的安全管理器"""
     def __init__(self, repo_path: str, protected_branches: Optional[List[str]] = None, permission_matrix: Optional[Dict[str, List[str]]] = None):
@@ -401,6 +415,7 @@ class SecurityManager:
                     if not os.path.abspath(file_path).startswith(os.path.abspath(self.repo_path)):
                         raise GitValidationError(f"文件路径不在仓库内: {file_path}")
         return True
+
 
 class GitHelperTool(BaseSkill):
     """
@@ -903,221 +918,6 @@ class GitHelperTool(BaseSkill):
             return {
                 "data": None,
                 "message": f"合并操作失败: {str(e)}"
-9 conflicting files
-executor.py
-src/execution/executor.py
-base.py
-src/shared/base.py
-utils.py
-src/shared/utils.py
-__init__.py
-src/skills/__init__.py
-calculator.py
-src/skills/calculator.py
-git_helper.py
-src/skills/git_helper.py
-test_calculator.py
-tests/test_calculator.py
-test_file_manager.py
-tests/test_file_manager.py
-test_git_helper.py
-tests/test_git_helper.py
-src/skills/git_helper.py1 conflict 
-  
-891
- 
-            }
-892
- 
-​
-893
- 
-    def _merge(self, branch: str) -> Dict[str, Any]:
-894
- 
-        """合并分支"""
-895
- 
-        logger.info(f"合并分支: {branch}")
-896
- 
-        try:
-897
- 
-            result = self.git_client.merge(branch)
-898
- 
-            # 清除状态缓存
-899
- 
-            self._clear_status_cache()
-900
- 
-            logger.info(f"成功合并分支: {result['message']}")
-901
- 
-            return result
-902
- 
-        except Exception as e:
-903
- 
-            logger.error(f"合并分支失败: {str(e)}")
-904
- 
-            return {
-905
- 
-                "data": None,
-906
- 
-                "message": f"合并操作失败: {str(e)}"
-907
- 
-            }
-908
- 
-​
-909
- 
-    def _stash(self, message: Optional[str]) -> Dict[str, Any]:
-910
- 
-        """暂存更改"""
-911
- 
-        logger.info(f"暂存更改: {message[:50]}...")
-912
- 
-        try:
-913
- 
-            result = self.git_client.stash(message)
-914
- 
-            # 清除状态缓存
-915
- 
-            self._clear_status_cache()
-916
- 
-            logger.info(f"成功暂存更改: {result['message']}")
-917
- 
-            return result
-918
- 
-        except Exception as e:
-919
- 
-            logger.error(f"暂存更改失败: {str(e)}")
-920
- 
-            return {
-921
- 
-                "data": None,
-922
- 
-                "message": f"暂存操作失败: {str(e)}"
-923
- 
-            }
-924
- 
-​
-925
- 
-    def _stash_list(self) -> Dict[str, Any]:
-926
- 
-        """列出所有暂存"""
-927
- 
-        logger.info("列出所有暂存")
-928
- 
-        try:
-929
- 
-            result = self.git_client.stash_list()
-930
- 
-            logger.info(f"成功列出暂存: {result['message']}")
-931
- 
-            return result
-932
- 
-        except Exception as e:
-933
- 
-            logger.error(f"列出暂存失败: {str(e)}")
-934
- 
-            return {
-935
- 
-                "data": None,
-936
- 
-                "message": f"列出暂存失败: {str(e)}"
-937
- 
-            }
-938
- 
-​
-939
- 
-    def _stash_apply(self, index: int) -> Dict[str, Any]:
-940
- 
-        """应用暂存"""
-941
- 
-        logger.info(f"应用暂存: {index}")
-942
- 
-        try:
-943
- 
-            result = self.git_client.stash_apply(index)
-944
- 
-            # 清除状态缓存
-945
- 
-            self._clear_status_cache()
-946
- 
-            logger.info(f"成功应用暂存: {result['message']}")
-947
- 
-            return result
-948
- 
-        except Exception as e:
-949
- 
-            logger.error(f"应用暂存失败: {str(e)}")
-950
- 
-            return {
-Footer
-© 2026 GitHub, Inc.
-Footer navigation
-Terms
-Privacy
-Security
-Status
-Community
-Docs
-Contact
-Manage cookies
-Do not share my personal information
-
-
             }
 
     def _stash(self, message: Optional[str]) -> Dict[str, Any]:
@@ -1288,6 +1088,7 @@ Do not share my personal information
         self.cache.clear()
         logger.info(f"清除了 {cache_size} 个缓存项")
 
+
 def create_git_helper(repo_path: str = ".", user_role: str = "admin", protected_branches: Optional[List[str]] = None, permission_matrix: Optional[Dict[str, List[str]]] = None, cache_ttl: int = 300) -> GitHelperTool:
     """
     创建 GitHelperTool 实例
@@ -1301,4 +1102,3 @@ def create_git_helper(repo_path: str = ".", user_role: str = "admin", protected_
         GitHelperTool: GitHelperTool 实例
     """
     return GitHelperTool(repo_path, user_role=user_role, protected_branches=protected_branches, permission_matrix=permission_matrix, cache_ttl=cache_ttl)
-

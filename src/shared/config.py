@@ -39,6 +39,7 @@ class Settings(BaseSettings):
     # --- 4. AI 与 Agent 核心配置 ---
     # 外部模型 API
     OPENAI_API_KEY: Optional[str] = None
+    ANTHROPIC_API_KEY: Optional[str] = None
     LANGSMITH_API_KEY: Optional[str] = None
     
     # Agent 行为控制

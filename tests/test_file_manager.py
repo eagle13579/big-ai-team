@@ -45,7 +45,9 @@ def test_read_file_success(file_manager_tool):
                     assert result["observation"]["data"] == "test content"
                     assert "成功读取文件" in result["observation"]["message"]
                     assert "timestamp" in result["observation"]
-                    assert "2026-04-07" in result["observation"]["timestamp"]
+                    # 验证时间戳格式正确，不依赖具体日期
+                    assert "T" in result["observation"]["timestamp"]
+                    assert "Z" in result["observation"]["timestamp"]
 
 
 def test_read_file_not_exists(file_manager_tool):

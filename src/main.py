@@ -14,6 +14,10 @@ from shared.config import settings, config_manager
 from execution.executor import ToolExecutor
 from workflow.loop import ExecutionLoop
 
+# 导入适配器模块
+from access.adapters import AdapterFactory, adapter_registry
+from access.adapters.base import AdapterContext
+
 # --- 1. 配置生产级日志系统 ---
 import os
 
@@ -71,7 +75,64 @@ class AceAgentApp:
         # 这里自动从 settings 中读取 AGENT_MAX_STEPS
         self.workflow = ExecutionLoop(executor=self.executor)
         
+        # 初始化适配器系统
+        self.adapters = {}
+        self._initialize_adapters()
+        
         logger.info("✅ 组件加载完毕。当前系统时间: 2026-04-06 01:27:00")
+    
+    def _initialize_adapters(self):
+        """初始化适配器系统"""
+        try:
+            # 创建默认适配器
+            self.adapters['llm'] = AdapterFactory.create_llm_adapter(
+                platform="mock_llm",
+                name="mock_llm_adapter",
+                api_key="test_key"
+            )
+            
+            self.adapters['cache'] = AdapterFactory.create_cache_adapter(
+                platform="memory_cache",
+                name="memory_cache_adapter"
+            )
+            
+            self.adapters['storage'] = AdapterFactory.create_storage_adapter(
+                platform="local_storage",
+                name="local_storage_adapter",
+                base_path="./storage"
+            )
+            
+            # 初始化所有适配器
+            asyncio.run(self._async_initialize_adapters())
+            logger.info("✅ 适配器系统初始化完成")
+        except Exception as e:
+            logger.error(f"❌ 适配器系统初始化失败: {str(e)}")
+    
+    async def _async_initialize_adapters(self):
+        """异步初始化适配器"""
+        for name, adapter in self.adapters.items():
+            try:
+                await adapter.initialize()
+                logger.info(f"✅ 初始化适配器 {name} 成功")
+            except Exception as e:
+                logger.error(f"❌ 初始化适配器 {name} 失败: {str(e)}")
+    
+    async def get_adapter_status(self):
+        """获取所有适配器状态"""
+        status = {}
+        context = AdapterContext(session_id="health_check")
+        
+        for name, adapter in self.adapters.items():
+            try:
+                health = await adapter.health_check(context)
+                status[name] = health
+            except Exception as e:
+                status[name] = {
+                    "status": "unhealthy",
+                    "error": str(e)
+                }
+        
+        return status
 
     async def run_task(self, query: str, max_steps: int = None):
         """
@@ -182,6 +243,9 @@ async def health_check(
             "memory_summary": agent_app.workflow.get_memory_summary()
         }
         
+        # 检查适配器状态
+        adapter_status = await agent_app.get_adapter_status()
+        
         return HealthResponse(
             status="healthy",
             version=settings.CONFIG_VERSION,
@@ -189,6 +253,7 @@ async def health_check(
             components={
                 "executor": executor_status,
                 "workflow": workflow_status,
+                "adapters": adapter_status,
                 "config": {
                     "version": settings.CONFIG_VERSION,
                     "env_mode": settings.ENV_MODE
@@ -221,6 +286,32 @@ async def get_config():
     """
     config = config_manager.get_settings()
     return config.model_dump()
+
+@app.get("/api/v1/adapters")
+async def get_adapters(
+    agent_app: AceAgentApp = Depends(get_agent_app)
+):
+    """
+    获取所有适配器信息
+    """
+    try:
+        # 获取适配器状态
+        adapter_status = await agent_app.get_adapter_status()
+        
+        # 获取已注册的平台列表
+        registered_platforms = adapter_registry.list_platforms()
+        
+        return {
+            "status": "success",
+            "adapters": adapter_status,
+            "registered_platforms": registered_platforms
+        }
+    except Exception as e:
+        logger.error(f"获取适配器信息失败: {str(e)}")
+        return {
+            "status": "error",
+            "error": str(e)
+        }
 
 # --- 7. 异常处理 ---
 @app.exception_handler(Exception)

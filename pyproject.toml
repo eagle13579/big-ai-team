@@ -24,6 +24,8 @@ agno = "^2.5.14"
 aiohttp = "^3.13.5"
 gitpython = "^3.1.46"
 tenacity = "^8.5.0"
+chromadb = "^1.1.1"
+
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"
