@@ -81,11 +81,6 @@ skill_registry = SkillRegistry()
 
 
 # 导出函数
-def get_all_skills() -> Dict[str, Type[BaseSkill]]:
-from .registry import skill_registry, SkillRegistry
-from .git_helper import GitHelperTool
-from .file_manager import FileManagerTool
-from .calculator import CalculatorTool
 
 __all__ = [
     "skill_registry",

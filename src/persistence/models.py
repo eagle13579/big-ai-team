@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Text, Boolean, Integer, TIMESTAMP, ARRAY, ForeignKey
+from sqlalchemy import Column, String, Text, Boolean, Integer, TIMESTAMP, ARRAY, ForeignKey, Float
 from sqlalchemy.dialects.postgresql import UUID, JSONB, ENUM
 from sqlalchemy.sql import func
 from .database import Base
@@ -19,8 +19,8 @@ class Memory(Base):
     user_id = Column(String(64), nullable=False)
     role_name = Column(String(32))
     content = Column(Text, nullable=False)
-    embedding = Column('embedding', 'vector(1536)')  # pgvector type
-    metadata = Column(JSONB, default={})
+    embedding = Column(ARRAY(Float))  # 使用ARRAY类型替代vector
+    memory_metadata = Column(JSONB, default={})
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
 
 class Task(Base):
