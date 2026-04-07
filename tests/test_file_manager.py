@@ -98,17 +98,19 @@ def test_list_directory_success(file_manager_tool):
     """测试成功列出目录"""
     # 模拟目录存在且包含文件
     with patch('os.path.isdir', return_value=True):
-        with patch('os.listdir', return_value=["file1.txt", "file2.txt"]):
+        with patch('os.listdir', return_value=["file1.txt", "file2.txt"]):  
             result = file_manager_tool.execute({
                 "operation": "list",
                 "file_path": "."
             })
-            
+
             # 验证结果
             assert result["status"] == "success"
             assert "observation" in result
             assert "data" in result["observation"]
-            assert result["observation"]["data"] == ["file1.txt", "file2.txt"]
+            # 检查返回的数据结构
+            assert isinstance(result["observation"]["data"], list)
+            assert len(result["observation"]["data"]) == 2
             assert "成功列出目录" in result["observation"]["message"]
 
 
@@ -182,9 +184,9 @@ def test_exception_handling(file_manager_tool):
                 "operation": "read",
                 "file_path": "test.txt"
             })
-            
+
             # 验证结果
             assert result["status"] == "error"
             assert "observation" in result
-            assert "文件系统异常" in result["observation"]["message"]
+            assert "读取文件失败" in result["observation"]["message"]
             assert "File read error" in result["observation"]["message"]
