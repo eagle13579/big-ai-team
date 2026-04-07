@@ -7,6 +7,8 @@ import hashlib
 from typing import Dict, Any, List, Optional, Callable, Awaitable
 from datetime import datetime, timedelta
 from ..shared.config import settings
+from ..skills import skill_registry, get_all_skills
+from ..skills import skill_registry
 
 # 设置日志
 logger = logging.getLogger("AceAgent.Execution")
@@ -70,6 +72,9 @@ class ToolExecutor:
             "get_system_status": self._get_system_status
         }
         
+        # 加载技能
+        self._load_skills()
+        
         # 速率限制器
         self._rate_limiters = {
             "web_search": RateLimiter(max_calls=5, time_frame=60),
@@ -86,6 +91,33 @@ class ToolExecutor:
             "delete_file": ["admin"],
             "default": ["admin", "user", "guest"]
         }
+    
+    def _load_skills(self):
+        """加载技能"""
+        try:
+            skills = get_all_skills()
+            for skill_name, skill_class in skills.items():
+                # 根据技能名称创建实例
+                if skill_name == "git_helper":
+                    # GitHelperTool 需要 repo_path 参数
+                    skill_instance = skill_class(repo_path=".")
+                else:
+                    # 其他技能使用默认参数
+                    skill_instance = skill_class()
+                
+                # 包装同步方法为异步
+                def create_async_wrapper(skill):
+                    async def async_execute(args):
+                        loop = asyncio.get_event_loop()
+                        return await loop.run_in_executor(None, skill.execute, args)
+                    return async_execute
+                
+                # 注册技能
+                async_wrapper = create_async_wrapper(skill_instance)
+                self._tool_registry[skill_name] = async_wrapper
+                logger.info(f"🔧 已加载技能: {skill_name}")
+        except Exception as e:
+            logger.error(f"加载技能失败: {str(e)}")
 
     def _ensure_workspace(self):
         """初始化工作目录"""
@@ -129,15 +161,29 @@ class ToolExecutor:
         """
         核心执行入口：具备自愈能力的调用逻辑
         """
-        # 检查工具是否存在
-        if tool_name not in self._tool_registry:
-            logger.warning(f"⚠️  未知工具尝试调用: {tool_name}")
-            return {
-                "success": False, 
-                "error": f"工具 '{tool_name}' 未在注册表中。可用工具: {list(self._tool_registry.keys())}",
-                "timestamp": datetime.now().isoformat()
-            }
+        # 检查工具是否存在于内置注册表
+        if tool_name in self._tool_registry:
+            # 使用内置工具
+            return await self._execute_builtin_tool(tool_name, args, role, timeout)
+        else:
+            # 检查工具是否存在于SkillRegistry
+            skill_class = skill_registry.get_skill(tool_name)
+            if skill_class:
+                # 使用技能注册表中的工具
+                return await self._execute_skill_tool(skill_class, args, role, timeout)
+            else:
+                logger.warning(f"⚠️  未知工具尝试调用: {tool_name}")
+                available_tools = list(self._tool_registry.keys()) + skill_registry.get_skill_names()
+                return {
+                    "success": False, 
+                    "error": f"工具 '{tool_name}' 未在注册表中。可用工具: {available_tools}",
+                    "timestamp": datetime.now().isoformat()
+                }
 
+    async def _execute_builtin_tool(self, tool_name: str, args: Dict[str, Any], role: str = "user", timeout: int = 30) -> Dict[str, Any]:
+        """
+        执行内置工具
+        """
         # 检查权限
         if not self._check_permission(tool_name, role):
             logger.warning(f"🚫 权限不足: {role} 无法调用 {tool_name}")
@@ -159,7 +205,7 @@ class ToolExecutor:
             }
 
         try:
-            logger.info(f"🛠️  正在执行: {tool_name} | 参数: {args}")
+            logger.info(f"🛠️  正在执行内置工具: {tool_name} | 参数: {args}")
             
             # 应用速率限制
             rate_limiter = self._rate_limiters.get(tool_name, self._rate_limiters["default"])
@@ -193,6 +239,33 @@ class ToolExecutor:
             error_msg = f"执行运行时错误: {str(e)}"
             logger.error(f"❌ {tool_name} 崩溃: {error_msg}")
             return {"success": False, "error": error_msg, "timestamp": datetime.now().isoformat()}
+
+    async def _execute_skill_tool(self, skill_class, args: Dict[str, Any], role: str = "user", timeout: int = 30) -> Dict[str, Any]:
+        """
+        执行技能工具
+        """
+        try:
+            logger.info(f"🛠️  正在执行技能工具: {skill_class.name} | 参数: {args}")
+            
+            # 创建技能实例
+            skill = skill_class()
+            
+            # 执行技能
+            result = await asyncio.wait_for(
+                asyncio.to_thread(skill.execute, args),
+                timeout=timeout
+            )
+            
+            return result
+            
+        except asyncio.TimeoutError:
+            error_msg = f"执行超时: 超过 {timeout} 秒"
+            logger.error(f"⏰ {skill_class.name} 执行超时: {error_msg}")
+            return {"status": "error", "observation": {"data": None, "message": error_msg, "timestamp": datetime.now().isoformat()}}
+        except Exception as e:
+            error_msg = f"执行运行时错误: {str(e)}"
+            logger.error(f"❌ {skill_class.name} 崩溃: {error_msg}")
+            return {"status": "error", "observation": {"data": None, "message": error_msg, "timestamp": datetime.now().isoformat()}}
 
     # --- 核心工具实现区 ---
 
@@ -303,7 +376,8 @@ class ToolExecutor:
 
     def get_available_tools(self) -> List[str]:
         """获取所有可用工具清单"""
-        return list(self._tool_registry.keys())
+        # 合并内置工具和技能注册表中的工具
+        return list(self._tool_registry.keys()) + skill_registry.get_skill_names()
 
     def register_tool(self, name: str, func: Callable[..., Awaitable[Any]]):
         """注册新工具"""

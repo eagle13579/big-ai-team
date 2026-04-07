@@ -142,6 +142,7 @@ vite.config.ts.timestamp-*
 .env
 .venv/
 __pycache__/
+__pycache__/
 *.pyc
 .trae/
 .gitbutler/
@@ -150,3 +151,6 @@ __pycache__/
 *.idx
 # 敏感的日志与追踪
 .langsmith/
+docs/
+*.md
+

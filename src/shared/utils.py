@@ -1,5 +1,6 @@
 import uuid
 import logging
+import os
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from typing import Optional, Dict, Any
@@ -51,3 +52,20 @@ def safe_json_loads(data: str) -> Optional[Dict[str, Any]]:
         return json.loads(data)
     except json.JSONDecodeError:
         return None
+
+
+def sanitize_path(path: str) -> str:
+    """安全处理路径
+    
+    Args:
+        path: 原始路径
+    
+    Returns:
+        安全处理后的路径
+    """
+    import os
+    # 规范化路径
+    path = os.path.normpath(path)
+    # 移除路径中的危险字符
+    path = path.replace('..', '')
+    return path
