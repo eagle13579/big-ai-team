@@ -14,11 +14,13 @@ logger = logging.getLogger("AceAgent.GitHelper")
 try:
     from src.shared.base import BaseSkill
     from src.shared.utils import sanitize_path
+    from src.execution.sandbox import SecurityManager
 except ImportError:
     # 兼容重构后可能的路径变化
     try:
         from shared.base import BaseSkill
         from shared.utils import sanitize_path
+        from execution.sandbox import SecurityManager
     except ImportError:
         # 如果依然找不到，定义占位符以防止代码崩溃
         class BaseSkill:
@@ -26,6 +28,13 @@ except ImportError:
                 from datetime import datetime
                 return datetime.now().isoformat() + "Z"
         def sanitize_path(p): return p
+        class SecurityManager:
+            def __init__(self, repo_path, protected_branches=None, permission_matrix=None):
+                pass
+            def check_permission(self, action, user_role, branch):
+                return True
+            def validate_input(self, files):
+                return True
 
 # 尝试导入 GitPython
 try:
@@ -59,6 +68,7 @@ class GitRepositoryError(GitHelperError):
     """Git 仓库错误"""
     pass
 
+
 class GitAction(str, Enum):
     """Git 操作类型枚举"""
     STATUS = "status"
@@ -78,6 +88,7 @@ class GitAction(str, Enum):
     HOOKS_READ = "hooks_read"
     HOOKS_WRITE = "hooks_write"
     HOOKS_DELETE = "hooks_delete"
+
 
 class GitArgsSchema(BaseModel):
     """Git 操作的参数校验架构"""
@@ -110,6 +121,7 @@ class GitArgsSchema(BaseModel):
         if action == GitAction.HOOKS_WRITE and not values.get('hook_content'):
             raise ValueError("执行 hooks_write 操作时必须提供钩子内容")
         return values
+
 
 class GitInterface:
     """Git 操作的抽象接口"""
@@ -164,6 +176,7 @@ class GitInterface:
     def hooks_delete(self, hook_name: str) -> Dict[str, Any]:
         """删除钩子"""
         raise NotImplementedError
+
 
 class GitPythonClient(GitInterface):
     """使用 GitPython 实现的 Git 客户端"""
@@ -357,6 +370,7 @@ class GitPythonClient(GitInterface):
         except Exception as e:
             return {"data": None, "message": f"删除钩子失败: {str(e)}"}
 
+
 class SecurityManager:
     """Git 操作的安全管理器"""
     def __init__(self, repo_path: str, protected_branches: Optional[List[str]] = None, permission_matrix: Optional[Dict[str, List[str]]] = None):
@@ -401,6 +415,7 @@ class SecurityManager:
                     if not os.path.abspath(file_path).startswith(os.path.abspath(self.repo_path)):
                         raise GitValidationError(f"文件路径不在仓库内: {file_path}")
         return True
+
 
 class GitHelperTool(BaseSkill):
     """
@@ -1072,6 +1087,7 @@ class GitHelperTool(BaseSkill):
         cache_size = len(self.cache)
         self.cache.clear()
         logger.info(f"清除了 {cache_size} 个缓存项")
+
 
 def create_git_helper(repo_path: str = ".", user_role: str = "admin", protected_branches: Optional[List[str]] = None, permission_matrix: Optional[Dict[str, List[str]]] = None, cache_ttl: int = 300) -> GitHelperTool:
     """

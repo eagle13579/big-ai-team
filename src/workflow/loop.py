@@ -311,14 +311,24 @@ class ExecutionLoop:
             execution_response = await self.executor.execute(tool_name, tool_args)
             
             # 4. 观察阶段 (Observing Phase)
-            status = "成功" if execution_response["success"] else "失败"
+            status = "success" if execution_response["success"] else "error"
             observation = execution_response.get("result") if execution_response["success"] else execution_response.get("error")
             
-            # 更新上下文志，供下一步“思考”参考
+            # 增强的观察结果，包含更多详细信息
+            observation_data = {
+                "status": status,
+                "content": observation,
+                "tool_name": tool_name,
+                "tool_args": tool_args,
+                "timestamp": datetime.now().isoformat()
+            }
+            
+            # 更新上下文日志，供下一步“思考”参考
             step_summary = (
-                f"\n--- 步骤 {current_step} 记录 ---\n"
+                f"\n--- 步骤 {current_step} 记录 --\n"
                 f"思考: {thought}\n"
                 f"动作: 调用工具 [{tool_name}]\n"
+                f"参数: {tool_args}\n"
                 f"结果状态: {status}\n"
                 f"观察到: {observation}\n"
             )
@@ -328,9 +338,11 @@ class ExecutionLoop:
             step_record = {
                 "step": current_step,
                 "thought": thought,
-                "tool": tool_name,
-                "status": status,
-                "observation": observation,
+                "action": {
+                    "tool": tool_name,
+                    "args": tool_args
+                },
+                "observation": observation_data,
                 "timestamp": datetime.now().isoformat()
             }
             context["steps"].append(step_record)
@@ -356,14 +368,62 @@ class ExecutionLoop:
             except Exception as e:
                 logger.error(f"添加到mempalace失败: {str(e)}")
 
-            # 如果工具连续失败，触发自愈提示
+            # 如果工具执行失败，触发自愈和重试机制
             if not execution_response["success"]:
                 logger.warning(f"⚠️ 步骤 {current_step} 出现异常，Agent 将尝试修复逻辑...")
-                # 生成修复提示
+                
+                # 1. 生成修复提示
                 repair_prompt = f"上一步执行失败，错误信息: {observation}。请提供一个修复方案。"
                 repair_response = await self.llm_client.generate(repair_prompt)
                 logger.info(f"🔧 修复方案: {repair_response}")
                 context["full_log"] += f"修复方案: {repair_response}\n"
+                
+                # 2. 尝试自动重试（最多重试2次）
+                retry_count = 0
+                max_retries = 2
+                
+                while retry_count < max_retries:
+                    retry_count += 1
+                    logger.info(f"🔄 尝试重试 ({retry_count}/{max_retries})...")
+                    
+                    # 重新执行工具
+                    retry_response = await self.executor.execute(tool_name, tool_args)
+                    retry_status = "success" if retry_response["success"] else "error"
+                    retry_observation = retry_response.get("result") if retry_response["success"] else retry_response.get("error")
+                    
+                    # 更新观察结果
+                    retry_observation_data = {
+                        "status": retry_status,
+                        "content": retry_observation,
+                        "tool_name": tool_name,
+                        "tool_args": tool_args,
+                        "retry_count": retry_count,
+                        "timestamp": datetime.now().isoformat()
+                    }
+                    
+                    # 更新日志
+                    retry_summary = (
+                        f"\n--- 步骤 {current_step} 重试 ({retry_count}) 记录 --\n"
+                        f"思考: 尝试重试操作\n"
+                        f"动作: 调用工具 [{tool_name}]\n"
+                        f"结果状态: {retry_status}\n"
+                        f"观察到: {retry_observation}\n"
+                    )
+                    context["full_log"] += retry_summary
+                    
+                    # 如果重试成功，更新状态并跳出循环
+                    if retry_response["success"]:
+                        logger.info(f"✅ 重试成功！")
+                        # 更新当前步骤的观察结果
+                        step_record["observation"] = retry_observation_data
+                        context["steps"][-1] = step_record
+                        self.history[-1] = step_record
+                        break
+                    else:
+                        logger.warning(f"⚠️ 重试 {retry_count} 失败，错误: {retry_observation}")
+                        # 如果达到最大重试次数，记录最终失败状态
+                        if retry_count >= max_retries:
+                            logger.error(f"❌ 达到最大重试次数，操作失败")
 
         # 检查是否因为达到最大步数而被迫终止
         if current_step >= self.max_steps and not is_completed:

@@ -112,9 +112,10 @@ try:
         'FileManagerTool',
         'GitHelperTool',
         'skill_registry',
+        'SkillRegistry',
         'get_all_skills'
     ]
 except ImportError as e:
     print(f"Error importing skills: {e}")
-    __all__ = ['skill_registry', 'get_all_skills']
+    __all__ = ['skill_registry', 'SkillRegistry', 'get_all_skills']
 
