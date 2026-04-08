@@ -1,5 +1,5 @@
 from typing import Dict, Any, Optional
-from ..shared.utils import generate_uuid
+from src.shared.utils import generate_uuid
 
 
 class RoleFactory:

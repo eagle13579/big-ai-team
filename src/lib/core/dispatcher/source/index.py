@@ -1,7 +1,7 @@
 from typing import Dict, Any, Optional
 from sqlalchemy.orm import Session
-from ..persistence.models import Task, TaskStatus
-from ..shared.utils import generate_uuid
+from src.persistence.models import Task, TaskStatus
+from src.shared.utils import generate_uuid
 
 
 class Dispatcher:

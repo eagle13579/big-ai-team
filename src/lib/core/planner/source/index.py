@@ -1,6 +1,6 @@
 from typing import List, Dict, Any
-from ..shared.utils import generate_uuid
-from ..persistence.models import TaskStatus
+from src.shared.utils import generate_uuid
+from src.persistence.models import TaskStatus
 
 
 class Planner:

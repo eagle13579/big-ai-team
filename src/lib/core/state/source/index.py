@@ -1,6 +1,6 @@
 from typing import Dict, Any, Optional
 from sqlalchemy.orm import Session
-from ..persistence.models import Task, TaskStatus
+from src.persistence.models import Task, TaskStatus
 
 
 class TaskStateMachine:
