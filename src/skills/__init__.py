@@ -81,7 +81,17 @@ skill_registry = SkillRegistry()
 
 
 # 导出函数
-def get_all_skills() -> Dict[str, Type[BaseSkill]]:
+
+__all__ = [
+    "skill_registry",
+    "SkillRegistry",
+    "GitHelperTool",
+    "FileManagerTool",
+    "CalculatorTool",
+    "get_all_skills"
+]
+
+def get_all_skills():
     """
     获取所有技能
     
