@@ -1,9 +1,0 @@
-wing: palace
-rooms:
-- name: general
-  description: All project files
-
-# 架构规范
-architecture:
-  - rule: "[架构规范] 核心算法与逻辑必须位于 src/lib/core/[模块名]/source/index.py"
-  - rule: "[锚点规则] AI 在进行算法开发或修改时，必须以该路径作为唯一逻辑入口，严禁在模块根目录直接创建逻辑文件"

@@ -1,48 +1,64 @@
 import asyncio
 import json
 import os
-import logging
 from typing import Dict, Any, List, Optional
 from datetime import datetime
-
-# 配置日志
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
 from pathlib import Path
 
 # 导入配置，用于控制最大步数等参数
 from ..shared.config import settings
+from ..shared.logging import logger
+from ..shared.monitoring import task_monitor
 
-logger = logging.getLogger("AceAgent.Workflow")
+logger = logger.bind(name="AceAgent.Workflow")
+
+import psutil
 
 class MemoryManager:
     """
     记忆管理器，负责管理 Agent 的短期和长期记忆
     """
-    def __init__(self, memory_dir: str = "memory"):
+    def __init__(self, memory_dir: str = "memory", max_short_term_memory: int = 100, memory_limit_mb: int = 100):
         self.memory_dir = Path(memory_dir)
         self.memory_dir.mkdir(exist_ok=True)
         self.short_term_memory: List[Dict[str, Any]] = []
         self.long_term_memory: Dict[str, Any] = {}
+        self.max_short_term_memory = max_short_term_memory
+        self.memory_limit_mb = memory_limit_mb
         self._load_long_term_memory()
+        self._memory_usage_history = []
 
     def add_to_short_term_memory(self, item: Dict[str, Any]):
         """添加到短期记忆"""
+        # 为记忆项添加优先级和时间戳
+        item["timestamp"] = item.get("timestamp", datetime.now().isoformat())
+        item["priority"] = item.get("priority", 1)  # 默认为低优先级
+        
         self.short_term_memory.append(item)
-        # 限制短期记忆大小
-        if len(self.short_term_memory) > 100:
-            self.short_term_memory = self.short_term_memory[-100:]
+        # 检查内存使用情况
+        if self._check_memory_usage():
+            # 内存使用过高，清理部分记忆
+            self._cleanup_memory()
+        else:
+            # 限制短期记忆大小
+            if len(self.short_term_memory) > self.max_short_term_memory:
+                # 按优先级排序，保留高优先级记忆
+                self.short_term_memory.sort(key=lambda x: x.get("priority", 1), reverse=True)
+                self.short_term_memory = self.short_term_memory[:self.max_short_term_memory]
 
     def add_to_long_term_memory(self, key: str, value: Any):
         """添加到长期记忆"""
         self.long_term_memory[key] = value
         self._save_long_term_memory()
+        # 检查内存使用情况
+        if self._check_memory_usage():
+            self._cleanup_memory()
 
     def get_short_term_memory(self, limit: int = 10) -> List[Dict[str, Any]]:
         """获取短期记忆"""
-        return self.short_term_memory[-limit:]
+        # 按时间戳排序，返回最近的记忆
+        sorted_memory = sorted(self.short_term_memory, key=lambda x: x.get("timestamp", ""), reverse=True)
+        return sorted_memory[:limit]
 
     def get_long_term_memory(self, key: Optional[str] = None) -> Any:
         """获取长期记忆"""
@@ -65,6 +81,49 @@ class MemoryManager:
                     self.long_term_memory = json.load(f)
             except Exception as e:
                 logger.error(f"加载长期记忆失败: {str(e)}")
+
+    def _check_memory_usage(self) -> bool:
+        """检查内存使用情况"""
+        process = psutil.Process()
+        memory_usage = process.memory_info().rss / (1024 * 1024)  # 转换为 MB
+        self._memory_usage_history.append(memory_usage)
+        # 只保留最近的 10 条记录
+        if len(self._memory_usage_history) > 10:
+            self._memory_usage_history = self._memory_usage_history[-10:]
+        
+        logger.debug(f"当前内存使用: {memory_usage:.2f} MB")
+        return memory_usage > self.memory_limit_mb
+
+    def _cleanup_memory(self):
+        """清理内存"""
+        logger.warning("内存使用过高，开始清理记忆...")
+        
+        # 1. 清理短期记忆，保留高优先级和最近的记忆
+        if len(self.short_term_memory) > 0:
+            # 按优先级和时间戳排序
+            self.short_term_memory.sort(key=lambda x: (x.get("priority", 1), x.get("timestamp", "")), reverse=True)
+            # 只保留一半的记忆
+            self.short_term_memory = self.short_term_memory[:len(self.short_term_memory) // 2]
+            logger.info(f"已清理短期记忆，当前数量: {len(self.short_term_memory)}")
+        
+        # 2. 清理长期记忆，移除不常用的项
+        if len(self.long_term_memory) > 0:
+            # 这里可以根据实际情况实现更复杂的清理策略
+            # 例如，移除最旧的项或使用频率最低的项
+            pass
+
+    def get_memory_usage_summary(self) -> Dict[str, Any]:
+        """获取内存使用摘要"""
+        process = psutil.Process()
+        memory_usage = process.memory_info().rss / (1024 * 1024)  # 转换为 MB
+        
+        return {
+            "current_memory_usage_mb": memory_usage,
+            "short_term_memory_count": len(self.short_term_memory),
+            "long_term_memory_keys": len(self.long_term_memory),
+            "memory_limit_mb": self.memory_limit_mb,
+            "recent_memory_usage": self._memory_usage_history
+        }
 
 
 class LLMClient:
@@ -108,18 +167,18 @@ class LLMClient:
         """
         prompt = f"""
         你是一个智能 Agent，需要根据目标和上下文做出决策。
-        
+
         目标: {goal}
         上下文: {context}
-        
+
         请返回以下格式的 JSON 决策：
-        {
+        {{
             "action": "CALL_TOOL" 或 "FINISH",
             "thought": "你的思考过程",
             "tool": "工具名称" (如果 action 是 CALL_TOOL),
-            "args": {"参数名": "参数值"} (如果 action 是 CALL_TOOL),
+            "args": {{"参数名": "参数值"}} (如果 action 是 CALL_TOOL),
             "final_answer": "最终答案" (如果 action 是 FINISH)
-        }
+        }}
         """
         
         # 模拟决策生成
@@ -174,6 +233,7 @@ class ExecutionLoop:
         # LLMClient 将在 run 方法中初始化，以便根据任务选择模型
         self.llm_client = None
 
+    @task_monitor
     async def run(self, task_goal: str) -> Dict[str, Any]:
         """
         🚀 执行核心：自适应任务处理
@@ -316,7 +376,4 @@ class ExecutionLoop:
 
     def get_memory_summary(self) -> Dict[str, Any]:
         """获取记忆摘要"""
-        return {
-            "short_term_memory_count": len(self.memory_manager.short_term_memory),
-            "long_term_memory_keys": list(self.memory_manager.long_term_memory.keys())
-        }
+        return self.memory_manager.get_memory_usage_summary()

@@ -2,13 +2,25 @@ import time
 import psutil
 import prometheus_client
 from prometheus_client import Counter, Gauge, Histogram, Summary
-from opentelemetry import trace
-from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor
-from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
-from opentelemetry.instrumentation.aiohttp_client import AioHttpClientInstrumentor
 from ..shared.config import settings
+
+# 尝试导入 OpenTelemetry 相关模块
+trace = None
+OTLPSpanExporter = None
+TracerProvider = None
+BatchSpanProcessor = None
+FastAPIInstrumentor = None
+AioHttpClientInstrumentor = None
+
+try:
+    from opentelemetry import trace
+    from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+    from opentelemetry.sdk.trace import TracerProvider
+    from opentelemetry.sdk.trace.export import BatchSpanProcessor
+    from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+    from opentelemetry.instrumentation.aiohttp_client import AioHttpClientInstrumentor
+except ImportError:
+    print("⚠️  OpenTelemetry 依赖未安装，将禁用相关功能")
 
 # 初始化 Prometheus 指标
 REQUEST_COUNT = Counter('ace_agent_requests_total', 'Total number of requests', ['method', 'endpoint', 'status'])
@@ -25,7 +37,7 @@ def init_telemetry():
     """
     初始化 OpenTelemetry 追踪
     """
-    if settings.OTEL_EXPORTER_OTLP_ENDPOINT:
+    if settings.OTEL_EXPORTER_OTLP_ENDPOINT and trace and OTLPSpanExporter and TracerProvider and BatchSpanProcessor:
         # 创建 OTLP 导出器
         exporter = OTLPSpanExporter(endpoint=settings.OTEL_EXPORTER_OTLP_ENDPOINT)
         
@@ -40,6 +52,8 @@ def init_telemetry():
         trace.set_tracer_provider(tracer_provider)
         
         print(f"📡 OpenTelemetry 已初始化，导出到: {settings.OTEL_EXPORTER_OTLP_ENDPOINT}")
+    else:
+        print("⚠️  OpenTelemetry 未初始化，相关功能已禁用")
 
 # 性能监控中间件
 def performance_monitor(func):
@@ -155,8 +169,12 @@ def init_monitoring(app=None):
     # 为 FastAPI 应用添加监控
     if app:
         # 集成 OpenTelemetry
-        FastAPIInstrumentor.instrument_app(app)
-        AioHttpClientInstrumentor().instrument()
+        if FastAPIInstrumentor and AioHttpClientInstrumentor:
+            FastAPIInstrumentor.instrument_app(app)
+            AioHttpClientInstrumentor().instrument()
+            print("🔍 OpenTelemetry 已集成到 FastAPI")
+        else:
+            print("⚠️  OpenTelemetry 集成已跳过，相关模块未安装")
         
         # 添加 Prometheus 中间件
         @app.middleware("http")

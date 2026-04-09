@@ -1,8 +1,8 @@
 import asyncio
-import logging
 import sys
 import uvicorn
 from datetime import datetime
+from typing import Dict, Any
 from fastapi import FastAPI, HTTPException, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -11,29 +11,11 @@ from contextlib import asynccontextmanager
 
 # 导入项目核心组件
 from shared.config import settings, config_manager
+from shared.logging import logger, LogContext
 from execution.executor import ToolExecutor
 from workflow.loop import ExecutionLoop
 
-# --- 1. 配置生产级日志系统 ---
-import os
-
-# 创建日志目录
-LOG_DIR = "logs"
-os.makedirs(LOG_DIR, exist_ok=True)
-
-# 配置日志
-logging.basicConfig(
-    level=getattr(logging, settings.LOG_LEVEL, logging.INFO),
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler(sys.stdout),  # 控制台输出
-        logging.FileHandler(
-            os.path.join(LOG_DIR, f"agent_{datetime.now().strftime('%Y%m%d')}.log"),
-            encoding='utf-8'  # 指定 UTF-8 编码，解决中文乱码问题
-        )  # 文件输出
-    ]
-)
-logger = logging.getLogger("AceAgent.Main")
+logger = logger.bind(name="AceAgent.Main")
 
 # --- 2. 定义请求和响应模型 ---
 class TaskRequest(BaseModel):
@@ -96,6 +78,16 @@ class AceAgentApp:
         """
         print(welcome_msg)
 
+    def close(self):
+        """关闭应用，清理资源"""
+        logger.info("关闭 Ace Agent 应用，清理资源...")
+        
+        # 关闭执行器
+        if hasattr(self, 'executor'):
+            self.executor.close()
+        
+        logger.info("Ace Agent 应用已成功关闭")
+
 # 导入监控模块
 try:
     from shared.monitoring import init_monitoring
@@ -120,6 +112,8 @@ async def lifespan(app: FastAPI):
     yield
     # 关闭时
     logger.info("👋 关闭 Ace Agent 服务...")
+    if hasattr(app.state, 'agent_app'):
+        app.state.agent_app.close()
 
 # 创建 FastAPI 应用
 app = FastAPI(

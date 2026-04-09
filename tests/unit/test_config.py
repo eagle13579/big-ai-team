@@ -22,12 +22,22 @@ class TestSettings:
     
     def test_settings_validation(self):
         """测试配置验证"""
-        # 测试缺少必要配置
-        with pytest.raises(Exception):
-            # 清除必要的环境变量
-            if "DATABASE_URL" in os.environ:
-                del os.environ["DATABASE_URL"]
-            Settings()
+        # 测试 secret_key 长度验证
+        # 保存原始环境变量
+        original_secret_key = os.environ.get("SECRET_KEY")
+        
+        try:
+            # 设置太短的 secret_key
+            os.environ["SECRET_KEY"] = "short"
+            os.environ["DATABASE_URL"] = "sqlite:///./test.db"
+            os.environ["REDIS_URL"] = "redis://localhost:6379/0"
+            
+            with pytest.raises(Exception):
+                Settings()
+        finally:
+            # 恢复原始环境变量
+            if original_secret_key:
+                os.environ["SECRET_KEY"] = original_secret_key
 
 
 class TestConfigManager:
