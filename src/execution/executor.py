@@ -1,17 +1,15 @@
-import logging
 import asyncio
 import os
-import shutil
 import httpx
 import hashlib
 from typing import Dict, Any, List, Optional, Callable, Awaitable
 from datetime import datetime, timedelta
 from ..shared.config import settings
+from ..shared.logging import logger
+from ..shared.monitoring import tool_monitor
 from ..skills import skill_registry, get_all_skills
-from ..skills import skill_registry
 
-# 设置日志
-logger = logging.getLogger("AceAgent.Execution")
+logger = logger.bind(name="AceAgent.Execution")
 
 class RateLimiter:
     """
@@ -84,6 +82,10 @@ class ToolExecutor:
         # 结果缓存
         self._cache: Dict[str, Dict[str, Any]] = {}
         self._cache_ttl = 3600  # 缓存过期时间（秒）
+        self._cache_max_size = 1000  # 最大缓存条目数
+        self._cache_usage = 0  # 缓存使用统计
+        self._cache_hits = 0  # 缓存命中次数
+        self._cache_misses = 0  # 缓存未命中次数
         
         # 权限管理
         self._permissions = {
@@ -137,18 +139,54 @@ class ToolExecutor:
             cache_entry = self._cache[cache_key]
             if datetime.now().timestamp() - cache_entry["timestamp"] < self._cache_ttl:
                 logger.info(f"🔄 从缓存中获取 {tool_name} 的结果")
+                self._cache_hits += 1
                 return cache_entry["result"]
             else:
                 # 缓存过期，删除
                 del self._cache[cache_key]
+                self._cache_misses += 1
+        else:
+            self._cache_misses += 1
         return None
 
     def _update_cache(self, tool_name: str, args: Dict[str, Any], result: Any):
         """更新缓存"""
+        # 检查缓存大小，如果超过限制，清理部分缓存
+        if len(self._cache) >= self._cache_max_size:
+            self._cleanup_cache()
+        
         cache_key = self._generate_cache_key(tool_name, args)
         self._cache[cache_key] = {
             "result": result,
-            "timestamp": datetime.now().timestamp()
+            "timestamp": datetime.now().timestamp(),
+            "tool_name": tool_name
+        }
+        self._cache_usage += 1
+
+    def _cleanup_cache(self):
+        """清理缓存，移除最旧的条目"""
+        logger.info(f"缓存大小超过限制 ({self._cache_max_size})，开始清理...")
+        
+        # 按时间戳排序，移除最旧的 20% 缓存
+        sorted_cache = sorted(self._cache.items(), key=lambda x: x[1]["timestamp"])
+        items_to_remove = int(len(self._cache) * 0.2)
+        
+        for i in range(items_to_remove):
+            if sorted_cache:
+                cache_key, _ = sorted_cache.pop(0)
+                del self._cache[cache_key]
+        
+        logger.info(f"已清理缓存，当前大小: {len(self._cache)}")
+
+    def get_cache_stats(self) -> Dict[str, Any]:
+        """获取缓存统计信息"""
+        return {
+            "cache_size": len(self._cache),
+            "cache_max_size": self._cache_max_size,
+            "cache_hits": self._cache_hits,
+            "cache_misses": self._cache_misses,
+            "cache_usage": self._cache_usage,
+            "cache_hit_rate": (self._cache_hits / (self._cache_hits + self._cache_misses) * 100) if (self._cache_hits + self._cache_misses) > 0 else 0
         }
 
     def _check_permission(self, tool_name: str, role: str = "user") -> bool:
@@ -157,6 +195,7 @@ class ToolExecutor:
             return role in self._permissions[tool_name]
         return role in self._permissions["default"]
 
+    @tool_monitor
     async def execute(self, tool_name: str, args: Dict[str, Any], role: str = "user", timeout: int = 30) -> Dict[str, Any]:
         """
         核心执行入口：具备自愈能力的调用逻辑
@@ -167,11 +206,20 @@ class ToolExecutor:
             return await self._execute_builtin_tool(tool_name, args, role, timeout)
         else:
             # 检查工具是否存在于SkillRegistry
-            skill_class = skill_registry.get_skill(tool_name)
-            if skill_class:
-                # 使用技能注册表中的工具
-                return await self._execute_skill_tool(skill_class, args, role, timeout)
-            else:
+            try:
+                skill_class = skill_registry.get_skill(tool_name)
+                if skill_class:
+                    # 使用技能注册表中的工具
+                    return await self._execute_skill_tool(skill_class, args, role, timeout)
+                else:
+                    logger.warning(f"⚠️  未知工具尝试调用: {tool_name}")
+                    available_tools = list(self._tool_registry.keys()) + skill_registry.get_skill_names()
+                    return {
+                        "success": False, 
+                        "error": f"工具 '{tool_name}' 未在注册表中。可用工具: {available_tools}",
+                        "timestamp": datetime.now().isoformat()
+                    }
+            except ValueError as e:
                 logger.warning(f"⚠️  未知工具尝试调用: {tool_name}")
                 available_tools = list(self._tool_registry.keys()) + skill_registry.get_skill_names()
                 return {
@@ -369,7 +417,7 @@ class ToolExecutor:
             "status": "ready",
             "workspace": os.path.abspath(self.output_dir),
             "tool_count": len(self._tool_registry),
-            "cache_size": len(self._cache),
+            "cache_stats": self.get_cache_stats(),
             "server_time": datetime.now().isoformat(),
             "python_version": os.sys.version
         }
@@ -391,3 +439,53 @@ class ToolExecutor:
             logger.info(f"🔧 已注销工具: {name}")
         else:
             logger.warning(f"⚠️  工具 {name} 不存在")
+
+    def close(self):
+        """关闭执行器，清理资源"""
+        logger.info("关闭工具执行器，清理资源...")
+        
+        # 清理缓存
+        self._cache.clear()
+        logger.info("已清理缓存")
+        
+        # 清理工具注册表
+        self._tool_registry.clear()
+        logger.info("已清理工具注册表")
+        
+        logger.info("工具执行器已成功关闭")
+
+    async def execute_multiple(self, tool_calls: List[Dict[str, Any]], role: str = "user", timeout: int = 30) -> List[Dict[str, Any]]:
+        """
+        并发执行多个工具调用
+        
+        Args:
+            tool_calls: 工具调用列表，每个元素包含 tool_name 和 args
+            role: 用户角色
+            timeout: 每个工具的超时时间
+            
+        Returns:
+            工具执行结果列表
+        """
+        tasks = []
+        for call in tool_calls:
+            tool_name = call.get("tool_name")
+            args = call.get("args", {})
+            if tool_name:
+                task = self.execute(tool_name, args, role, timeout)
+                tasks.append(task)
+        
+        if tasks:
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+            # 处理异常结果
+            processed_results = []
+            for result in results:
+                if isinstance(result, Exception):
+                    processed_results.append({
+                        "success": False,
+                        "error": str(result),
+                        "timestamp": datetime.now().isoformat()
+                    })
+                else:
+                    processed_results.append(result)
+            return processed_results
+        return []
