@@ -1,0 +1,21 @@
+name: Generate Validation Report
+on:
+  push:
+    branches: [ main, feature/* ] # 当有新代码推送时触发
+jobs:
+  build-report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Dependencies
+        run: npm install
+      - name: Run Validation Script
+        run: npm run validate # 运行你生成 module_validation_report 的脚本
+      - name: Deploy Report to Wiki/Pages
+        run: |
+          # 这里可以将生成的 markdown 推送到仓库的 docs 目录或专门的 report 分支
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add module_validation_report.md
+          git commit -m "docs: update validation report [skip ci]"
+          git push
