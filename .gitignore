@@ -156,3 +156,25 @@ build/
 docs/
 *.md
 
+# 二进制保护文件
+*.pyd
+*.so
+dist/
+build/
+
+# Python 环境与缓存
+__pycache__/
+*.pyc
+venv/
+.env
+
+# 永远不要同步二进制黑盒到 GitHub
+core/*.pyd
+core/*.so
+core/*.c
+core/__pycache__/
+
+# 如果你的加密脚本会生成 build 文件夹，也忽略它
+build/
+dist/
+dist_temp/

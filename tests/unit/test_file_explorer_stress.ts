@@ -1,4 +1,4 @@
-import { FileExplorerTool } from './FileExplorerTool';
+import { FileExplorerTool } from '../../frontend/FileExplorerTool';
 import fs from 'fs/promises';
 import path from 'path';
 import { performance } from 'perf_hooks';
