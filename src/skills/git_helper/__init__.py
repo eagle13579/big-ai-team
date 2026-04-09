@@ -1,14 +1,24 @@
 import os
-import logging
 import time
 from datetime import datetime
 from typing import Dict, Any, Optional, List, Callable, Tuple
 from enum import Enum
-from pydantic import BaseModel, Field, field_validator, ConfigDict, model_validator
+from pydantic import BaseModel, Field, ConfigDict, model_validator
 from tenacity import retry, stop_after_attempt, wait_exponential
 
-# 配置日志
-logger = logging.getLogger("AceAgent.GitHelper")
+# 尝试从 shared 模块导入日志
+try:
+    from src.shared.logging import logger
+    logger = logger.bind(name="AceAgent.GitHelper")
+except ImportError:
+    # 兼容重构后可能的路径变化
+    try:
+        from shared.logging import logger
+        logger = logger.bind(name="AceAgent.GitHelper")
+    except ImportError:
+        # 如果依然找不到，使用默认日志
+        import logging
+        logger = logging.getLogger("AceAgent.GitHelper")
 
 # 尝试从 shared 模块导入基础类
 try:
@@ -902,240 +912,10 @@ class GitHelperTool(BaseSkill):
             logger.error(f"合并分支失败: {str(e)}")
             return {
                 "data": None,
-                "message": f"合并操作失败: {str(e)}"
-9 conflicting files
-executor.py
-src/execution/executor.py
-base.py
-src/shared/base.py
-utils.py
-src/shared/utils.py
-__init__.py
-src/skills/__init__.py
-calculator.py
-src/skills/calculator.py
-git_helper.py
-src/skills/git_helper.py
-test_calculator.py
-tests/test_calculator.py
-test_file_manager.py
-tests/test_file_manager.py
-test_git_helper.py
-tests/test_git_helper.py
-src/skills/git_helper.py1 conflict 
-  
-891
- 
+                "message": f"合并操作失败: {str(e)}",
+                "status": "error"
             }
-892
  
-​
-893
- 
-    def _merge(self, branch: str) -> Dict[str, Any]:
-894
- 
-        """合并分支"""
-895
- 
-        logger.info(f"合并分支: {branch}")
-896
- 
-        try:
-897
- 
-            result = self.git_client.merge(branch)
-898
- 
-            # 清除状态缓存
-899
- 
-            self._clear_status_cache()
-900
- 
-            logger.info(f"成功合并分支: {result['message']}")
-901
- 
-            return result
-902
- 
-        except Exception as e:
-903
- 
-            logger.error(f"合并分支失败: {str(e)}")
-904
- 
-            return {
-905
- 
-                "data": None,
-906
- 
-                "message": f"合并操作失败: {str(e)}"
-907
- 
-            }
-908
- 
-​
-909
- 
-    def _stash(self, message: Optional[str]) -> Dict[str, Any]:
-910
- 
-        """暂存更改"""
-911
- 
-        logger.info(f"暂存更改: {message[:50]}...")
-912
- 
-        try:
-913
- 
-            result = self.git_client.stash(message)
-914
- 
-            # 清除状态缓存
-915
- 
-            self._clear_status_cache()
-916
- 
-            logger.info(f"成功暂存更改: {result['message']}")
-917
- 
-            return result
-918
- 
-        except Exception as e:
-919
- 
-            logger.error(f"暂存更改失败: {str(e)}")
-920
- 
-            return {
-921
- 
-                "data": None,
-922
- 
-                "message": f"暂存操作失败: {str(e)}"
-923
- 
-            }
-924
- 
-​
-925
- 
-    def _stash_list(self) -> Dict[str, Any]:
-926
- 
-        """列出所有暂存"""
-927
- 
-        logger.info("列出所有暂存")
-928
- 
-        try:
-929
- 
-            result = self.git_client.stash_list()
-930
- 
-            logger.info(f"成功列出暂存: {result['message']}")
-931
- 
-            return result
-932
- 
-        except Exception as e:
-933
- 
-            logger.error(f"列出暂存失败: {str(e)}")
-934
- 
-            return {
-935
- 
-                "data": None,
-936
- 
-                "message": f"列出暂存失败: {str(e)}"
-937
- 
-            }
-938
- 
-​
-939
- 
-    def _stash_apply(self, index: int) -> Dict[str, Any]:
-940
- 
-        """应用暂存"""
-941
- 
-        logger.info(f"应用暂存: {index}")
-942
- 
-        try:
-943
- 
-            result = self.git_client.stash_apply(index)
-944
- 
-            # 清除状态缓存
-945
- 
-            self._clear_status_cache()
-946
- 
-            logger.info(f"成功应用暂存: {result['message']}")
-947
- 
-            return result
-948
- 
-        except Exception as e:
-949
- 
-            logger.error(f"应用暂存失败: {str(e)}")
-950
- 
-            return {
-Footer
-© 2026 GitHub, Inc.
-Footer navigation
-Terms
-Privacy
-Security
-Status
-Community
-Docs
-Contact
-Manage cookies
-Do not share my personal information
-
-
-            }
-
-    def _stash(self, message: Optional[str]) -> Dict[str, Any]:
-        """暂存更改"""
-        logger.info(f"暂存更改: {message[:50]}...")
-        try:
-            result = self.git_client.stash(message)
-            # 清除状态缓存
-            self._clear_status_cache()
-            logger.info(f"成功暂存更改: {result['message']}")
-            return result
-        except Exception as e:
-            logger.error(f"暂存更改失败: {str(e)}")
-            return {
-                "data": None,
-                "message": f"暂存操作失败: {str(e)}"
-            }
-
     def _stash_list(self) -> Dict[str, Any]:
         """列出所有暂存"""
         logger.info("列出所有暂存")

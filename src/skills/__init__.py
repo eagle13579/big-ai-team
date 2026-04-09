@@ -2,10 +2,14 @@
 Ace AI Engine - 技能模块
 """
 
-from typing import Dict, Type
+from typing import Dict, Type, List
 from src.shared.base import BaseSkill
 import importlib
 import os
+import logging
+
+# 配置日志
+logger = logging.getLogger("AceAgent.Skills")
 
 
 class SkillRegistry:
@@ -48,9 +52,9 @@ class SkillRegistry:
                                 # 注册技能
                                 skill_name = getattr(obj, 'name', name.lower())
                                 self.skills[skill_name] = obj
-                                print(f"Registered skill: {skill_name} ({name})")
+                                logger.info(f"Registered skill: {skill_name} ({name})")
                     except Exception as e:
-                        print(f"Error importing module {full_module_path}: {e}")
+                        logger.error(f"Error importing module {full_module_path}: {e}")
 
     def get_skill(self, name: str) -> Type[BaseSkill]:
         """
@@ -61,19 +65,31 @@ class SkillRegistry:
         
         Returns:
             Type[BaseSkill]: 技能类
+        
+        Raises:
+            ValueError: 如果技能不存在
         """
         if name not in self.skills:
             raise ValueError(f"Skill not found: {name}")
         return self.skills[name]
 
-    def get_skill_names(self) -> list[str]:
+    def get_skill_names(self) -> List[str]:
         """
         获取所有技能名称
         
         Returns:
-            list[str]: 技能名称列表
+            List[str]: 技能名称列表
         """
         return list(self.skills.keys())
+
+    def get_all_skills(self) -> Dict[str, Type[BaseSkill]]:
+        """
+        获取所有技能
+        
+        Returns:
+            Dict[str, Type[BaseSkill]]: 技能字典
+        """
+        return self.skills
 
 
 # 创建全局技能注册表实例
@@ -82,28 +98,13 @@ skill_registry = SkillRegistry()
 
 # 导出函数
 def get_all_skills() -> Dict[str, Type[BaseSkill]]:
-from .registry import skill_registry, SkillRegistry
-from .git_helper import GitHelperTool
-from .file_manager import FileManagerTool
-from .calculator import CalculatorTool
-
-__all__ = [
-    "skill_registry",
-    "SkillRegistry",
-    "GitHelperTool",
-    "FileManagerTool",
-    "CalculatorTool",
-    "get_all_skills"
-]
-
-def get_all_skills():
     """
     获取所有技能
     
     Returns:
         Dict[str, Type[BaseSkill]]: 技能字典
     """
-    return skill_registry.skills
+    return skill_registry.get_all_skills()
 
 
 # 导出技能类
@@ -120,6 +121,6 @@ try:
         'get_all_skills'
     ]
 except ImportError as e:
-    print(f"Error importing skills: {e}")
+    logger.error(f"Error importing skills: {e}")
     __all__ = ['skill_registry', 'get_all_skills']
 
