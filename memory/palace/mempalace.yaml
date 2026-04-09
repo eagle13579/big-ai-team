@@ -1,4 +1,29 @@
 wing: palace
 rooms:
-- name: general
-  description: All project files
+  - name: core-logic
+    description: "系统核心逻辑，包含入口 main.py、核心业务流程及底层架构实现。"
+    path_filters:
+      - "src/main.py"
+      - "src/workflow/**"
+
+  - name: skills-system
+    description: "AI 技能插件系统，负责处理各类专门的 AI 任务逻辑和 prompt 定义。"
+    path_filters:
+      - "src/skills/**"
+
+  - name: frontend-components
+    description: "前端界面代码，包含 UI 组件、文件浏览器工具以及边缘计算 Worker 脚本。"
+    path_filters:
+      - "frontend/**"
+
+  - name: testing-suite
+    description: "自动化测试套件，涵盖后端单元测试、集成测试及前端性能/压力测试。"
+    path_filters:
+      - "tests/**"
+
+  - name: docs-and-config
+    description: "项目全局文档 (Markdown)、环境配置文件以及记忆宫殿 (Memory Palace) 自身的定义。"
+    path_filters:
+      - "*.md"
+      - "memory/**"
+      - "mempalace.yaml"
