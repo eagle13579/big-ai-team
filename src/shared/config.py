@@ -1,10 +1,12 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import field_validator, Field
-from typing import Optional, Dict, Any
+from pydantic import field_validator, Field, validator
+from typing import Optional, Dict, Any, List
 import os
 import json
 import time
+import logging
 from pathlib import Path
+from functools import lru_cache
 
 # 导入敏感信息管理器
 try:
@@ -13,6 +15,8 @@ try:
 except ImportError:
     secret_manager = None
 
+logger = logging.getLogger(__name__)
+
 class Settings(BaseSettings):
     """
     🚀 Ace Agent 全局配置中心 (2026 生产级标准)
@@ -20,7 +24,7 @@ class Settings(BaseSettings):
     """
     
     # 配置版本管理
-    CONFIG_VERSION: str = "2.0.0"
+    CONFIG_VERSION: str = "3.0.0"
     
     # --- 1. 基础项目配置 ---
     PROJECT_NAME: str = "big-ai-team"
@@ -40,6 +44,11 @@ class Settings(BaseSettings):
     # 外部模型 API
     OPENAI_API_KEY: Optional[str] = None
     LANGSMITH_API_KEY: Optional[str] = None
+    ANTHROPIC_API_KEY: Optional[str] = None
+    GOOGLE_API_KEY: Optional[str] = None
+    DEEPSEEK_API_KEY: Optional[str] = None
+    ZHIPU_API_KEY: Optional[str] = None
+    MOONSHOT_API_KEY: Optional[str] = None
     
     # Agent 行为控制
     AGENT_MAX_STEPS: int = Field(default=10, ge=1, le=100)  # 允许 Agent 自适应循环的最大次数
@@ -69,6 +78,11 @@ class Settings(BaseSettings):
     # 浏览器配置
     ACE_PRIVACY_MODE: bool = True
     ALLOWED_DOMAINS: str = "github.com,google.com,wikipedia.org,arxiv.org"
+
+    # 性能配置
+    CACHE_TTL: int = 3600  # 缓存过期时间（秒）
+    MAX_CONCURRENT_TASKS: int = 10  # 最大并发任务数
+    RATE_LIMIT_PER_MINUTE: int = 60  # 每分钟请求限制
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -104,6 +118,14 @@ class Settings(BaseSettings):
             return secret_manager.get_secret(key)
         return getattr(self, key, None)
 
+    # 获取允许的域名列表
+    @property
+    def allowed_domains_list(self) -> List[str]:
+        """
+        获取允许的域名列表
+        """
+        return [domain.strip() for domain in self.ALLOWED_DOMAINS.split(",")]
+
 
 class ConfigManager:
     """
@@ -122,6 +144,7 @@ class ConfigManager:
         self._settings = self._load_settings()
         self._last_load_time = time.time()
         self._config_file_mtime = self._env_file.stat().st_mtime if self._env_file.exists() else 0
+        logger.info(f"🔧 配置管理器初始化完成，加载配置文件: {self._env_file}")
 
     def _load_settings(self) -> Settings:
         """
@@ -131,6 +154,7 @@ class ConfigManager:
         os.environ["PYDANTIC_SETTINGS_ENV_FILE"] = str(self._env_file)
         return Settings()
 
+    @lru_cache(maxsize=1)
     def get_settings(self) -> Settings:
         """
         获取配置，支持热重载
@@ -139,10 +163,12 @@ class ConfigManager:
         if self._env_file.exists():
             current_mtime = self._env_file.stat().st_mtime
             if current_mtime > self._config_file_mtime:
+                # 清除缓存
+                self.get_settings.cache_clear()
                 self._settings = self._load_settings()
                 self._config_file_mtime = current_mtime
                 self._last_load_time = time.time()
-                print(f"📝 配置文件已更新，重新加载配置 (版本: {self._settings.CONFIG_VERSION})")
+                logger.info(f"📝 配置文件已更新，重新加载配置 (版本: {self._settings.CONFIG_VERSION})")
         return self._settings
 
     def get_config_version(self) -> str:
@@ -156,9 +182,15 @@ class ConfigManager:
         导出配置到文件
         """
         config_dict = self.get_settings().model_dump()
+        # 移除敏感信息
+        sensitive_keys = ["SECRET_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY", "GOOGLE_API_KEY", "DEEPSEEK_API_KEY", "ZHIPU_API_KEY", "MOONSHOT_API_KEY", "E2B_API_KEY"]
+        for key in sensitive_keys:
+            if key in config_dict:
+                config_dict[key] = "[REDACTED]"
+        
         with open(path, "w", encoding="utf-8") as f:
             json.dump(config_dict, f, indent=2, ensure_ascii=False)
-        print(f"📤 配置已导出到 {path}")
+        logger.info(f"📤 配置已导出到 {path}")
 
     def import_config(self, path: str) -> None:
         """
@@ -172,13 +204,38 @@ class ConfigManager:
         
         # 更新环境变量
         for key, value in config_dict.items():
-            if value is not None:
+            if value is not None and value != "[REDACTED]":
                 os.environ[key] = str(value)
         
-        # 重新加载配置
+        # 清除缓存并重新加载配置
+        self.get_settings.cache_clear()
         self._settings = self._load_settings()
         self._last_load_time = time.time()
-        print(f"📥 配置已从 {path} 导入")
+        logger.info(f"📥 配置已从 {path} 导入")
+
+    def validate_config(self) -> bool:
+        """
+        验证配置的有效性
+        """
+        try:
+            settings = self.get_settings()
+            # 验证必填字段
+            required_fields = ["DATABASE_URL", "REDIS_URL", "SECRET_KEY"]
+            for field in required_fields:
+                if not getattr(settings, field):
+                    logger.error(f"❌ 配置验证失败: {field} 不能为空")
+                    return False
+            
+            # 验证 SECRET_KEY 长度
+            if len(settings.SECRET_KEY) < 32:
+                logger.error("❌ 配置验证失败: SECRET_KEY 长度必须至少为 32 个字符")
+                return False
+            
+            logger.info("✅ 配置验证通过")
+            return True
+        except Exception as e:
+            logger.error(f"❌ 配置验证失败: {str(e)}")
+            return False
 
 
 # 实例化配置管理器
@@ -190,4 +247,7 @@ settings = config_manager.get_settings()
 # 自动创建 Agent 输出目录
 if not os.path.exists(settings.AGENT_OUTPUT_DIR):
     os.makedirs(settings.AGENT_OUTPUT_DIR)
-    print(f"📁 已创建 Agent 工作目录: {settings.AGENT_OUTPUT_DIR}")
+    logger.info(f"📁 已创建 Agent 工作目录: {settings.AGENT_OUTPUT_DIR}")
+
+# 验证配置
+config_manager.validate_config()

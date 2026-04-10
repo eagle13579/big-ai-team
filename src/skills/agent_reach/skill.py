@@ -114,7 +114,7 @@ class AgentReachSkill(BaseSkill):
             # GitHub
             "search_github_repos": self._search_github_repos,
             "search_github_code": self._search_github_code,
-            "view_github_repo": self._view_github_repo",
+            "view_github_repo": self._view_github_repo,
             # 小红书
             "search_xiaohongshu": self._search_xiaohongshu,
             "get_xiaohongshu_detail": self._get_xiaohongshu_detail,
