@@ -1,0 +1,7 @@
+# MemPalace 依赖包
+nuitka
+zstandard
+numpy
+scikit-learn
+networkx
+mempalace

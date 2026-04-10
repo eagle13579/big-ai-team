@@ -1,4 +1,14 @@
 {
+  "name": "big-ai-team",
+  "version": "1.0.0",
+  "description": "Core algorithm with binary protection",
+  "main": "bridge/caller.py",
+  "scripts": {
+    "build:core": "python build_protect.py",
+    "test": "python core/test_core.py",
+    "clean": "rm -rf core/*.pyd core/*.so core/__pycache__",
+    "dev": "tsx index.ts"
+  },
   "dependencies": {
     "winston": "^3.19.0"
   },
