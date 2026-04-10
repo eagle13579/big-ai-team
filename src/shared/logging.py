@@ -27,8 +27,12 @@ class LoggingConfig:
         self.log_retention = os.getenv("LOG_RETENTION", "7 days")
 
         # 日志格式
-        self.console_format = "{time:YYYY-MM-DD HH:mm:ss.SSS} | {level: <8} | {name}:{function}:{line} | {message}"
-        self.file_format = "{time:YYYY-MM-DD HH:mm:ss.SSS} | {level: <8} | {name}:{function}:{line} | {message}"
+        self.console_format = (
+            "{time:YYYY-MM-DD HH:mm:ss.SSS} | {level: <8} | {name}:{function}:{line} | {message}"
+        )
+        self.file_format = (
+            "{time:YYYY-MM-DD HH:mm:ss.SSS} | {level: <8} | {name}:{function}:{line} | {message}"
+        )
         self.json_format = '{"timestamp": "{time}", "level": "{level}", "logger": "{name}", "function": "{function}", "line": {line}, "message": "{message}"}'
 
     def setup(self):

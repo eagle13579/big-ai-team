@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Memory management module
 """
 
-from typing import Dict, Any, Optional
+from typing import Any, Optional
 
 
 class MemoryManager:
@@ -21,7 +20,7 @@ class MemoryManager:
 
         创建一个空的内存存储字典。
         """
-        self.memory_store: Dict[str, Any] = {}
+        self.memory_store: dict[str, Any] = {}
 
     def store(self, key: str, value: Any) -> bool:
         """存储内存数据
@@ -78,7 +77,7 @@ class MemoryManager:
         self.memory_store.clear()
         return True
 
-    def get_all(self) -> Dict[str, Any]:
+    def get_all(self) -> dict[str, Any]:
         """获取所有内存数据
 
         获取内存中存储的所有数据的副本。

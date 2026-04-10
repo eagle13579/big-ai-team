@@ -1,5 +1,7 @@
-from typing import Dict, Any, Optional, List
+from typing import Any, Optional
+
 from sqlalchemy.orm import Session
+
 from src.persistence.models import Task, TaskStatus
 from src.shared.utils import generate_uuid
 
@@ -21,7 +23,7 @@ class Dispatcher:
         """
         self.db = db
 
-    def dispatch_task(self, task_data: Dict[str, Any]) -> Task:
+    def dispatch_task(self, task_data: dict[str, Any]) -> Task:
         """调度任务
 
         创建并保存新任务到数据库。
@@ -56,7 +58,7 @@ class Dispatcher:
         self.db.refresh(task)
         return task
 
-    def get_pending_tasks(self, assignee: Optional[str] = None) -> List[Task]:
+    def get_pending_tasks(self, assignee: Optional[str] = None) -> list[Task]:
         """获取待处理任务
 
         查询状态为PENDING的任务，可选择按负责人过滤。
@@ -91,7 +93,7 @@ class Dispatcher:
             self.db.refresh(task)
         return task
 
-    def update_task_output(self, task_id: str, output_data: Dict[str, Any]) -> Optional[Task]:
+    def update_task_output(self, task_id: str, output_data: dict[str, Any]) -> Optional[Task]:
         """更新任务输出
 
         根据任务ID更新任务输出数据。
@@ -121,7 +123,7 @@ class Dispatcher:
         """
         return self.db.query(Task).filter(Task.task_id == task_id).first()
 
-    def get_tasks_by_plan(self, plan_id: str) -> List[Task]:
+    def get_tasks_by_plan(self, plan_id: str) -> list[Task]:
         """根据计划ID获取任务
 
         Args:

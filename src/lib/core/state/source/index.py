@@ -1,5 +1,7 @@
-from typing import Dict, Any, Optional
+from typing import Any, Optional
+
 from sqlalchemy.orm import Session
+
 from src.persistence.models import Task, TaskStatus
 
 
@@ -64,7 +66,7 @@ class TaskStateMachine:
         else:
             return False
 
-        valid_transitions: Dict[str, list[str]] = {
+        valid_transitions: dict[str, list[str]] = {
             TaskStatus.PENDING.value: ["in_progress", "failed"],
             TaskStatus.IN_PROGRESS.value: ["completed", "failed", "retrying"],
             TaskStatus.COMPLETED.value: [],
@@ -86,7 +88,7 @@ class TaskStateMachine:
         task = self.db.query(Task).filter(Task.task_id == task_id).first()
         return task.status.value if task else None
 
-    def get_plan_state(self, plan_id: str) -> Dict[str, Any]:
+    def get_plan_state(self, plan_id: str) -> dict[str, Any]:
         """获取计划状态
 
         获取指定计划的整体状态和任务状态分布。
@@ -105,7 +107,7 @@ class TaskStateMachine:
         if not tasks:
             return {"status": "not_found", "tasks": []}
 
-        status_counts: Dict[str, int] = {
+        status_counts: dict[str, int] = {
             "pending": 0,
             "in_progress": 0,
             "completed": 0,
