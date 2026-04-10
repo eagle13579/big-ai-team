@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 移动根目录脚本到 scripts/ 目录
 """
+
 import os
 import shutil
 
@@ -14,7 +14,7 @@ scripts = [
     "cleanup_pycache.py",
     "copy_core_files.py",
     "restructure_core.py",
-    "test_refactoring.py"
+    "test_refactoring.py",
 ]
 
 dest_dir = "scripts"

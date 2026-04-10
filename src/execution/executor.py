@@ -1,20 +1,25 @@
 import asyncio
-import os
-import httpx
 import hashlib
-from typing import Dict, Any, List, Optional, Callable, Awaitable
+import os
+from collections.abc import Awaitable
 from datetime import datetime, timedelta
-from ..shared.config import settings
-from ..shared.logging import logger
-from ..shared.monitoring import tool_monitor
-from ..skills import skill_registry, get_all_skills
+from typing import Any, Callable, Optional
+
+import httpx
+
+from shared.config import settings
+from shared.logging import logger
+from shared.monitoring import tool_monitor
+from skills import get_all_skills, skill_registry
 
 logger = logger.bind(name="AceAgent.Execution")
+
 
 class RateLimiter:
     """
     速率限制器
     """
+
     def __init__(self, max_calls: int, time_frame: int):
         self.max_calls = max_calls
         self.time_frame = time_frame
@@ -23,15 +28,17 @@ class RateLimiter:
     async def __aenter__(self):
         now = datetime.now()
         # 清理过期的调用记录
-        self.calls = [call for call in self.calls if now - call < timedelta(seconds=self.time_frame)]
-        
+        self.calls = [
+            call for call in self.calls if now - call < timedelta(seconds=self.time_frame)
+        ]
+
         # 检查是否超过速率限制
         if len(self.calls) >= self.max_calls:
             wait_time = self.time_frame - (now - self.calls[0]).total_seconds()
             if wait_time > 0:
                 logger.warning(f"⚠️  速率限制触发，等待 {wait_time:.2f} 秒")
                 await asyncio.sleep(wait_time)
-        
+
         # 记录本次调用
         self.calls.append(datetime.now())
         return self
@@ -58,42 +65,42 @@ class ToolExecutor:
         # 从配置中心读取输出路径，默认为 'output'
         self.output_dir = getattr(settings, "AGENT_OUTPUT_DIR", "output")
         self._ensure_workspace()
-        
+
         # 核心工具注册表
         # key: 工具名称, value: 对应的异步函数
-        self._tool_registry: Dict[str, Callable[..., Awaitable[Any]]] = {
+        self._tool_registry: dict[str, Callable[..., Awaitable[Any]]] = {
             "web_search": self._web_search,
             "write_file": self._write_file,
             "read_file": self._read_file,
             "list_files": self._list_files,
             "delete_file": self._delete_file,
-            "get_system_status": self._get_system_status
+            "get_system_status": self._get_system_status,
         }
-        
+
         # 加载技能
         self._load_skills()
-        
+
         # 速率限制器
         self._rate_limiters = {
             "web_search": RateLimiter(max_calls=5, time_frame=60),
-            "default": RateLimiter(max_calls=10, time_frame=60)
+            "default": RateLimiter(max_calls=10, time_frame=60),
         }
-        
+
         # 结果缓存
-        self._cache: Dict[str, Dict[str, Any]] = {}
+        self._cache: dict[str, dict[str, Any]] = {}
         self._cache_ttl = 3600  # 缓存过期时间（秒）
         self._cache_max_size = 1000  # 最大缓存条目数
         self._cache_usage = 0  # 缓存使用统计
         self._cache_hits = 0  # 缓存命中次数
         self._cache_misses = 0  # 缓存未命中次数
-        
+
         # 权限管理
         self._permissions = {
             "write_file": ["admin", "user"],
             "delete_file": ["admin"],
-            "default": ["admin", "user", "guest"]
+            "default": ["admin", "user", "guest"],
         }
-    
+
     def _load_skills(self):
         """加载技能"""
         try:
@@ -106,14 +113,15 @@ class ToolExecutor:
                 else:
                     # 其他技能使用默认参数
                     skill_instance = skill_class()
-                
+
                 # 包装同步方法为异步
                 def create_async_wrapper(skill):
                     async def async_execute(args):
                         loop = asyncio.get_event_loop()
                         return await loop.run_in_executor(None, skill.execute, args)
+
                     return async_execute
-                
+
                 # 注册技能
                 async_wrapper = create_async_wrapper(skill_instance)
                 self._tool_registry[skill_name] = async_wrapper
@@ -127,12 +135,12 @@ class ToolExecutor:
             os.makedirs(self.output_dir)
             logger.info(f"📁 已创建 Agent 工作目录: {self.output_dir}")
 
-    def _generate_cache_key(self, tool_name: str, args: Dict[str, Any]) -> str:
+    def _generate_cache_key(self, tool_name: str, args: dict[str, Any]) -> str:
         """生成缓存键"""
         data = f"{tool_name}:{str(sorted(args.items()))}"
         return hashlib.md5(data.encode()).hexdigest()
 
-    def _check_cache(self, tool_name: str, args: Dict[str, Any]) -> Optional[Any]:
+    def _check_cache(self, tool_name: str, args: dict[str, Any]) -> Optional[Any]:
         """检查缓存"""
         cache_key = self._generate_cache_key(tool_name, args)
         if cache_key in self._cache:
@@ -149,36 +157,36 @@ class ToolExecutor:
             self._cache_misses += 1
         return None
 
-    def _update_cache(self, tool_name: str, args: Dict[str, Any], result: Any):
+    def _update_cache(self, tool_name: str, args: dict[str, Any], result: Any):
         """更新缓存"""
         # 检查缓存大小，如果超过限制，清理部分缓存
         if len(self._cache) >= self._cache_max_size:
             self._cleanup_cache()
-        
+
         cache_key = self._generate_cache_key(tool_name, args)
         self._cache[cache_key] = {
             "result": result,
             "timestamp": datetime.now().timestamp(),
-            "tool_name": tool_name
+            "tool_name": tool_name,
         }
         self._cache_usage += 1
 
     def _cleanup_cache(self):
         """清理缓存，移除最旧的条目"""
         logger.info(f"缓存大小超过限制 ({self._cache_max_size})，开始清理...")
-        
+
         # 按时间戳排序，移除最旧的 20% 缓存
         sorted_cache = sorted(self._cache.items(), key=lambda x: x[1]["timestamp"])
         items_to_remove = int(len(self._cache) * 0.2)
-        
-        for i in range(items_to_remove):
+
+        for _i in range(items_to_remove):
             if sorted_cache:
                 cache_key, _ = sorted_cache.pop(0)
                 del self._cache[cache_key]
-        
+
         logger.info(f"已清理缓存，当前大小: {len(self._cache)}")
 
-    def get_cache_stats(self) -> Dict[str, Any]:
+    def get_cache_stats(self) -> dict[str, Any]:
         """获取缓存统计信息"""
         return {
             "cache_size": len(self._cache),
@@ -186,7 +194,9 @@ class ToolExecutor:
             "cache_hits": self._cache_hits,
             "cache_misses": self._cache_misses,
             "cache_usage": self._cache_usage,
-            "cache_hit_rate": (self._cache_hits / (self._cache_hits + self._cache_misses) * 100) if (self._cache_hits + self._cache_misses) > 0 else 0
+            "cache_hit_rate": (self._cache_hits / (self._cache_hits + self._cache_misses) * 100)
+            if (self._cache_hits + self._cache_misses) > 0
+            else 0,
         }
 
     def _check_permission(self, tool_name: str, role: str = "user") -> bool:
@@ -196,7 +206,9 @@ class ToolExecutor:
         return role in self._permissions["default"]
 
     @tool_monitor
-    async def execute(self, tool_name: str, args: Dict[str, Any], role: str = "user", timeout: int = 30) -> Dict[str, Any]:
+    async def execute(
+        self, tool_name: str, args: dict[str, Any], role: str = "user", timeout: int = 30
+    ) -> dict[str, Any]:
         """
         核心执行入口：具备自愈能力的调用逻辑
         """
@@ -213,22 +225,28 @@ class ToolExecutor:
                     return await self._execute_skill_tool(skill_class, args, role, timeout)
                 else:
                     logger.warning(f"⚠️  未知工具尝试调用: {tool_name}")
-                    available_tools = list(self._tool_registry.keys()) + skill_registry.get_skill_names()
+                    available_tools = (
+                        list(self._tool_registry.keys()) + skill_registry.get_skill_names()
+                    )
                     return {
-                        "success": False, 
+                        "success": False,
                         "error": f"工具 '{tool_name}' 未在注册表中。可用工具: {available_tools}",
-                        "timestamp": datetime.now().isoformat()
+                        "timestamp": datetime.now().isoformat(),
                     }
-            except ValueError as e:
+            except ValueError:
                 logger.warning(f"⚠️  未知工具尝试调用: {tool_name}")
-                available_tools = list(self._tool_registry.keys()) + skill_registry.get_skill_names()
+                available_tools = (
+                    list(self._tool_registry.keys()) + skill_registry.get_skill_names()
+                )
                 return {
-                    "success": False, 
+                    "success": False,
                     "error": f"工具 '{tool_name}' 未在注册表中。可用工具: {available_tools}",
-                    "timestamp": datetime.now().isoformat()
+                    "timestamp": datetime.now().isoformat(),
                 }
 
-    async def _execute_builtin_tool(self, tool_name: str, args: Dict[str, Any], role: str = "user", timeout: int = 30) -> Dict[str, Any]:
+    async def _execute_builtin_tool(
+        self, tool_name: str, args: dict[str, Any], role: str = "user", timeout: int = 30
+    ) -> dict[str, Any]:
         """
         执行内置工具
         """
@@ -238,7 +256,7 @@ class ToolExecutor:
             return {
                 "success": False,
                 "error": f"权限不足: {role} 无法调用 {tool_name}",
-                "timestamp": datetime.now().isoformat()
+                "timestamp": datetime.now().isoformat(),
             }
 
         # 检查缓存
@@ -249,32 +267,31 @@ class ToolExecutor:
                 "tool": tool_name,
                 "result": cached_result,
                 "timestamp": datetime.now().isoformat(),
-                "from_cache": True
+                "from_cache": True,
             }
 
         try:
             logger.info(f"🛠️  正在执行内置工具: {tool_name} | 参数: {args}")
-            
+
             # 应用速率限制
             rate_limiter = self._rate_limiters.get(tool_name, self._rate_limiters["default"])
             async with rate_limiter:
                 # 执行工具，添加超时控制
                 result = await asyncio.wait_for(
-                    self._tool_registry[tool_name](**args),
-                    timeout=timeout
+                    self._tool_registry[tool_name](**args), timeout=timeout
                 )
-            
+
             # 更新缓存
             self._update_cache(tool_name, args, result)
-            
+
             return {
                 "success": True,
                 "tool": tool_name,
                 "result": result,
                 "timestamp": datetime.now().isoformat(),
-                "from_cache": False
+                "from_cache": False,
             }
-            
+
         except asyncio.TimeoutError:
             error_msg = f"执行超时: 超过 {timeout} 秒"
             logger.error(f"⏰ {tool_name} 执行超时: {error_msg}")
@@ -288,32 +305,45 @@ class ToolExecutor:
             logger.error(f"❌ {tool_name} 崩溃: {error_msg}")
             return {"success": False, "error": error_msg, "timestamp": datetime.now().isoformat()}
 
-    async def _execute_skill_tool(self, skill_class, args: Dict[str, Any], role: str = "user", timeout: int = 30) -> Dict[str, Any]:
+    async def _execute_skill_tool(
+        self, skill_class, args: dict[str, Any], role: str = "user", timeout: int = 30
+    ) -> dict[str, Any]:
         """
         执行技能工具
         """
         try:
             logger.info(f"🛠️  正在执行技能工具: {skill_class.name} | 参数: {args}")
-            
+
             # 创建技能实例
             skill = skill_class()
-            
+
             # 执行技能
-            result = await asyncio.wait_for(
-                asyncio.to_thread(skill.execute, args),
-                timeout=timeout
-            )
-            
+            result = await asyncio.wait_for(asyncio.to_thread(skill.execute, args), timeout=timeout)
+
             return result
-            
+
         except asyncio.TimeoutError:
             error_msg = f"执行超时: 超过 {timeout} 秒"
             logger.error(f"⏰ {skill_class.name} 执行超时: {error_msg}")
-            return {"status": "error", "observation": {"data": None, "message": error_msg, "timestamp": datetime.now().isoformat()}}
+            return {
+                "status": "error",
+                "observation": {
+                    "data": None,
+                    "message": error_msg,
+                    "timestamp": datetime.now().isoformat(),
+                },
+            }
         except Exception as e:
             error_msg = f"执行运行时错误: {str(e)}"
             logger.error(f"❌ {skill_class.name} 崩溃: {error_msg}")
-            return {"status": "error", "observation": {"data": None, "message": error_msg, "timestamp": datetime.now().isoformat()}}
+            return {
+                "status": "error",
+                "observation": {
+                    "data": None,
+                    "message": error_msg,
+                    "timestamp": datetime.now().isoformat(),
+                },
+            }
 
     # --- 核心工具实现区 ---
 
@@ -333,18 +363,18 @@ class ToolExecutor:
                             "query": query,
                             "api_key": api_key,
                             "search_depth": "basic",
-                            "include_answer": True
+                            "include_answer": True,
                         },
-                        timeout=10
+                        timeout=10,
                     )
-                    
+
                     if response.status_code == 200:
                         data = response.json()
                         if "answer" in data and data["answer"]:
                             return f"找到关于 '{query}' 的信息：{data['answer']}"
                         elif "results" in data and data["results"]:
                             return f"找到关于 '{query}' 的信息：{data['results'][0]['title']} - {data['results'][0]['snippet']}"
-            
+
             # 模拟搜索结果（当 API_KEY 未设置时）
             await asyncio.sleep(1.2)
             return f"找到关于 '{query}' 的信息：Ace 浏览器在 2026 年 4 月已占据 AI 原生浏览器市场领先地位。"
@@ -360,11 +390,11 @@ class ToolExecutor:
         使用线程池防止大文件写入阻塞事件循环
         """
         file_path = os.path.join(self.output_dir, filename)
-        
+
         # 检查文件路径安全性
         if ".." in filename or os.path.isabs(filename):
             raise ValueError("不安全的文件路径")
-        
+
         def _sync_write():
             # 确保目录存在
             os.makedirs(os.path.dirname(file_path), exist_ok=True)
@@ -379,39 +409,39 @@ class ToolExecutor:
     async def _read_file(self, filename: str) -> str:
         """📖 异步读取文件"""
         file_path = os.path.join(self.output_dir, filename)
-        
+
         # 检查文件路径安全性
         if ".." in filename or os.path.isabs(filename):
             raise ValueError("不安全的文件路径")
-        
+
         if not os.path.exists(file_path):
             raise FileNotFoundError(f"无法读取: 文件 {filename} 不存在")
-        
+
         def _sync_read():
-            with open(file_path, "r", encoding="utf-8") as f:
+            with open(file_path, encoding="utf-8") as f:
                 return f.read()
-        
+
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(None, _sync_read)
 
-    async def _list_files(self) -> List[str]:
+    async def _list_files(self) -> list[str]:
         """📂 列出当前工作目录下的所有文件"""
         return os.listdir(self.output_dir)
 
     async def _delete_file(self, filename: str) -> str:
         """🗑️ 删除指定文件"""
         file_path = os.path.join(self.output_dir, filename)
-        
+
         # 检查文件路径安全性
         if ".." in filename or os.path.isabs(filename):
             raise ValueError("不安全的文件路径")
-        
+
         if os.path.exists(file_path):
             os.remove(file_path)
             return f"文件 {filename} 已从工作目录删除"
         return f"未找到文件 {filename}，无需删除"
 
-    async def _get_system_status(self) -> Dict[str, Any]:
+    async def _get_system_status(self) -> dict[str, Any]:
         """📊 获取当前执行器状态"""
         return {
             "status": "ready",
@@ -419,10 +449,10 @@ class ToolExecutor:
             "tool_count": len(self._tool_registry),
             "cache_stats": self.get_cache_stats(),
             "server_time": datetime.now().isoformat(),
-            "python_version": os.sys.version
+            "python_version": os.sys.version,
         }
 
-    def get_available_tools(self) -> List[str]:
+    def get_available_tools(self) -> list[str]:
         """获取所有可用工具清单"""
         # 合并内置工具和技能注册表中的工具
         return list(self._tool_registry.keys()) + skill_registry.get_skill_names()
@@ -443,26 +473,28 @@ class ToolExecutor:
     def close(self):
         """关闭执行器，清理资源"""
         logger.info("关闭工具执行器，清理资源...")
-        
+
         # 清理缓存
         self._cache.clear()
         logger.info("已清理缓存")
-        
+
         # 清理工具注册表
         self._tool_registry.clear()
         logger.info("已清理工具注册表")
-        
+
         logger.info("工具执行器已成功关闭")
 
-    async def execute_multiple(self, tool_calls: List[Dict[str, Any]], role: str = "user", timeout: int = 30) -> List[Dict[str, Any]]:
+    async def execute_multiple(
+        self, tool_calls: list[dict[str, Any]], role: str = "user", timeout: int = 30
+    ) -> list[dict[str, Any]]:
         """
         并发执行多个工具调用
-        
+
         Args:
             tool_calls: 工具调用列表，每个元素包含 tool_name 和 args
             role: 用户角色
             timeout: 每个工具的超时时间
-            
+
         Returns:
             工具执行结果列表
         """
@@ -473,18 +505,20 @@ class ToolExecutor:
             if tool_name:
                 task = self.execute(tool_name, args, role, timeout)
                 tasks.append(task)
-        
+
         if tasks:
             results = await asyncio.gather(*tasks, return_exceptions=True)
             # 处理异常结果
             processed_results = []
             for result in results:
                 if isinstance(result, Exception):
-                    processed_results.append({
-                        "success": False,
-                        "error": str(result),
-                        "timestamp": datetime.now().isoformat()
-                    })
+                    processed_results.append(
+                        {
+                            "success": False,
+                            "error": str(result),
+                            "timestamp": datetime.now().isoformat(),
+                        }
+                    )
                 else:
                     processed_results.append(result)
             return processed_results

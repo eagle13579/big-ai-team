@@ -9,26 +9,28 @@ MemPalace 核心逻辑【安全构建】脚本
 4. 跨平台兼容：支持 Windows、Linux 和 macOS
 5. 性能优化：减少不必要的操作和重复工作
 """
+
 import os
-import sys
+import platform
 import shutil
 import subprocess
-import platform
+import sys
 import time
 from datetime import datetime
 
 # --- 1. 配置路径 ---
-SOURCE_DIR = "core"       # 源码目录（受到保护，不会被删）
-OUTPUT_DIR = "core"        # 交付目录（生成的黑盒存放在这里）
-TEMP_DIST = "dist_temp"   # Nuitka 临时编译目录
+SOURCE_DIR = "core"  # 源码目录（受到保护，不会被删）
+OUTPUT_DIR = "core"  # 交付目录（生成的黑盒存放在这里）
+TEMP_DIST = "dist_temp"  # Nuitka 临时编译目录
 CORE_SOURCE = "src/persistence/mempalace_integration_v2.py"  # 核心源码文件
+
 
 # --- 2. 工具函数 ---
 def force_remove_dir(path):
     """强制删除目录，处理防病毒软件锁定的情况"""
     if not os.path.exists(path):
         return True
-    
+
     max_attempts = 5
     for attempt in range(max_attempts):
         try:
@@ -44,25 +46,27 @@ def force_remove_dir(path):
                 print("💡 提示：请尝试暂时禁用防病毒软件后重新运行")
                 return False
 
+
 def get_current_time():
     """获取当前时间"""
     return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+
 def check_requirements():
     """环境检查"""
     print("🔍 正在检查构建环境...")
-    
+
     # 检查 Python 版本
     python_version = platform.python_version()
     print(f"🐍 Python 版本: {python_version}")
-    
+
     # 检查 Nuitka
     try:
         result = subprocess.run(
             [sys.executable, "-m", "nuitka", "--version"],
             capture_output=True,
             text=True,
-            check=True
+            check=True,
         )
         nuitka_version = result.stdout.strip()
         print(f"🛠️ Nuitka 版本: {nuitka_version}")
@@ -71,8 +75,7 @@ def check_requirements():
         print("⚠️ 未找到 Nuitka，尝试安装...")
         try:
             subprocess.run(
-                [sys.executable, "-m", "pip", "install", "nuitka", "zstandard"],
-                check=True
+                [sys.executable, "-m", "pip", "install", "nuitka", "zstandard"], check=True
             )
             print("✅ Nuitka 安装成功")
             return True
@@ -80,26 +83,27 @@ def check_requirements():
             print("❌ 安装失败，请手动执行: pip install nuitka zstandard")
             return False
 
+
 def build_safe():
     """核心构建逻辑"""
-    print(f"\n🚀 开始安全构建 [MemPalace Core]...")
+    print("\n🚀 开始安全构建 [MemPalace Core]...")
     start_time = time.time()
-    
+
     # 清理历史残留
     print("🧹 清理历史残留...")
-    
+
     # 保存 __init__.py 文件
     init_file = os.path.join(SOURCE_DIR, "__init__.py")
     init_content = None
     if os.path.exists(init_file):
-        with open(init_file, "r", encoding="utf-8") as f:
+        with open(init_file, encoding="utf-8") as f:
             init_content = f.read()
-        print(f"📝 保存 __init__.py 内容")
-    
+        print("📝 保存 __init__.py 内容")
+
     # 清理临时目录
     if os.path.exists(TEMP_DIST):
         force_remove_dir(TEMP_DIST)
-    
+
     # 清理输出目录（但保留 __init__.py）
     if os.path.exists(OUTPUT_DIR):
         for item in os.listdir(OUTPUT_DIR):
@@ -110,17 +114,17 @@ def build_safe():
                     print(f"✅ 删除文件: {item_path}")
                 except Exception as e:
                     print(f"❌ 删除文件失败: {e}")
-    
+
     # 创建输出目录（如果不存在）
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     print(f"📁 确保输出目录存在: {OUTPUT_DIR}")
-    
+
     # 恢复 __init__.py 文件
     if init_content is not None:
         with open(init_file, "w", encoding="utf-8") as f:
             f.write(init_content)
-        print(f"✅ 恢复 __init__.py 文件")
-    
+        print("✅ 恢复 __init__.py 文件")
+
     # 复制核心源码文件到 core 目录
     if os.path.exists(CORE_SOURCE):
         core_file = os.path.join(SOURCE_DIR, "mempalace_core.py")
@@ -137,17 +141,20 @@ def build_safe():
     # Nuitka 构建命令
     # 注意：我们直接把结果输出到 TEMP_DIST，不碰 SOURCE_DIR
     cmd = [
-        sys.executable, "-m", "nuitka",
-        "--module", os.path.join(SOURCE_DIR, "mempalace_core.py"),
+        sys.executable,
+        "-m",
+        "nuitka",
+        "--module",
+        os.path.join(SOURCE_DIR, "mempalace_core.py"),
         f"--output-dir={TEMP_DIST}",
         "--remove-output",
         "--no-pyi-file",
         "--show-progress",
-        "--enable-plugin=pylint-warnings"
+        "--enable-plugin=pylint-warnings",
     ]
-    
+
     print(f"🛠️ 执行编译: {' '.join(cmd)}")
-    
+
     try:
         subprocess.run(cmd, check=True)
         print("✅ 编译成功！")
@@ -158,19 +165,19 @@ def build_safe():
     # 移动产物到最终交付目录 core
     ext = ".pyd" if platform.system() == "Windows" else ".so"
     found_binary = False
-    
+
     print("📦 正在收集编译产物...")
     print(f"🔍 搜索临时目录: {TEMP_DIST}")
     print(f"🔍 目标目录: {OUTPUT_DIR}")
-    
+
     # 列出临时目录中的所有文件
     if os.path.exists(TEMP_DIST):
         print("📁 临时目录内容:")
-        for root, dirs, files in os.walk(TEMP_DIST):
-            level = root.replace(TEMP_DIST, '').count(os.sep)
-            indent = ' ' * 2 * level
+        for root, _dirs, files in os.walk(TEMP_DIST):
+            level = root.replace(TEMP_DIST, "").count(os.sep)
+            indent = " " * 2 * level
             print(f"{indent}{os.path.basename(root)}/")
-            subindent = ' ' * 2 * (level + 1)
+            subindent = " " * 2 * (level + 1)
             for file in files:
                 print(f"{subindent}{file}")
                 if file.endswith(ext):
@@ -187,6 +194,7 @@ def build_safe():
                     except Exception as e:
                         print(f"❌ 移动文件失败: {e}")
                         import traceback
+
                         traceback.print_exc()
     else:
         print("❌ 临时目录不存在")
@@ -204,7 +212,7 @@ def build_safe():
     # 清理编译产生的临时垃圾
     if os.path.exists(TEMP_DIST):
         force_remove_dir(TEMP_DIST)
-    
+
     # 删除 core 目录下的 .py 源码文件（除了 __init__.py）
     print("🧹 清理核心源码文件...")
     for file in os.listdir(SOURCE_DIR):
@@ -215,44 +223,46 @@ def build_safe():
                 print(f"✅ 删除源码文件: {file_path}")
             except Exception as e:
                 print(f"❌ 删除文件失败: {e}")
-    
+
     # 计算构建时间
     build_time = time.time() - start_time
     print(f"⏱️  构建耗时: {build_time:.2f} 秒")
-        
+
     return found_binary
+
 
 def verify_build():
     """验证构建结果"""
     print("\n🔍 验证构建结果...")
-    
+
     # 检查输出目录是否存在
     if not os.path.exists(OUTPUT_DIR):
         print("❌ 输出目录不存在")
         return False
-    
+
     # 检查是否生成了二进制文件
     ext = ".pyd" if platform.system() == "Windows" else ".so"
     binary_files = [f for f in os.listdir(OUTPUT_DIR) if f.endswith(ext)]
-    
+
     if not binary_files:
         print("❌ 未找到生成的二进制文件")
         return False
-    
+
     print(f"✅ 找到 {len(binary_files)} 个二进制文件:")
     for file in binary_files:
         file_path = os.path.join(OUTPUT_DIR, file)
         file_size = os.path.getsize(file_path) / (1024 * 1024)  # 转换为 MB
         print(f"  - {file} ({file_size:.2f} MB)")
-    
+
     # 检查 __init__.py 是否存在
     init_file = os.path.join(OUTPUT_DIR, "__init__.py")
     if os.path.exists(init_file):
         print("✅ __init__.py 存在")
     else:
         print("⚠️ __init__.py 不存在")
-    
+
     return True
+
 
 def main():
     print("=" * 60)
@@ -281,6 +291,7 @@ def main():
     else:
         print("\n❌ 构建过程中出现错误。")
         return 1
+
 
 if __name__ == "__main__":
     sys.exit(main())

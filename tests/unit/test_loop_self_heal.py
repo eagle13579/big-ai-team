@@ -1,7 +1,8 @@
 import asyncio
 import logging
+from typing import Optional
+
 import pytest
-from typing import List, Optional
 
 # 配置日志
 logging.basicConfig(level=logging.INFO)
@@ -32,14 +33,14 @@ class AgenticLoop:
     def __init__(self, agent: MockAgent, max_steps: int = 5):
         self.agent = agent
         self.max_steps = max_steps
-        self.history: List[MockRunResponse] = []
+        self.history: list[MockRunResponse] = []
 
     async def run_until_complete(self, task: str) -> Optional[MockRunResponse]:
         step = 0
         current_prompt = task
         while step < self.max_steps:
             logger.info(f"--- [Step {step + 1}] Executing Loop ---")
-            
+
             # 1. 执行 (Act & Observe)
             response = await self.agent.arun(current_prompt)
             self.history.append(response)

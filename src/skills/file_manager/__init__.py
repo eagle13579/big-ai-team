@@ -1,37 +1,56 @@
 import os
 import shutil
 import stat
-from typing import Dict, Any, Optional, List
+from typing import Any, Dict, List, Optional
+
 from pydantic import BaseModel, Field, field_validator
+
 from src.shared.base import BaseSkill
 from src.shared.utils import sanitize_path
 
 
 class FileManagerArgsSchema(BaseModel):
     """文件管理操作的参数校验架构"""
-    operation: str = Field(..., description="操作类型: read, write, list, delete, copy, move, mkdir, rename, stat")
+
+    operation: str = Field(
+        ..., description="操作类型: read, write, list, delete, copy, move, mkdir, rename, stat"
+    )
     file_path: str = Field(..., description="文件或目录路径")
     content: Optional[str] = Field(default=None, description="写入文件的内容")
     target_path: Optional[str] = Field(default=None, description="复制、移动或重命名的目标路径")
-    max_size: Optional[int] = Field(default=10485760, description="文件大小限制（字节），默认为10MB")
+    max_size: Optional[int] = Field(
+        default=10485760, description="文件大小限制（字节），默认为10MB"
+    )
 
     @field_validator("operation")
     @classmethod
     def validate_operation(cls, v):
-        valid_operations = ["read", "write", "list", "delete", "copy", "move", "mkdir", "rename", "stat"]
+        valid_operations = [
+            "read",
+            "write",
+            "list",
+            "delete",
+            "copy",
+            "move",
+            "mkdir",
+            "rename",
+            "stat",
+        ]
         if v not in valid_operations:
             raise ValueError(f"不支持的操作类型: {v}，支持的操作类型: {valid_operations}")
         return v
 
-    @field_validator("content", mode='before')
+    @field_validator("content", mode="before")
     @classmethod
     def validate_content(cls, v, info):
         if info.data.get("operation") == "write" and v is None:
             raise ValueError("写入操作必须提供 content 参数")
         # 检查内容大小
         max_size = info.data.get("max_size", 10485760)
-        if v and len(v.encode('utf-8')) > max_size:
-            raise ValueError(f"内容大小超过限制: {len(v.encode('utf-8'))} 字节，最大允许: {max_size} 字节")
+        if v and len(v.encode("utf-8")) > max_size:
+            raise ValueError(
+                f"内容大小超过限制: {len(v.encode('utf-8'))} 字节，最大允许: {max_size} 字节"
+            )
         return v
 
     @field_validator("target_path")
@@ -66,10 +85,10 @@ class FileManagerTool(BaseSkill):
             "move": self._move_file,
             "mkdir": self._create_directory,
             "rename": self._rename_file,
-            "stat": self._get_file_stat
+            "stat": self._get_file_stat,
         }
 
-    def execute(self, args: Dict[str, Any]) -> Dict[str, Any]:
+    def execute(self, args: dict[str, Any]) -> dict[str, Any]:
         """
         执行文件系统操作
 
@@ -87,7 +106,9 @@ class FileManagerTool(BaseSkill):
             operation = validated_args.operation
             file_path = sanitize_path(validated_args.file_path)
             content = validated_args.content
-            target_path = sanitize_path(validated_args.target_path) if validated_args.target_path else None
+            target_path = (
+                sanitize_path(validated_args.target_path) if validated_args.target_path else None
+            )
             max_size = validated_args.max_size
 
             # 规范化路径
@@ -114,8 +135,8 @@ class FileManagerTool(BaseSkill):
                     "observation": {
                         "data": None,
                         "message": f"不支持的操作类型: {operation}",
-                        "timestamp": self._get_timestamp()
-                    }
+                        "timestamp": self._get_timestamp(),
+                    },
                 }
 
         except ValueError as e:
@@ -124,8 +145,8 @@ class FileManagerTool(BaseSkill):
                 "observation": {
                     "data": None,
                     "message": str(e),
-                    "timestamp": self._get_timestamp()
-                }
+                    "timestamp": self._get_timestamp(),
+                },
             }
         except Exception as e:
             # 检查是否是写入操作时缺少内容
@@ -135,19 +156,14 @@ class FileManagerTool(BaseSkill):
                     "observation": {
                         "data": None,
                         "message": "写入操作必须提供 content 参数",
-                        "timestamp": self._get_timestamp()
-                    }
+                        "timestamp": self._get_timestamp(),
+                    },
                 }
             return {
                 "status": "error",
                 "observation": {
                     "data": None,
                     "message": f"文件系统异常: {str(e)}",
-                    "timestamp": self._get_timestamp()
-                }
+                    "timestamp": self._get_timestamp(),
+                },
             }
-
-
-
-
-

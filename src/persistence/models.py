@@ -1,31 +1,36 @@
-from sqlalchemy import Column, String, Text, Boolean, Integer, TIMESTAMP, ARRAY, ForeignKey
-from sqlalchemy.dialects.postgresql import UUID, JSONB, ENUM
-from sqlalchemy.sql import func
-from .database import Base
 import enum
 
+from sqlalchemy import ARRAY, TIMESTAMP, Boolean, Column, Integer, String, Text
+from sqlalchemy.dialects.postgresql import ENUM, JSONB, UUID
+from sqlalchemy.sql import func
+
+from .database import Base
+
+
 class TaskStatus(str, enum.Enum):
-    PENDING = 'pending'
-    IN_PROGRESS = 'in_progress'
-    COMPLETED = 'completed'
-    FAILED = 'failed'
-    RETRYING = 'retrying'
+    PENDING = "pending"
+    IN_PROGRESS = "in_progress"
+    COMPLETED = "completed"
+    FAILED = "failed"
+    RETRYING = "retrying"
+
 
 class Memory(Base):
-    __tablename__ = 'memories'
-    
+    __tablename__ = "memories"
+
     id = Column(UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid())
     session_id = Column(String(64), nullable=False, index=True)
     user_id = Column(String(64), nullable=False)
     role_name = Column(String(32))
     content = Column(Text, nullable=False)
-    embedding = Column('embedding', 'vector(1536)')  # pgvector type
+    embedding = Column("embedding", "vector(1536)")  # pgvector type
     metadata = Column(JSONB, default={})
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
 
+
 class Task(Base):
-    __tablename__ = 'tasks'
-    
+    __tablename__ = "tasks"
+
     task_id = Column(UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid())
     plan_id = Column(UUID(as_uuid=True), nullable=False)
     parent_task_id = Column(UUID(as_uuid=True), nullable=True)
@@ -40,9 +45,10 @@ class Task(Base):
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
     updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), onupdate=func.now())
 
+
 class SkillRegistry(Base):
-    __tablename__ = 'skill_registry'
-    
+    __tablename__ = "skill_registry"
+
     id = Column(UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid())
     name = Column(String(64), unique=True, nullable=False)
     version = Column(String(16), nullable=True)

@@ -1,10 +1,9 @@
-import sys
-import os
-import time
 import logging
+import os
 
 # 直接定义日志目录，避免依赖 src.main
 LOG_DIR = "logs"
+
 
 def test_logging_system():
     """
@@ -14,7 +13,7 @@ def test_logging_system():
     print("📋 测试日志系统")
     print("=" * 60)
     print()
-    
+
     # 1. 检查日志目录是否存在
     print("1. 检查日志目录...")
     if os.path.exists(LOG_DIR):
@@ -22,10 +21,10 @@ def test_logging_system():
     else:
         print(f"❌ 日志目录不存在: {LOG_DIR}")
     print()
-    
+
     # 2. 检查是否有日志文件
     print("2. 检查日志文件...")
-    log_files = [f for f in os.listdir(LOG_DIR) if f.endswith('.log')]
+    log_files = [f for f in os.listdir(LOG_DIR) if f.endswith(".log")]
     if log_files:
         print(f"✅ 找到 {len(log_files)} 个日志文件:")
         for log_file in log_files:
@@ -35,7 +34,7 @@ def test_logging_system():
     else:
         print("⚠️  暂未发现日志文件")
     print()
-    
+
     # 3. 测试日志写入
     print("3. 测试日志写入...")
     test_logger = logging.getLogger("TestLogger")
@@ -44,27 +43,27 @@ def test_logging_system():
     test_logger.error("这是一条测试错误日志")
     print("✅ 日志写入测试完成")
     print()
-    
+
     # 4. 再次检查日志文件
     print("4. 再次检查日志文件...")
-    log_files = [f for f in os.listdir(LOG_DIR) if f.endswith('.log')]
+    log_files = [f for f in os.listdir(LOG_DIR) if f.endswith(".log")]
     if log_files:
         print(f"✅ 找到 {len(log_files)} 个日志文件:")
         for log_file in log_files:
             file_path = os.path.join(LOG_DIR, log_file)
             file_size = os.path.getsize(file_path)
             print(f"   - {log_file} ({file_size} bytes)")
-            
+
             # 查看日志文件内容
             print("   最近的日志内容:")
-            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+            with open(file_path, encoding="utf-8", errors="ignore") as f:
                 lines = f.readlines()
                 for line in lines[-5:]:  # 显示最后5行
                     print(f"     {line.rstrip()}")
     else:
         print("❌ 仍然没有日志文件")
     print()
-    
+
     print("=" * 60)
     print("✅ 日志系统测试完成！")
     print("=" * 60)
