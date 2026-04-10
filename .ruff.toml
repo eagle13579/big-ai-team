@@ -1,0 +1,43 @@
+# ==========================================
+# .ruff.toml - 2026 工业级修正版
+# ==========================================
+
+# 1. 全局配置 (必须放在最顶部，不能放在 [lint] 下)
+target-version = "py39"
+line-length = 100
+
+# 关键修复：解决 Binary error
+# 在全局层级定义排除，Ruff 才能正确识别并跳过二进制文件
+exclude = [
+    "*.so",
+    "*.pyd",
+    "*.pyc",
+    "__pycache__",
+    "dist",
+    "build",
+    ".venv",
+    "venv"
+]
+
+# 2. 检查规则配置
+[lint]
+# E (Error), F (Pyflakes), I (Isort), B (Bugbear), UP (Pyupgrade)
+select = ["E", "F", "I", "B", "UP"]
+
+# 允许 __init__.py 中存在导入但未使用 (F401)
+# 允许 bridge 中存在 sys.path 操作 (E402)
+[lint.per-file-ignores]
+"__init__.py" = ["F401"]
+"bridge/*.py" = ["E402"]
+
+[lint.mccabe]
+max-complexity = 15
+
+# 3. 自动排序导入 (Isort 标准)
+[lint.isort]
+known-first-party = ["core", "bridge"]
+
+# 4. 格式化设置
+[format]
+quote-style = "double"
+indent-style = "space"

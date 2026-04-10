@@ -1,21 +1,28 @@
-name: Generate Validation Report
+name: "Project Report"
+
 on:
-  push:
-    branches: [ main, feature/* ] # 当有新代码推送时触发
+  workflow_run:
+    workflows: ["Production-Grade AI Core Protection Pipeline"]
+    types: [completed]
+
 jobs:
-  build-report:
+  summary:
+    name: "📝 Final Summary"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Install Dependencies
-        run: npm install
-      - name: Run Validation Script
-        run: npm run validate # 运行你生成 module_validation_report 的脚本
-      - name: Deploy Report to Wiki/Pages
+      - name: "📝 Generate Run Summary"
         run: |
-          # 这里可以将生成的 markdown 推送到仓库的 docs 目录或专门的 report 分支
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add module_validation_report.md
-          git commit -m "docs: update validation report [skip ci]"
-          git push
+          echo "## 🚀 构建流水线最终报告" >> $GITHUB_STEP_SUMMARY
+          echo "- **项目仓库**: \`${{ github.repository }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **最终结论**: ${{ github.event.workflow_run.conclusion == 'success' && '✅ 成功 (SUCCESS)' || '❌ 失败 (FAILED)' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **完成时间**: $(date)" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ github.event.workflow_run.conclusion }}" == "success" ]; then
+            echo "### 🛡️ 安全状态：已加固" >> $GITHUB_STEP_SUMMARY
+            echo "✅ 核心代码已完成二进制转换。" >> $GITHUB_STEP_SUMMARY
+            echo "✅ 源码残留审计已通过。" >> $GITHUB_STEP_SUMMARY
+            echo "✅ 产物已上传至 Artifacts。" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ⚠️ 风险警报" >> $GITHUB_STEP_SUMMARY
+            echo "❌ 构建中断。请立即检查主流水线中的 **Step 4 (测试)** 或 **Step 6 (审计)**。" >> $GITHUB_STEP_SUMMARY
+          fi

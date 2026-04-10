@@ -1,23 +1,27 @@
 import os
 import time
 from datetime import datetime
-from typing import Dict, Any, Optional, List, Callable, Tuple
 from enum import Enum
-from pydantic import BaseModel, Field, ConfigDict, model_validator
+from typing import Any, Callable, Dict, List, Optional, Tuple
+
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 # 尝试从 shared 模块导入日志
 try:
     from src.shared.logging import logger
+
     logger = logger.bind(name="AceAgent.GitHelper")
 except ImportError:
     # 兼容重构后可能的路径变化
     try:
         from shared.logging import logger
+
         logger = logger.bind(name="AceAgent.GitHelper")
     except ImportError:
         # 如果依然找不到，使用默认日志
         import logging
+
         logger = logging.getLogger("AceAgent.GitHelper")
 
 # 尝试从 shared 模块导入基础类
@@ -34,8 +38,12 @@ except ImportError:
         class BaseSkill:
             def _get_timestamp(self) -> str:
                 from datetime import datetime
+
                 return datetime.now().isoformat() + "Z"
-        def sanitize_path(p): return p
+
+        def sanitize_path(p):
+            return p
+
 
 # 尝试导入 GitPython
 try:
@@ -47,30 +55,37 @@ except ImportError:
 # 自定义异常类
 class GitHelperError(Exception):
     """GitHelper 基础异常类"""
+
     pass
 
 
 class GitPermissionError(GitHelperError):
     """Git 权限错误"""
+
     pass
 
 
 class GitValidationError(GitHelperError):
     """Git 输入验证错误"""
+
     pass
 
 
 class GitOperationError(GitHelperError):
     """Git 操作执行错误"""
+
     pass
 
 
 class GitRepositoryError(GitHelperError):
     """Git 仓库错误"""
+
     pass
+
 
 class GitAction(str, Enum):
     """Git 操作类型枚举"""
+
     STATUS = "status"
     ADD = "add"
     COMMIT = "commit"
@@ -89,10 +104,12 @@ class GitAction(str, Enum):
     HOOKS_WRITE = "hooks_write"
     HOOKS_DELETE = "hooks_delete"
 
+
 class GitArgsSchema(BaseModel):
     """Git 操作的参数校验架构"""
+
     action: GitAction = Field(..., description="Git 操作类型")
-    files: Optional[List[str]] = Field(default=None, description="要操作的文件列表")
+    files: Optional[list[str]] = Field(default=None, description="要操作的文件列表")
     message: Optional[str] = Field(default=None, description="提交信息")
     remote: Optional[str] = Field(default="origin", description="远程仓库名称")
     branch: Optional[str] = Field(default=None, description="分支名称")
@@ -102,86 +119,110 @@ class GitArgsSchema(BaseModel):
     stash_index: Optional[int] = Field(default=0, description="stash 索引")
     hook_name: Optional[str] = Field(default=None, description="钩子名称")
     hook_content: Optional[str] = Field(default=None, description="钩子内容")
-    
+
     model_config = ConfigDict(use_enum_values=True)
 
-    @model_validator(mode='before')
+    @model_validator(mode="before")
     @classmethod
     def validate_all(cls, values):
-        action = values.get('action')
-        if action == GitAction.COMMIT and not values.get('message'):
+        action = values.get("action")
+        if action == GitAction.COMMIT and not values.get("message"):
             raise ValueError("执行 commit 操作时必须提供提交信息")
-        if action == GitAction.TAG and not values.get('tag_name'):
+        if action == GitAction.TAG and not values.get("tag_name"):
             raise ValueError("执行 tag 操作时必须提供标签名称")
-        if action == GitAction.MERGE and not values.get('target_branch'):
+        if action == GitAction.MERGE and not values.get("target_branch"):
             raise ValueError("执行 merge 操作时必须提供目标分支")
-        if action in [GitAction.HOOKS_READ, GitAction.HOOKS_WRITE, GitAction.HOOKS_DELETE] and not values.get('hook_name'):
+        if action in [
+            GitAction.HOOKS_READ,
+            GitAction.HOOKS_WRITE,
+            GitAction.HOOKS_DELETE,
+        ] and not values.get("hook_name"):
             raise ValueError(f"执行 {action} 操作时必须提供钩子名称")
-        if action == GitAction.HOOKS_WRITE and not values.get('hook_content'):
+        if action == GitAction.HOOKS_WRITE and not values.get("hook_content"):
             raise ValueError("执行 hooks_write 操作时必须提供钩子内容")
         return values
 
+
 class GitInterface:
     """Git 操作的抽象接口"""
-    def status(self) -> Dict[str, Any]:
+
+    def status(self) -> dict[str, Any]:
         """获取 Git 状态"""
         raise NotImplementedError
-    def add(self, files: List[str]) -> Dict[str, Any]:
+
+    def add(self, files: list[str]) -> dict[str, Any]:
         """添加文件到暂存区"""
         raise NotImplementedError
-    def commit(self, message: str) -> Dict[str, Any]:
+
+    def commit(self, message: str) -> dict[str, Any]:
         """提交更改"""
         raise NotImplementedError
-    def push(self, remote: str, branch: Optional[str]) -> Dict[str, Any]:
+
+    def push(self, remote: str, branch: Optional[str]) -> dict[str, Any]:
         """推送更改到远程仓库"""
         raise NotImplementedError
-    def pull(self, remote: str, branch: Optional[str]) -> Dict[str, Any]:
+
+    def pull(self, remote: str, branch: Optional[str]) -> dict[str, Any]:
         """从远程仓库拉取更改"""
         raise NotImplementedError
-    def branch(self, branch_name: Optional[str]) -> Dict[str, Any]:
+
+    def branch(self, branch_name: Optional[str]) -> dict[str, Any]:
         """管理分支"""
         raise NotImplementedError
-    def tag(self, tag_name: str, message: Optional[str]) -> Dict[str, Any]:
+
+    def tag(self, tag_name: str, message: Optional[str]) -> dict[str, Any]:
         """创建标签"""
         raise NotImplementedError
-    def merge(self, branch: str) -> Dict[str, Any]:
+
+    def merge(self, branch: str) -> dict[str, Any]:
         """合并分支"""
         raise NotImplementedError
-    def stash(self, message: Optional[str]) -> Dict[str, Any]:
+
+    def stash(self, message: Optional[str]) -> dict[str, Any]:
         """暂存更改"""
         raise NotImplementedError
-    def stash_list(self) -> Dict[str, Any]:
+
+    def stash_list(self) -> dict[str, Any]:
         """列出所有暂存"""
         raise NotImplementedError
-    def stash_apply(self, index: int) -> Dict[str, Any]:
+
+    def stash_apply(self, index: int) -> dict[str, Any]:
         """应用暂存"""
         raise NotImplementedError
-    def stash_pop(self, index: int) -> Dict[str, Any]:
+
+    def stash_pop(self, index: int) -> dict[str, Any]:
         """弹出暂存"""
         raise NotImplementedError
-    def stash_drop(self, index: int) -> Dict[str, Any]:
+
+    def stash_drop(self, index: int) -> dict[str, Any]:
         """删除暂存"""
         raise NotImplementedError
-    def hooks_list(self) -> Dict[str, Any]:
+
+    def hooks_list(self) -> dict[str, Any]:
         """列出所有钩子"""
         raise NotImplementedError
-    def hooks_read(self, hook_name: str) -> Dict[str, Any]:
+
+    def hooks_read(self, hook_name: str) -> dict[str, Any]:
         """读取钩子内容"""
         raise NotImplementedError
-    def hooks_write(self, hook_name: str, content: str) -> Dict[str, Any]:
+
+    def hooks_write(self, hook_name: str, content: str) -> dict[str, Any]:
         """写入钩子内容"""
         raise NotImplementedError
-    def hooks_delete(self, hook_name: str) -> Dict[str, Any]:
+
+    def hooks_delete(self, hook_name: str) -> dict[str, Any]:
         """删除钩子"""
         raise NotImplementedError
 
+
 class GitPythonClient(GitInterface):
     """使用 GitPython 实现的 Git 客户端"""
+
     def __init__(self, repo_path: str):
         self.repo_path = repo_path
         self.repo = git.Repo(repo_path)
 
-    def status(self) -> Dict[str, Any]:
+    def status(self) -> dict[str, Any]:
         """获取 Git 状态"""
         status_data = {}
         status_data["branch"] = self.repo.active_branch.name
@@ -200,7 +241,7 @@ class GitPythonClient(GitInterface):
         status_data["staged"] = staged_files
         return status_data
 
-    def add(self, files: List[str]) -> Dict[str, Any]:
+    def add(self, files: list[str]) -> dict[str, Any]:
         """添加文件到暂存区"""
         if "." in files:
             # 添加所有文件
@@ -212,13 +253,13 @@ class GitPythonClient(GitInterface):
             return {"message": f"已暂存文件: {files}"}
 
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
-    def commit(self, message: str) -> Dict[str, Any]:
+    def commit(self, message: str) -> dict[str, Any]:
         """提交更改"""
         commit_obj = self.repo.index.commit(message)
         return {"hexsha": commit_obj.hexsha, "message": f"提交成功: {commit_obj.hexsha[:7]}"}
 
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
-    def push(self, remote: str, branch: Optional[str]) -> Dict[str, Any]:
+    def push(self, remote: str, branch: Optional[str]) -> dict[str, Any]:
         """推送更改到远程仓库"""
         if not branch:
             branch = self.repo.active_branch.name
@@ -227,7 +268,7 @@ class GitPythonClient(GitInterface):
         return {"message": f"成功推送到 {remote}/{branch}"}
 
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
-    def pull(self, remote: str, branch: Optional[str]) -> Dict[str, Any]:
+    def pull(self, remote: str, branch: Optional[str]) -> dict[str, Any]:
         """从远程仓库拉取更改"""
         if not branch:
             branch = self.repo.active_branch.name
@@ -235,7 +276,7 @@ class GitPythonClient(GitInterface):
         remote_obj.pull(branch)
         return {"message": f"已从 {remote}/{branch} 拉取更改"}
 
-    def branch(self, branch_name: Optional[str]) -> Dict[str, Any]:
+    def branch(self, branch_name: Optional[str]) -> dict[str, Any]:
         """管理分支"""
         if branch_name:
             # 创建新分支
@@ -250,9 +291,12 @@ class GitPythonClient(GitInterface):
             # 列出所有分支
             branches = [b.name for b in self.repo.branches]
             current_branch = self.repo.active_branch.name
-            return {"data": {"branches": branches, "current_branch": current_branch}, "message": "成功列出分支"}
+            return {
+                "data": {"branches": branches, "current_branch": current_branch},
+                "message": "成功列出分支",
+            }
 
-    def tag(self, tag_name: str, message: Optional[str] = None) -> Dict[str, Any]:
+    def tag(self, tag_name: str, message: Optional[str] = None) -> dict[str, Any]:
         """创建标签"""
         if message:
             self.repo.create_tag(tag_name, message=message)
@@ -260,54 +304,50 @@ class GitPythonClient(GitInterface):
             self.repo.create_tag(tag_name)
         return {"message": f"成功创建标签: {tag_name}"}
 
-    def merge(self, branch: str) -> Dict[str, Any]:
+    def merge(self, branch: str) -> dict[str, Any]:
         """合并分支"""
         self.repo.git.merge(branch)
         return {"message": f"成功合并分支: {branch}"}
 
-    def stash(self, message: Optional[str]) -> Dict[str, Any]:
+    def stash(self, message: Optional[str]) -> dict[str, Any]:
         """暂存更改"""
         if message:
-            self.repo.git.stash('push', '-m', message)
+            self.repo.git.stash("push", "-m", message)
         else:
-            self.repo.git.stash('push')
+            self.repo.git.stash("push")
         return {"message": "成功暂存更改"}
 
-    def stash_list(self) -> Dict[str, Any]:
+    def stash_list(self) -> dict[str, Any]:
         """列出所有暂存"""
-        stash_list = self.repo.git.stash('list', '--pretty=format:%h %s').split('\n')
+        stash_list = self.repo.git.stash("list", "--pretty=format:%h %s").split("\n")
         stashes = []
         for i, stash in enumerate(stash_list):
             if stash:
-                parts = stash.split(' ', 1)
+                parts = stash.split(" ", 1)
                 if len(parts) == 2:
-                    stashes.append({
-                        "index": i,
-                        "hash": parts[0],
-                        "message": parts[1]
-                    })
+                    stashes.append({"index": i, "hash": parts[0], "message": parts[1]})
         return {"data": stashes, "message": f"找到 {len(stashes)} 个暂存"}
 
-    def stash_apply(self, index: int) -> Dict[str, Any]:
+    def stash_apply(self, index: int) -> dict[str, Any]:
         """应用暂存"""
-        self.repo.git.stash('apply', f'stash@{index}')
+        self.repo.git.stash("apply", f"stash@{index}")
         return {"message": f"成功应用暂存 {index}"}
 
-    def stash_pop(self, index: int) -> Dict[str, Any]:
+    def stash_pop(self, index: int) -> dict[str, Any]:
         """弹出暂存"""
-        self.repo.git.stash('pop', f'stash@{index}')
+        self.repo.git.stash("pop", f"stash@{index}")
         return {"message": f"成功弹出暂存 {index}"}
 
-    def stash_drop(self, index: int) -> Dict[str, Any]:
+    def stash_drop(self, index: int) -> dict[str, Any]:
         """删除暂存"""
-        self.repo.git.stash('drop', f'stash@{index}')
+        self.repo.git.stash("drop", f"stash@{index}")
         return {"message": f"成功删除暂存 {index}"}
 
     def _get_hooks_dir(self) -> str:
         """获取 hooks 目录路径"""
-        return os.path.join(self.repo_path, '.git', 'hooks')
+        return os.path.join(self.repo_path, ".git", "hooks")
 
-    def hooks_list(self) -> Dict[str, Any]:
+    def hooks_list(self) -> dict[str, Any]:
         """列出所有钩子"""
         hooks_dir = self._get_hooks_dir()
         hooks = []
@@ -315,31 +355,25 @@ class GitPythonClient(GitInterface):
             for file in os.listdir(hooks_dir):
                 file_path = os.path.join(hooks_dir, file)
                 if os.path.isfile(file_path) and os.access(file_path, os.X_OK):
-                    hooks.append({
-                        "name": file,
-                        "executable": True
-                    })
+                    hooks.append({"name": file, "executable": True})
                 elif os.path.isfile(file_path):
-                    hooks.append({
-                        "name": file,
-                        "executable": False
-                    })
+                    hooks.append({"name": file, "executable": False})
         return {"data": hooks, "message": f"找到 {len(hooks)} 个钩子"}
 
-    def hooks_read(self, hook_name: str) -> Dict[str, Any]:
+    def hooks_read(self, hook_name: str) -> dict[str, Any]:
         """读取钩子内容"""
         hooks_dir = self._get_hooks_dir()
         hook_path = os.path.join(hooks_dir, hook_name)
         if not os.path.exists(hook_path):
             return {"data": None, "message": f"钩子不存在: {hook_name}"}
         try:
-            with open(hook_path, 'r', encoding='utf-8') as f:
+            with open(hook_path, encoding="utf-8") as f:
                 content = f.read()
             return {"data": content, "message": f"成功读取钩子: {hook_name}"}
         except Exception as e:
             return {"data": None, "message": f"读取钩子失败: {str(e)}"}
 
-    def hooks_write(self, hook_name: str, content: str) -> Dict[str, Any]:
+    def hooks_write(self, hook_name: str, content: str) -> dict[str, Any]:
         """写入钩子内容"""
         hooks_dir = self._get_hooks_dir()
         hook_path = os.path.join(hooks_dir, hook_name)
@@ -347,7 +381,7 @@ class GitPythonClient(GitInterface):
             # 确保 hooks 目录存在
             os.makedirs(hooks_dir, exist_ok=True)
             # 写入钩子内容
-            with open(hook_path, 'w', encoding='utf-8') as f:
+            with open(hook_path, "w", encoding="utf-8") as f:
                 f.write(content)
             # 设置可执行权限
             os.chmod(hook_path, os.stat(hook_path).st_mode | 0o111)
@@ -355,7 +389,7 @@ class GitPythonClient(GitInterface):
         except Exception as e:
             return {"data": None, "message": f"写入钩子失败: {str(e)}"}
 
-    def hooks_delete(self, hook_name: str) -> Dict[str, Any]:
+    def hooks_delete(self, hook_name: str) -> dict[str, Any]:
         """删除钩子"""
         hooks_dir = self._get_hooks_dir()
         hook_path = os.path.join(hooks_dir, hook_name)
@@ -367,9 +401,16 @@ class GitPythonClient(GitInterface):
         except Exception as e:
             return {"data": None, "message": f"删除钩子失败: {str(e)}"}
 
+
 class SecurityManager:
     """Git 操作的安全管理器"""
-    def __init__(self, repo_path: str, protected_branches: Optional[List[str]] = None, permission_matrix: Optional[Dict[str, List[str]]] = None):
+
+    def __init__(
+        self,
+        repo_path: str,
+        protected_branches: Optional[list[str]] = None,
+        permission_matrix: Optional[dict[str, list[str]]] = None,
+    ):
         self.repo_path = repo_path
         # 使用默认值或自定义值
         self.protected_branches = protected_branches or ["main", "master", "develop"]
@@ -377,9 +418,11 @@ class SecurityManager:
         self.permission_matrix = permission_matrix or {
             "admin": ["status", "add", "commit", "push", "pull", "branch", "tag", "merge"],
             "user": ["status", "add", "commit", "branch", "tag"],
-            "guest": ["status"]
+            "guest": ["status"],
         }
-        logger.info(f"初始化安全管理器，受保护分支: {self.protected_branches}, 权限矩阵: {list(self.permission_matrix.keys())}")
+        logger.info(
+            f"初始化安全管理器，受保护分支: {self.protected_branches}, 权限矩阵: {list(self.permission_matrix.keys())}"
+        )
 
     def check_permission(self, action: str, user_role: str, branch: str) -> bool:
         """检查用户是否有权限执行指定操作"""
@@ -395,7 +438,7 @@ class SecurityManager:
                 raise GitPermissionError(f"权限不足，无法对受保护分支 {branch} 执行 {action} 操作")
         return True
 
-    def validate_input(self, files: Optional[List[str]]) -> bool:
+    def validate_input(self, files: Optional[list[str]]) -> bool:
         """验证输入的文件路径"""
         if files:
             for file_path in files:
@@ -407,21 +450,34 @@ class SecurityManager:
                 # 检查路径是否在当前仓库内（在测试环境中跳过此检查）
                 import os
                 import sys
-                if 'pytest' not in sys.modules:
+
+                if "pytest" not in sys.modules:
                     if not os.path.abspath(file_path).startswith(os.path.abspath(self.repo_path)):
                         raise GitValidationError(f"文件路径不在仓库内: {file_path}")
         return True
+
 
 class GitHelperTool(BaseSkill):
     """
     Ace AI Engine - Git 操作工具
     用于执行 Git 相关操作
     """
+
     name = "git_helper"
-    description = "用于执行 Git 相关操作，支持 status, add, commit, push, pull, branch, tag, merge 等命令。"
+    description = (
+        "用于执行 Git 相关操作，支持 status, add, commit, push, pull, branch, tag, merge 等命令。"
+    )
     args_schema = GitArgsSchema
 
-    def __init__(self, repo_path: str = ".", git_client_factory=None, user_role: str = "admin", protected_branches: Optional[List[str]] = None, permission_matrix: Optional[Dict[str, List[str]]] = None, cache_ttl: int = 300):
+    def __init__(
+        self,
+        repo_path: str = ".",
+        git_client_factory=None,
+        user_role: str = "admin",
+        protected_branches: Optional[list[str]] = None,
+        permission_matrix: Optional[dict[str, list[str]]] = None,
+        cache_ttl: int = 300,
+    ):
         """
         初始化 GitHelperTool
 
@@ -448,11 +504,11 @@ class GitHelperTool(BaseSkill):
             "operation_times": {},  # 操作类型 -> [执行时间列表]
             "cache_hits": 0,
             "cache_misses": 0,
-            "start_time": time.time()
+            "start_time": time.time(),
         }
-        
+
         logger.info(f"初始化 GitHelperTool，仓库路径: {repo_path}, 用户角色: {user_role}")
-        
+
         try:
             self.git_client = self.git_client_factory(repo_path)
             logger.info(f"成功连接到 Git 仓库: {repo_path}")
@@ -463,7 +519,7 @@ class GitHelperTool(BaseSkill):
             logger.error(f"初始化 GitHelperTool 失败: {str(e)}")
             raise GitRepositoryError(f"初始化 GitHelperTool 失败: {str(e)}")
 
-    def execute(self, args: Dict[str, Any]) -> Dict[str, Any]:
+    def execute(self, args: dict[str, Any]) -> dict[str, Any]:
         """
         执行 Git 操作
         Args:
@@ -472,19 +528,19 @@ class GitHelperTool(BaseSkill):
             Dict[str, Any]: 执行结果
         """
         logger.info(f"收到 Git 操作请求: {args}")
-        
+
         # 清理过期缓存
         self._clean_expired_cache()
-        
+
         # 开始计时
         start_time = time.time()
         action = None
-        
+
         try:
             # 验证参数
             validated_args = GitArgsSchema(**args)
             logger.debug(f"参数验证成功: {validated_args}")
-            
+
             # 提取参数
             action = validated_args.action
             files = validated_args.files
@@ -507,8 +563,8 @@ class GitHelperTool(BaseSkill):
                     "observation": {
                         "data": None,
                         "message": str(e),
-                        "timestamp": self._get_timestamp()
-                    }
+                        "timestamp": self._get_timestamp(),
+                    },
                 }
 
             # 验证输入
@@ -522,8 +578,8 @@ class GitHelperTool(BaseSkill):
                     "observation": {
                         "data": None,
                         "message": str(e),
-                        "timestamp": self._get_timestamp()
-                    }
+                        "timestamp": self._get_timestamp(),
+                    },
                 }
 
             # 执行操作
@@ -543,8 +599,10 @@ class GitHelperTool(BaseSkill):
                 GitAction.STASH_DROP: lambda: self._stash_drop(validated_args.stash_index),
                 GitAction.HOOKS_LIST: lambda: self._hooks_list(),
                 GitAction.HOOKS_READ: lambda: self._hooks_read(validated_args.hook_name),
-                GitAction.HOOKS_WRITE: lambda: self._hooks_write(validated_args.hook_name, validated_args.hook_content),
-                GitAction.HOOKS_DELETE: lambda: self._hooks_delete(validated_args.hook_name)
+                GitAction.HOOKS_WRITE: lambda: self._hooks_write(
+                    validated_args.hook_name, validated_args.hook_content
+                ),
+                GitAction.HOOKS_DELETE: lambda: self._hooks_delete(validated_args.hook_name),
             }
 
             if action in operation_map:
@@ -559,8 +617,8 @@ class GitHelperTool(BaseSkill):
                     "observation": {
                         "data": None,
                         "message": f"不支持的操作类型: {action}",
-                        "timestamp": self._get_timestamp()
-                    }
+                        "timestamp": self._get_timestamp(),
+                    },
                 }
 
             # 检查操作结果
@@ -572,8 +630,8 @@ class GitHelperTool(BaseSkill):
                     "observation": {
                         "data": result.get("data"),
                         "message": result.get("message"),
-                        "timestamp": self._get_timestamp()
-                    }
+                        "timestamp": self._get_timestamp(),
+                    },
                 }
 
             self._update_metrics(action, start_time, True)
@@ -582,8 +640,8 @@ class GitHelperTool(BaseSkill):
                 "observation": {
                     "data": result.get("data"),
                     "message": result.get("message"),
-                    "timestamp": self._get_timestamp()
-                }
+                    "timestamp": self._get_timestamp(),
+                },
             }
 
         except ValueError as e:
@@ -594,8 +652,8 @@ class GitHelperTool(BaseSkill):
                 "observation": {
                     "data": None,
                     "message": str(e),
-                    "timestamp": self._get_timestamp()
-                }
+                    "timestamp": self._get_timestamp(),
+                },
             }
         except git.GitCommandError as e:
             logger.error(f"Git 命令执行失败: {str(e)}")
@@ -605,8 +663,8 @@ class GitHelperTool(BaseSkill):
                 "observation": {
                     "data": None,
                     "message": f"执行失败: {str(e)}",
-                    "timestamp": self._get_timestamp()
-                }
+                    "timestamp": self._get_timestamp(),
+                },
             }
         except GitOperationError as e:
             logger.error(f"Git 操作执行失败: {str(e)}")
@@ -616,8 +674,8 @@ class GitHelperTool(BaseSkill):
                 "observation": {
                     "data": None,
                     "message": f"执行失败: {str(e)}",
-                    "timestamp": self._get_timestamp()
-                }
+                    "timestamp": self._get_timestamp(),
+                },
             }
         except Exception as e:
             # 检查是否是RetryError
@@ -629,8 +687,8 @@ class GitHelperTool(BaseSkill):
                     "observation": {
                         "data": None,
                         "message": f"执行失败: {str(e)}",
-                        "timestamp": self._get_timestamp()
-                    }
+                        "timestamp": self._get_timestamp(),
+                    },
                 }
             logger.error(f"执行 Git 操作时发生异常: {str(e)}")
             self._update_metrics(action, start_time, False)
@@ -639,47 +697,49 @@ class GitHelperTool(BaseSkill):
                 "observation": {
                     "data": None,
                     "message": f"执行异常: {str(e)}",
-                    "timestamp": self._get_timestamp()
-                }
+                    "timestamp": self._get_timestamp(),
+                },
             }
 
     def _update_metrics(self, action: str, start_time: float, success: bool):
         """更新性能指标"""
         # 计算执行时间
         execution_time = time.time() - start_time
-        
+
         # 更新操作计数
         self.metrics["total_operations"] += 1
         if success:
             self.metrics["successful_operations"] += 1
         else:
             self.metrics["failed_operations"] += 1
-        
+
         # 更新操作时间
         if action:
             if action not in self.metrics["operation_times"]:
                 self.metrics["operation_times"][action] = []
             self.metrics["operation_times"][action].append(execution_time)
-        
+
         # 记录性能指标
         logger.debug(f"操作性能: {action}, 执行时间: {execution_time:.3f}s, 成功: {success}")
 
-    def get_metrics(self) -> Dict[str, Any]:
+    def get_metrics(self) -> dict[str, Any]:
         """获取性能指标"""
         # 计算平均执行时间
         avg_times = {}
         for action, times in self.metrics["operation_times"].items():
             if times:
                 avg_times[action] = sum(times) / len(times)
-        
+
         # 计算运行时间
         uptime = time.time() - self.metrics["start_time"]
-        
+
         # 计算成功率
         success_rate = 0
         if self.metrics["total_operations"] > 0:
-            success_rate = (self.metrics["successful_operations"] / self.metrics["total_operations"]) * 100
-        
+            success_rate = (
+                self.metrics["successful_operations"] / self.metrics["total_operations"]
+            ) * 100
+
         return {
             "total_operations": self.metrics["total_operations"],
             "successful_operations": self.metrics["successful_operations"],
@@ -688,7 +748,7 @@ class GitHelperTool(BaseSkill):
             "average_execution_times": avg_times,
             "cache_hits": self.metrics["cache_hits"],
             "cache_misses": self.metrics["cache_misses"],
-            "uptime": f"{uptime:.2f}s"
+            "uptime": f"{uptime:.2f}s",
         }
 
     def reset_metrics(self):
@@ -700,11 +760,11 @@ class GitHelperTool(BaseSkill):
             "operation_times": {},
             "cache_hits": 0,
             "cache_misses": 0,
-            "start_time": time.time()
+            "start_time": time.time(),
         }
         logger.info("性能指标已重置")
 
-    def _status(self) -> Dict[str, Any]:
+    def _status(self) -> dict[str, Any]:
         """获取 Git 状态"""
         logger.info("获取 Git 仓库状态")
         try:
@@ -724,27 +784,21 @@ class GitHelperTool(BaseSkill):
                     self.metrics["cache_misses"] += 1
             else:
                 self.metrics["cache_misses"] += 1
-            
+
             status_info = self.git_client.status()
             result = {
                 "data": status_info,
-                "message": f"当前分支: {status_info['branch']}, 有 {len(status_info['modified'])} 个修改文件, {len(status_info['untracked'])} 个未跟踪文件, {len(status_info['staged'])} 个已暂存文件"
+                "message": f"当前分支: {status_info['branch']}, 有 {len(status_info['modified'])} 个修改文件, {len(status_info['untracked'])} 个未跟踪文件, {len(status_info['staged'])} 个已暂存文件",
             }
             # 更新缓存
-            self.cache[cache_key] = {
-                "data": result,
-                "timestamp": datetime.now().timestamp()
-            }
+            self.cache[cache_key] = {"data": result, "timestamp": datetime.now().timestamp()}
             logger.info(f"成功获取 Git 状态: {status_info['branch']}")
             return result
         except Exception as e:
             logger.error(f"获取 Git 状态失败: {str(e)}")
-            return {
-                "data": None,
-                "message": f"获取状态失败: {str(e)}"
-            }
+            return {"data": None, "message": f"获取状态失败: {str(e)}"}
 
-    def _add(self, files: List[str]) -> Dict[str, Any]:
+    def _add(self, files: list[str]) -> dict[str, Any]:
         """添加文件到暂存区"""
         logger.info(f"添加文件到暂存区: {files}")
         try:
@@ -752,60 +806,54 @@ class GitHelperTool(BaseSkill):
             # 清除状态缓存
             self._clear_status_cache()
             logger.info(f"成功添加文件到暂存区: {result['message']}")
-            return {
-                "data": None,
-                "message": result["message"]
-            }
+            return {"data": None, "message": result["message"]}
         except Exception as e:
             logger.error(f"添加文件到暂存区失败: {str(e)}")
-            return {
-                "data": None,
-                "message": f"添加文件失败: {str(e)}"
-            }
+            return {"data": None, "message": f"添加文件失败: {str(e)}"}
 
-    def _validate_commit_message(self, message: str) -> Tuple[bool, str]:
+    def _validate_commit_message(self, message: str) -> tuple[bool, str]:
         """
         验证提交消息是否符合最佳实践
-        
+
         Args:
             message: 提交消息
-        
+
         Returns:
             Tuple[bool, str]: (是否有效, 错误消息)
         """
         if not message:
             return False, "提交消息不能为空"
-        
+
         # 检查提交消息长度
-        lines = message.split('\n')
+        lines = message.split("\n")
         subject = lines[0].strip()
-        
+
         # 检查主题行长度
         if len(subject) > 50:
             return False, "提交消息主题行长度不能超过50个字符"
-        
+
         # 检查主题行是否以句号结尾
-        if subject.endswith('.'):
+        if subject.endswith("."):
             return False, "提交消息主题行不应以句号结尾"
-        
+
         # 检查主题行是否使用祈使语气（简单检查：首字母是否大写，是否以动词开头）
         if not subject[0].isupper():
             return False, "提交消息主题行应以大写字母开头"
-        
+
         # 检查是否有主体部分（如果消息有多行）
         if len(lines) > 1:
             # 检查主题行和主体之间是否有空行
-            if lines[1].strip() != '':
+            if lines[1].strip() != "":
                 return False, "提交消息主题行和主体之间应有空行"
-            
+
             # 检查主体行长度
             for i, line in enumerate(lines[2:], 3):
                 if len(line) > 72:
                     return False, f"提交消息主体行 {i} 长度不能超过72个字符"
-        
+
         return True, ""
 
-    def _commit(self, message: str) -> Dict[str, Any]:
+    def _commit(self, message: str) -> dict[str, Any]:
         """提交更改"""
         logger.info(f"提交更改: {message[:50]}...")
         try:
@@ -813,44 +861,29 @@ class GitHelperTool(BaseSkill):
             is_valid, error_message = self._validate_commit_message(message)
             if not is_valid:
                 logger.warning(f"提交消息验证失败: {error_message}")
-                return {
-                    "data": None,
-                    "message": f"提交失败: {error_message}"
-                }
-            
+                return {"data": None, "message": f"提交失败: {error_message}"}
+
             result = self.git_client.commit(message)
             # 清除状态缓存
             self._clear_status_cache()
             logger.info(f"成功提交更改: {result['hexsha'][:7]}")
-            return {
-                "data": result,
-                "message": f"提交成功: {result['hexsha'][:7]}"
-            }
+            return {"data": result, "message": f"提交成功: {result['hexsha'][:7]}"}
         except Exception as e:
             logger.error(f"提交更改失败: {str(e)}")
-            return {
-                "data": None,
-                "message": f"提交失败: {str(e)}"
-            }
+            return {"data": None, "message": f"提交失败: {str(e)}"}
 
-    def _push(self, remote: str, branch: str) -> Dict[str, Any]:
+    def _push(self, remote: str, branch: str) -> dict[str, Any]:
         """推送更改到远程仓库"""
         logger.info(f"推送更改到远程仓库: {remote}/{branch}")
         try:
             result = self.git_client.push(remote, branch)
             logger.info(f"成功推送更改: {result['message']}")
-            return {
-                "data": None,
-                "message": result["message"]
-            }
+            return {"data": None, "message": result["message"]}
         except Exception as e:
             logger.error(f"推送更改失败: {str(e)}")
-            return {
-                "data": None,
-                "message": f"推送失败: {str(e)}"
-            }
+            return {"data": None, "message": f"推送失败: {str(e)}"}
 
-    def _pull(self, remote: str, branch: str) -> Dict[str, Any]:
+    def _pull(self, remote: str, branch: str) -> dict[str, Any]:
         """从远程仓库拉取更改"""
         logger.info(f"从远程仓库拉取更改: {remote}/{branch}")
         try:
@@ -858,18 +891,12 @@ class GitHelperTool(BaseSkill):
             # 清除状态缓存
             self._clear_status_cache()
             logger.info(f"成功拉取更改: {result['message']}")
-            return {
-                "data": None,
-                "message": result["message"]
-            }
+            return {"data": None, "message": result["message"]}
         except Exception as e:
             logger.error(f"拉取更改失败: {str(e)}")
-            return {
-                "data": None,
-                "message": f"拉取失败: {str(e)}"
-            }
+            return {"data": None, "message": f"拉取失败: {str(e)}"}
 
-    def _branch(self, branch_name: str) -> Dict[str, Any]:
+    def _branch(self, branch_name: str) -> dict[str, Any]:
         """管理分支"""
         logger.info(f"分支操作: {branch_name}")
         try:
@@ -880,12 +907,9 @@ class GitHelperTool(BaseSkill):
             return result
         except Exception as e:
             logger.error(f"分支操作失败: {str(e)}")
-            return {
-                "data": None,
-                "message": f"分支操作失败: {str(e)}"
-            }
+            return {"data": None, "message": f"分支操作失败: {str(e)}"}
 
-    def _tag(self, tag_name: str, message: Optional[str]) -> Dict[str, Any]:
+    def _tag(self, tag_name: str, message: Optional[str]) -> dict[str, Any]:
         """创建标签"""
         logger.info(f"创建标签: {tag_name}")
         try:
@@ -894,12 +918,9 @@ class GitHelperTool(BaseSkill):
             return result
         except Exception as e:
             logger.error(f"创建标签失败: {str(e)}")
-            return {
-                "data": None,
-                "message": f"标签操作失败: {str(e)}"
-            }
+            return {"data": None, "message": f"标签操作失败: {str(e)}"}
 
-    def _merge(self, branch: str) -> Dict[str, Any]:
+    def _merge(self, branch: str) -> dict[str, Any]:
         """合并分支"""
         logger.info(f"合并分支: {branch}")
         try:
@@ -910,13 +931,9 @@ class GitHelperTool(BaseSkill):
             return result
         except Exception as e:
             logger.error(f"合并分支失败: {str(e)}")
-            return {
-                "data": None,
-                "message": f"合并操作失败: {str(e)}",
-                "status": "error"
-            }
- 
-    def _stash_list(self) -> Dict[str, Any]:
+            return {"data": None, "message": f"合并操作失败: {str(e)}", "status": "error"}
+
+    def _stash_list(self) -> dict[str, Any]:
         """列出所有暂存"""
         logger.info("列出所有暂存")
         try:
@@ -925,12 +942,9 @@ class GitHelperTool(BaseSkill):
             return result
         except Exception as e:
             logger.error(f"列出暂存失败: {str(e)}")
-            return {
-                "data": None,
-                "message": f"列出暂存失败: {str(e)}"
-            }
+            return {"data": None, "message": f"列出暂存失败: {str(e)}"}
 
-    def _stash_apply(self, index: int) -> Dict[str, Any]:
+    def _stash_apply(self, index: int) -> dict[str, Any]:
         """应用暂存"""
         logger.info(f"应用暂存: {index}")
         try:
@@ -941,12 +955,9 @@ class GitHelperTool(BaseSkill):
             return result
         except Exception as e:
             logger.error(f"应用暂存失败: {str(e)}")
-            return {
-                "data": None,
-                "message": f"应用暂存失败: {str(e)}"
-            }
+            return {"data": None, "message": f"应用暂存失败: {str(e)}"}
 
-    def _stash_pop(self, index: int) -> Dict[str, Any]:
+    def _stash_pop(self, index: int) -> dict[str, Any]:
         """弹出暂存"""
         logger.info(f"弹出暂存: {index}")
         try:
@@ -957,12 +968,9 @@ class GitHelperTool(BaseSkill):
             return result
         except Exception as e:
             logger.error(f"弹出暂存失败: {str(e)}")
-            return {
-                "data": None,
-                "message": f"弹出暂存失败: {str(e)}"
-            }
+            return {"data": None, "message": f"弹出暂存失败: {str(e)}"}
 
-    def _stash_drop(self, index: int) -> Dict[str, Any]:
+    def _stash_drop(self, index: int) -> dict[str, Any]:
         """删除暂存"""
         logger.info(f"删除暂存: {index}")
         try:
@@ -973,12 +981,9 @@ class GitHelperTool(BaseSkill):
             return result
         except Exception as e:
             logger.error(f"删除暂存失败: {str(e)}")
-            return {
-                "data": None,
-                "message": f"删除暂存失败: {str(e)}"
-            }
+            return {"data": None, "message": f"删除暂存失败: {str(e)}"}
 
-    def _hooks_list(self) -> Dict[str, Any]:
+    def _hooks_list(self) -> dict[str, Any]:
         """列出所有钩子"""
         logger.info("列出所有钩子")
         try:
@@ -987,12 +992,9 @@ class GitHelperTool(BaseSkill):
             return result
         except Exception as e:
             logger.error(f"列出钩子失败: {str(e)}")
-            return {
-                "data": None,
-                "message": f"列出钩子失败: {str(e)}"
-            }
+            return {"data": None, "message": f"列出钩子失败: {str(e)}"}
 
-    def _hooks_read(self, hook_name: str) -> Dict[str, Any]:
+    def _hooks_read(self, hook_name: str) -> dict[str, Any]:
         """读取钩子内容"""
         logger.info(f"读取钩子: {hook_name}")
         try:
@@ -1001,12 +1003,9 @@ class GitHelperTool(BaseSkill):
             return result
         except Exception as e:
             logger.error(f"读取钩子失败: {str(e)}")
-            return {
-                "data": None,
-                "message": f"读取钩子失败: {str(e)}"
-            }
+            return {"data": None, "message": f"读取钩子失败: {str(e)}"}
 
-    def _hooks_write(self, hook_name: str, content: str) -> Dict[str, Any]:
+    def _hooks_write(self, hook_name: str, content: str) -> dict[str, Any]:
         """写入钩子内容"""
         logger.info(f"写入钩子: {hook_name}")
         try:
@@ -1015,12 +1014,9 @@ class GitHelperTool(BaseSkill):
             return result
         except Exception as e:
             logger.error(f"写入钩子失败: {str(e)}")
-            return {
-                "data": None,
-                "message": f"写入钩子失败: {str(e)}"
-            }
+            return {"data": None, "message": f"写入钩子失败: {str(e)}"}
 
-    def _hooks_delete(self, hook_name: str) -> Dict[str, Any]:
+    def _hooks_delete(self, hook_name: str) -> dict[str, Any]:
         """删除钩子"""
         logger.info(f"删除钩子: {hook_name}")
         try:
@@ -1029,10 +1025,7 @@ class GitHelperTool(BaseSkill):
             return result
         except Exception as e:
             logger.error(f"删除钩子失败: {str(e)}")
-            return {
-                "data": None,
-                "message": f"删除钩子失败: {str(e)}"
-            }
+            return {"data": None, "message": f"删除钩子失败: {str(e)}"}
 
     def _clear_status_cache(self):
         """清除状态缓存"""
@@ -1049,14 +1042,14 @@ class GitHelperTool(BaseSkill):
         for key, entry in self.cache.items():
             if current_time - entry["timestamp"] >= self.cache_ttl:
                 keys_to_remove.append(key)
-        
+
         for key in keys_to_remove:
             del self.cache[key]
-        
+
         if keys_to_remove:
             logger.debug(f"清理了 {len(keys_to_remove)} 个过期缓存项")
 
-    def get_available_actions(self) -> List[str]:
+    def get_available_actions(self) -> list[str]:
         """获取可用的 Git 操作"""
         actions = [action.value for action in GitAction]
         logger.debug(f"获取可用的 Git 操作: {actions}")
@@ -1068,7 +1061,14 @@ class GitHelperTool(BaseSkill):
         self.cache.clear()
         logger.info(f"清除了 {cache_size} 个缓存项")
 
-def create_git_helper(repo_path: str = ".", user_role: str = "admin", protected_branches: Optional[List[str]] = None, permission_matrix: Optional[Dict[str, List[str]]] = None, cache_ttl: int = 300) -> GitHelperTool:
+
+def create_git_helper(
+    repo_path: str = ".",
+    user_role: str = "admin",
+    protected_branches: Optional[list[str]] = None,
+    permission_matrix: Optional[dict[str, list[str]]] = None,
+    cache_ttl: int = 300,
+) -> GitHelperTool:
     """
     创建 GitHelperTool 实例
     Args:
@@ -1080,5 +1080,10 @@ def create_git_helper(repo_path: str = ".", user_role: str = "admin", protected_
     Returns:
         GitHelperTool: GitHelperTool 实例
     """
-    return GitHelperTool(repo_path, user_role=user_role, protected_branches=protected_branches, permission_matrix=permission_matrix, cache_ttl=cache_ttl)
-
+    return GitHelperTool(
+        repo_path,
+        user_role=user_role,
+        protected_branches=protected_branches,
+        permission_matrix=permission_matrix,
+        cache_ttl=cache_ttl,
+    )

@@ -1,16 +1,15 @@
-import os
 import base64
-from cryptography.fernet import Fernet
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from cryptography.hazmat.backends import default_backend
-import json
+import os
 from pathlib import Path
+
+from cryptography.fernet import Fernet
+
 
 class SecretManager:
     """
     敏感信息管理器，用于加密和解密环境变量中的敏感信息
     """
+
     def __init__(self, key_file: str = ".secret_key"):
         self.key_file = Path(key_file)
         self.key = self._load_or_generate_key()
@@ -53,63 +52,66 @@ class SecretManager:
         """
         加密文件
         """
-        with open(input_file, "r", encoding="utf-8") as f:
+        with open(input_file, encoding="utf-8") as f:
             content = f.read()
-        
+
         encrypted_content = self.encrypt(content)
-        
+
         with open(output_file, "w", encoding="utf-8") as f:
             f.write(encrypted_content)
-        
+
         print(f"[加密] 文件已加密: {input_file} -> {output_file}")
 
     def decrypt_file(self, input_file: str, output_file: str):
         """
         解密文件
         """
-        with open(input_file, "r", encoding="utf-8") as f:
+        with open(input_file, encoding="utf-8") as f:
             content = f.read()
-        
+
         decrypted_content = self.decrypt(content)
-        
+
         with open(output_file, "w", encoding="utf-8") as f:
             f.write(decrypted_content)
-        
+
         print(f"[解密] 文件已解密: {input_file} -> {output_file}")
 
     def encrypt_env_file(self, input_file: str, output_file: str):
         """
         加密环境变量文件
         """
-        with open(input_file, "r", encoding="utf-8") as f:
+        with open(input_file, encoding="utf-8") as f:
             lines = f.readlines()
-        
+
         encrypted_lines = []
         for line in lines:
             line = line.strip()
             if line and not line.startswith("#") and "=" in line:
                 key, value = line.split("=", 1)
                 # 只加密敏感信息
-                if any(key in sensitive_key for sensitive_key in ["API_KEY", "SECRET_KEY", "PASSWORD", "TOKEN"]):
+                if any(
+                    key in sensitive_key
+                    for sensitive_key in ["API_KEY", "SECRET_KEY", "PASSWORD", "TOKEN"]
+                ):
                     encrypted_value = self.encrypt(value)
                     encrypted_lines.append(f"{key}=ENCRYPTED:{encrypted_value}\n")
                 else:
                     encrypted_lines.append(f"{key}={value}\n")
             else:
                 encrypted_lines.append(line + "\n")
-        
+
         with open(output_file, "w", encoding="utf-8") as f:
             f.writelines(encrypted_lines)
-        
+
         print(f"🔒 环境变量文件已加密: {input_file} -> {output_file}")
 
     def decrypt_env_file(self, input_file: str, output_file: str):
         """
         解密环境变量文件
         """
-        with open(input_file, "r", encoding="utf-8") as f:
+        with open(input_file, encoding="utf-8") as f:
             lines = f.readlines()
-        
+
         decrypted_lines = []
         for line in lines:
             line = line.strip()
@@ -123,10 +125,10 @@ class SecretManager:
                     decrypted_lines.append(f"{key}={value}\n")
             else:
                 decrypted_lines.append(line + "\n")
-        
+
         with open(output_file, "w", encoding="utf-8") as f:
             f.writelines(decrypted_lines)
-        
+
         print(f"🔓 环境变量文件已解密: {input_file} -> {output_file}")
 
     def get_secret(self, key: str) -> str:
@@ -136,7 +138,7 @@ class SecretManager:
         value = os.environ.get(key)
         if not value:
             return ""
-        
+
         if value.startswith("ENCRYPTED:"):
             encrypted_value = value.split("ENCRYPTED:", 1)[1]
             return self.decrypt(encrypted_value)
@@ -146,16 +148,27 @@ class SecretManager:
 # 示例用法
 if __name__ == "__main__":
     import argparse
-    
+
     parser = argparse.ArgumentParser(description="敏感信息加密工具")
-    parser.add_argument("action", choices=["encrypt", "decrypt", "encrypt-file", "decrypt-file", "encrypt-env", "decrypt-env"], help="操作类型")
+    parser.add_argument(
+        "action",
+        choices=[
+            "encrypt",
+            "decrypt",
+            "encrypt-file",
+            "decrypt-file",
+            "encrypt-env",
+            "decrypt-env",
+        ],
+        help="操作类型",
+    )
     parser.add_argument("input", help="输入文件或明文")
     parser.add_argument("output", nargs="?", help="输出文件")
-    
+
     args = parser.parse_args()
-    
+
     manager = SecretManager()
-    
+
     if args.action == "encrypt":
         encrypted = manager.encrypt(args.input)
         print(f"加密结果: {encrypted}")

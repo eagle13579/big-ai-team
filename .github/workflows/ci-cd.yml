@@ -1,53 +1,116 @@
-name: CI/CD Pipeline
+name: "Production-Grade AI Core Protection Pipeline"
 
 on:
   push:
-    branches: [ main, "feature/**" ]
+    branches: [ main, master, develop ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, master ]
+  workflow_dispatch:
+
+# 核心权限控制：允许机器人推送校验报告与代码修复
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
-  test:
+  validate-and-protect:
+    name: "🚀 Build & Protect (Python 3.10 / Ubuntu)"
     runs-on: ubuntu-latest
-    # 核心配置：解决 Pydantic 验证报错
-    env:
-      PYTHONPATH: .
-      LOG_DIR: logs
-      # 修复：SECRET_KEY 必须 > 32 位
-      SECRET_KEY: ci_test_secret_key_fixed_value_at_least_32_chars_long
-      # 修复：提供默认的测试数据库和 Redis 地址，防止 ValidationError
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
-      REDIS_URL: redis://localhost:6379/0
-      OPENAI_API_KEY: sk-dummy-key-for-ci
-
+    timeout-minutes: 30 
+    
     steps:
-      - name: Check out repository
+      # --- 1. 基础环境准备 (Foundation) ---
+      - name: "Step 1: Checkout Repository"
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set up Python
+      - name: "Step 2: Setup Python & Cache"
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.10'
+          cache: 'pip'
 
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
-        with:
-          virtualenvs-create: true
-          virtualenvs-in-project: true
-
-      - name: Load cached venv
-        id: cached-poetry-dependencies
-        uses: actions/cache@v4
-        with:
-          path: .venv
-          key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
-
-      - name: Install dependencies
-        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-        run: poetry install --no-interaction --no-root
-
-      - name: Run tests
+      - name: "Step 3: High-Performance Environment Setup"
         run: |
-          mkdir -p logs
-          # 使用 pytest 执行所有测试，-v 显示详细进度
-          poetry run pytest tests/ -v
+          python -m pip install --upgrade pip setuptools wheel
+          # 安装 Nova 推荐的核心工具链
+          pip install nuitka zstandard ruff pytest pytest-cov
+          if [ -f "requirements.txt" ]; then pip install -r requirements.txt; fi
+          sudo apt-get update && sudo apt-get install -y build-essential ccache
+
+      # --- 2. 源码自动化修复 (Nova Auto-Fix) ---
+      - name: "Step 4: Nova Intelligent Auto-Fix (Ruff)"
+        run: |
+          # 运行我为您提供的 v3.2 修复脚本
+          # 如果脚本不存在，则直接运行 ruff 强制指令
+          if [ -f "scripts/auto_fix.py" ]; then
+            python scripts/auto_fix.py
+          else
+            ruff check . --fix --unsafe-fixes --show-fixes --target-version=py310
+            ruff format .
+          fi
+
+      # --- 3. 源码阶段：质量卡点 (Pre-Build) ---
+      - name: "Step 5: Logic Validation & Tests"
+        run: |
+          # 在编译前确保原始逻辑 100% 正确
+          pytest --cov=core --cov-report=term-missing tests/
+          
+          # 生成自动化校验报告
+          echo "### 📊 Module Validation Report" > module_validation_report.md
+          echo "- **Generated on:** $(date)" >> module_validation_report.md
+          echo "- **Status:** Source Code Validated ✅" >> module_validation_report.md
+          echo "STATUS=SUCCESS" >> $GITHUB_ENV
+
+      # --- 4. 构建阶段：核心代码脱敏 (Build) ---
+      - name: "Step 6: Execute Nuitka Hardening"
+        run: |
+          # 执行模块化加密编译，将 core 目录转为二进制
+          if [ -f "build_protect.py" ]; then
+            python build_protect.py
+          else
+            python -m nuitka --module core/ --output-dir=dist --show-progress --remove-output
+            # 关键步骤：用编译后的文件替换源码（模拟脱敏环境）
+            cp -r dist/core/* core/ 2>/dev/null || true
+          fi
+        env:
+          CCACHE_DIR: ~/.ccache
+          FORCE_UNSAFE_CONFIGURE: 1
+
+      # --- 5. 二进制阶段：冒烟测试 (Post-Build Smoke Test) ---
+      - name: "Step 7: Binary Integrity Check (Nova Smoke Test)"
+        run: |
+          echo "🔍 正在验证脱敏后的二进制文件加载..."
+          # 运行我为您提供的 v2.0 冒烟测试脚本
+          # 它会检测模块是“源码态”还是“二进制态”
+          if [ -f "tests/test_protected_core.py" ]; then
+            python tests/test_protected_core.py
+          else
+            python -c "import core; print('✅ Core Package Loaded Successfully')"
+          fi
+
+      # --- 6. 安全审计与交付 (Audit & Delivery) ---
+      - name: "Step 8: Cleanup & Security Audit"
+        run: |
+          # [安全铁律] 检查 core 目录下是否还残留非 __init__.py 的源码
+          RESIDUAL_PY=$(find core -name "*.py" | grep -v "__init__.py" | wc -l)
+          if [ "$RESIDUAL_PY" -gt 0 ]; then
+            echo "❌ Critical Security Error: $RESIDUAL_PY source files still exist in core!"
+            exit 1
+          fi
+          echo "✅ Security Check Passed: Source code stripped, only binaries remain."
+
+      - name: "Step 9: Commit Changes & Report"
+        if: always()
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action Bot"
+          
+          # 提交自动修复后的代码和验证报告
+          git add .
+          git commit -m "chore: auto-fix & update validation report [skip ci]" || exit 0
+          git push
+
+ 

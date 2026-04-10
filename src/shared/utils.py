@@ -1,11 +1,12 @@
-import uuid
 import logging
 import os
+import uuid
 from datetime import datetime, timedelta
-from jose import JWTError, jwt
-from typing import Optional, Dict, Any
-from .config import settings
+from typing import Any, Optional
 
+from jose import JWTError, jwt
+
+from .config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +16,7 @@ def generate_uuid() -> str:
     return str(uuid.uuid4())
 
 
-def create_access_token(data: Dict[str, Any], expires_delta: Optional[timedelta] = None) -> str:
+def create_access_token(data: dict[str, Any], expires_delta: Optional[timedelta] = None) -> str:
     """创建访问令牌"""
     to_encode = data.copy()
     if expires_delta:
@@ -27,7 +28,7 @@ def create_access_token(data: Dict[str, Any], expires_delta: Optional[timedelta]
     return encoded_jwt
 
 
-def verify_token(token: str) -> Optional[Dict[str, Any]]:
+def verify_token(token: str) -> Optional[dict[str, Any]]:
     """验证令牌"""
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
@@ -40,14 +41,15 @@ def setup_logger() -> logging.Logger:
     """设置日志配置"""
     logging.basicConfig(
         level=getattr(logging, settings.LOG_LEVEL),
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
     return logger
 
 
-def safe_json_loads(data: str) -> Optional[Dict[str, Any]]:
+def safe_json_loads(data: str) -> Optional[dict[str, Any]]:
     """安全地解析JSON"""
     import json
+
     try:
         return json.loads(data)
     except json.JSONDecodeError:
@@ -56,16 +58,15 @@ def safe_json_loads(data: str) -> Optional[Dict[str, Any]]:
 
 def sanitize_path(path: str) -> str:
     """安全处理路径
-    
+
     Args:
         path: 原始路径
-    
+
     Returns:
         安全处理后的路径
     """
-    import os
     # 规范化路径
     path = os.path.normpath(path)
     # 移除路径中的危险字符
-    path = path.replace('..', '')
+    path = path.replace("..", "")
     return path

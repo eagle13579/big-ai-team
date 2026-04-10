@@ -1,4 +1,4 @@
-from src.skills.git_helper import GitHelperTool, GitAction
+from src.skills.git_helper import GitAction, GitHelperTool
 
 print("Import successful!")
 print(f"GitAction: {GitAction}")

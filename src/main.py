@@ -1,26 +1,29 @@
 import asyncio
 import sys
-import uvicorn
+from contextlib import asynccontextmanager
 from datetime import datetime
-from typing import Dict, Any
-from fastapi import FastAPI, HTTPException, Depends, Request
+
+import uvicorn
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from contextlib import asynccontextmanager
+
+from execution.executor import ToolExecutor
 
 # 导入项目核心组件
-from shared.config import settings, config_manager
-from shared.logging import logger, LogContext
-from execution.executor import ToolExecutor
+from shared.config import config_manager, settings
+from shared.logging import logger
 from workflow.loop import ExecutionLoop
 
 logger = logger.bind(name="AceAgent.Main")
+
 
 # --- 2. 定义请求和响应模型 ---
 class TaskRequest(BaseModel):
     query: str
     max_steps: int = None
+
 
 class TaskResponse(BaseModel):
     status: str
@@ -30,11 +33,13 @@ class TaskResponse(BaseModel):
     start_time: str
     end_time: str
 
+
 class HealthResponse(BaseModel):
     status: str
     version: str
     timestamp: str
     components: dict
+
 
 # --- 3. 应用生命周期管理 ---
 class AceAgentApp:
@@ -45,14 +50,14 @@ class AceAgentApp:
 
     def __init__(self):
         logger.info(f"🌟 初始化 {settings.PROJECT_NAME} 核心组件...")
-        
+
         # 初始化执行器 (负责具体工具操作)
         self.executor = ToolExecutor()
-        
+
         # 初始化工作流循环 (负责 AI 决策大脑)
         # 这里自动从 settings 中读取 AGENT_MAX_STEPS
         self.workflow = ExecutionLoop(executor=self.executor)
-        
+
         logger.info("✅ 组件加载完毕。当前系统时间: 2026-04-06 01:27:00")
 
     async def run_task(self, query: str, max_steps: int = None):
@@ -81,18 +86,20 @@ class AceAgentApp:
     def close(self):
         """关闭应用，清理资源"""
         logger.info("关闭 Ace Agent 应用，清理资源...")
-        
+
         # 关闭执行器
-        if hasattr(self, 'executor'):
+        if hasattr(self, "executor"):
             self.executor.close()
-        
+
         logger.info("Ace Agent 应用已成功关闭")
+
 
 # 导入监控模块
 try:
     from shared.monitoring import init_monitoring
 except ImportError:
     init_monitoring = None
+
 
 # --- 4. FastAPI 应用初始化 ---
 @asynccontextmanager
@@ -104,23 +111,20 @@ async def lifespan(app: FastAPI):
     logger.info("🚀 启动 Ace Agent 服务...")
     app.state.agent_app = AceAgentApp()
     app.state.agent_app.display_welcome()
-    
-    # 初始化监控
-    if init_monitoring:
-        init_monitoring(app)
-    
+
     yield
     # 关闭时
     logger.info("👋 关闭 Ace Agent 服务...")
-    if hasattr(app.state, 'agent_app'):
+    if hasattr(app.state, "agent_app"):
         app.state.agent_app.close()
+
 
 # 创建 FastAPI 应用
 app = FastAPI(
     title=settings.PROJECT_NAME,
     description="2026 生产级 AI Agent 系统",
     version="2.0.0",
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 
 # 配置 CORS
@@ -132,6 +136,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# 初始化监控
+if init_monitoring:
+    init_monitoring(app)
+
+
 # --- 5. 依赖注入 ---
 def get_agent_app(request: Request):
     """
@@ -139,12 +148,10 @@ def get_agent_app(request: Request):
     """
     return request.app.state.agent_app
 
+
 # --- 6. 路由定义 ---
 @app.post("/api/v1/tasks", response_model=TaskResponse)
-async def create_task(
-    task: TaskRequest,
-    agent_app: AceAgentApp = Depends(get_agent_app)
-):
+async def create_task(task: TaskRequest, agent_app: AceAgentApp = Depends(get_agent_app)):
     """
     创建并执行任务
     """
@@ -156,26 +163,25 @@ async def create_task(
         total_steps=result["total_steps"],
         steps=result["steps"],
         start_time=result["start_time"],
-        end_time=result["end_time"]
+        end_time=result["end_time"],
     )
 
+
 @app.get("/health", response_model=HealthResponse)
-async def health_check(
-    agent_app: AceAgentApp = Depends(get_agent_app)
-):
+async def health_check(agent_app: AceAgentApp = Depends(get_agent_app)):
     """
     健康检查端点
     """
     try:
         # 检查执行器状态
         executor_status = await agent_app.executor.execute("get_system_status", {})
-        
+
         # 检查工作流状态
         workflow_status = {
             "history_count": len(agent_app.workflow.history),
-            "memory_summary": agent_app.workflow.get_memory_summary()
+            "memory_summary": agent_app.workflow.get_memory_summary(),
         }
-        
+
         return HealthResponse(
             status="healthy",
             version=settings.CONFIG_VERSION,
@@ -183,11 +189,8 @@ async def health_check(
             components={
                 "executor": executor_status,
                 "workflow": workflow_status,
-                "config": {
-                    "version": settings.CONFIG_VERSION,
-                    "env_mode": settings.ENV_MODE
-                }
-            }
+                "config": {"version": settings.CONFIG_VERSION, "env_mode": settings.ENV_MODE},
+            },
         )
     except Exception as e:
         logger.error(f"健康检查失败: {str(e)}")
@@ -195,18 +198,18 @@ async def health_check(
             status="unhealthy",
             version=settings.CONFIG_VERSION,
             timestamp=datetime.now().isoformat(),
-            components={"error": str(e)}
+            components={"error": str(e)},
         )
 
+
 @app.get("/api/v1/tools")
-async def get_available_tools(
-    agent_app: AceAgentApp = Depends(get_agent_app)
-):
+async def get_available_tools(agent_app: AceAgentApp = Depends(get_agent_app)):
     """
     获取可用工具列表
     """
     tools = agent_app.executor.get_available_tools()
     return {"tools": tools}
+
 
 @app.get("/api/v1/config")
 async def get_config():
@@ -216,6 +219,7 @@ async def get_config():
     config = config_manager.get_settings()
     return config.model_dump()
 
+
 # --- 7. 异常处理 ---
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
@@ -223,10 +227,8 @@ async def global_exception_handler(request: Request, exc: Exception):
     全局异常处理
     """
     logger.error(f"全局异常: {str(exc)}", exc_info=True)
-    return JSONResponse(
-        status_code=500,
-        content={"detail": f"内部服务器错误: {str(exc)}"}
-    )
+    return JSONResponse(status_code=500, content={"detail": f"内部服务器错误: {str(exc)}"})
+
 
 # --- 8. 命令行执行 ---
 async def main():
@@ -247,6 +249,7 @@ async def main():
     # 执行异步任务
     await app.run_task(user_query)
 
+
 if __name__ == "__main__":
     # 检查是否以模块方式运行（用于 FastAPI）
     if "__uvicorn_main__" not in sys.modules:
@@ -264,9 +267,4 @@ if __name__ == "__main__":
 # --- 9. 启动服务器 ---
 if __name__ == "__main__" and "__uvicorn_main__" not in sys.modules:
     # 启动 FastAPI 服务器
-    uvicorn.run(
-        "main:app",
-        host="0.0.0.0",
-        port=8000,
-        reload=True
-    )
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
