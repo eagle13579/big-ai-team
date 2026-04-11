@@ -4,8 +4,8 @@ Nova v5.0 环境熔断自检脚本
 用于检查容器环境是否与 Nuitka 编译目标或 3.12 基准相符
 """
 
-import sys
 import platform
+import sys
 
 
 def check_python_version():
