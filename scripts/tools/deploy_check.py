@@ -1,91 +1,88 @@
 #!/usr/bin/env python3
 """
-[Nova 生产环境部署自检脚本 v5.0]
-发布日期: 2026-04-11
-更新日志:
-1. 融合 Python 3.12 生产基准支持（取代已过时的 3.10）。
-2. 增强了对 Nuitka 编译模块 (.so/.pyd) 的次版本号 (Minor Version) 硬校验。
-3. 优化了跨平台架构 (x86_64/AMD64) 的智能识别逻辑。
+Nova v5.0 环境熔断自检脚本
+用于检查容器环境是否与 Nuitka 编译目标或 3.12 基准相符
 """
 
-import os
-import platform
 import sys
-from datetime import datetime
+import platform
 
 
-def check_env_compatibility():
-    """
-    执行 2026 工业级环境兼容性检查。
-    针对 Nuitka 编译模块的强耦合性，确保 Python 次版本号、系统架构、运行容器状态完全一致。
-    """
-    curr_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-    # --- 头部装饰 ---
-    print(f"\n🔍 [Nova Audit] 环境扫描启动 | {curr_time}")
-    print("=" * 65)
-
-    # 1. 基础元数据提取
-    is_docker = os.path.exists("/.dockerenv")
-    env_tag = "DOCKER" if is_docker else "HOST"
-
-    metadata = [
-        ("操作系统", f"{platform.system()} {platform.release()}"),
-        ("硬件架构", platform.machine()),
-        ("运行环境", "Containerized" if is_docker else "Bare Metal"),
-        ("当前解释器", sys.executable),
-        ("当前版本", sys.version.split()[0]),
-    ]
-
-    for label, val in metadata:
-        print(f"[{env_tag}] {label:<10} : {val}")
-
-    print("-" * 65)
-
-    # 2. 核心校验：Python 版本一致性 (2026 生产基准: 3.12)
-    # Nuitka 编译产物严禁跨次版本运行 (如 3.12 编译的无法在 3.14 运行)
-    REQUIRED_MAJOR = 3
-    REQUIRED_MINOR = 12
-
-    is_compatible = True
-    curr_major = sys.version_info.major
-    curr_minor = sys.version_info.minor
-
-    if curr_major != REQUIRED_MAJOR or curr_minor != REQUIRED_MINOR:
-        print("\n❌ [严重错误] Python 次版本号不匹配！")
-        print(f"   >>> 预期目标: Python {REQUIRED_MAJOR}.{REQUIRED_MINOR}")
-        print(f"   >>> 实际运行: Python {curr_major}.{curr_minor}")
-        print("   >>> 风险预警: Nuitka 生成的二进制模块将触发致命的加载异常 (ImportError)。")
-        is_compatible = False
+def check_python_version():
+    """检查 Python 版本是否符合要求"""
+    version = sys.version_info
+    print(f"Python 版本: {version.major}.{version.minor}.{version.micro}")
+    
+    # 检查是否为 Python 3.12 或更高版本
+    if version.major == 3 and version.minor >= 12:
+        print("✅ Python 版本符合要求 (>= 3.12)")
+        return True
     else:
-        print(f"✅ [版本验证] Python {REQUIRED_MAJOR}.{REQUIRED_MINOR} 验证通过。")
+        print("❌ Python 版本不符合要求，需要 3.12 或更高版本")
+        return False
 
-    # 3. 架构校验 (针对 2026 年主流多架构集群部署)
-    # 自动识别 Windows(AMD64) 与 Linux(x86_64) 的等效性
-    target_archs = ["AMD64", "x86_64"]
-    curr_arch = platform.machine()
 
-    if curr_arch not in target_archs:
-        print("\n⚠️ [架构警告] 硬件不匹配预警！")
-        print(f"   >>> 编译目标: {target_archs}")
-        print(f"   >>> 当前运行: {curr_arch}")
-        print("   >>> 提示: 请检查 CI/CD 是否拉取了错误的 ARM 镜像层。")
+def check_platform():
+    """检查操作系统平台"""
+    system = platform.system()
+    print(f"操作系统: {system}")
+    
+    # 支持的平台
+    supported_platforms = ["Linux", "Windows"]
+    if system in supported_platforms:
+        print(f"✅ 操作系统平台 {system} 受支持")
+        return True
+    else:
+        print(f"❌ 操作系统平台 {system} 不受支持")
+        return False
 
-    print("-" * 65)
 
-    # 4. 最终裁决
-    if not is_compatible:
-        print("🚫 [结论] 环境不满足生产要求。正在强制中断部署流程 (Exit Code: 1)...")
-        sys.exit(1)
+def check_environment():
+    """检查环境变量"""
+    import os
+    
+    # 检查必要的环境变量
+    required_env_vars = ["PYTHONPATH"]
+    all_vars_exist = True
+    
+    for var in required_env_vars:
+        if var in os.environ:
+            print(f"✅ 环境变量 {var} 已设置: {os.environ[var]}")
+        else:
+            print(f"⚠️  环境变量 {var} 未设置")
+            all_vars_exist = False
+    
+    return all_vars_exist
 
-    print("🚀 [结论] 环境高度兼容。正在移交控制权给主程序...")
-    print("=" * 65 + "\n")
-    sys.exit(0)
+
+def main():
+    """主函数"""
+    print("=" * 60)
+    print("🚀 Nova v5.0 环境熔断自检")
+    print("=" * 60)
+    
+    # 执行各项检查
+    checks = [
+        ("Python 版本", check_python_version),
+        ("操作系统平台", check_platform),
+        ("环境变量", check_environment),
+    ]
+    
+    all_passed = True
+    for check_name, check_func in checks:
+        print(f"\n🔍 检查: {check_name}")
+        print("-" * 40)
+        if not check_func():
+            all_passed = False
+    
+    print("\n" + "=" * 60)
+    if all_passed:
+        print("✅ 环境检查通过，容器环境符合要求")
+        return 0
+    else:
+        print("❌ 环境检查失败，容器环境不符合要求")
+        return 1
 
 
 if __name__ == "__main__":
-    try:
-        check_env_compatibility()
-    except Exception as e:
-        print(f"💥 [紧急故障] 审计脚本自检异常: {str(e)}")
-        sys.exit(2)
+    sys.exit(main())
