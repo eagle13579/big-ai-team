@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: big-ai-team-config
+  namespace: big-ai-team
+data:
+  ENV_MODE: production
+  API_V1_STR: /api/v1
+  PROJECT_NAME: big-ai-team
+  LOG_LEVEL: INFO
+  OTEL_EXPORTER_OTLP_ENDPOINT: http://prometheus:9090

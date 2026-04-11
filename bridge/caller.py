@@ -1,5 +1,8 @@
 import importlib
 import sys
+import threading
+import http.server
+import socketserver
 from pathlib import Path
 from typing import Any
 
@@ -63,7 +66,29 @@ class CoreLoader:
 
 
 # ==========================================
-# 2. 外部标准调用接口 (统一契约)
+# 2. 健康检查服务器
+# ==========================================
+class HealthCheckHandler(http.server.SimpleHTTPRequestHandler):
+    def do_GET(self):
+        if self.path == "/health":
+            self.send_response(200)
+            self.send_header("Content-type", "text/plain")
+            self.end_headers()
+            self.wfile.write(b"OK")
+        else:
+            self.send_response(404)
+            self.end_headers()
+
+def start_health_check_server():
+    """启动健康检查服务器"""
+    port = 8000
+    with socketserver.TCPServer(("", port), HealthCheckHandler) as httpd:
+        print(f"✅ [Bridge] 健康检查服务器启动在端口 {port}")
+        httpd.serve_forever()
+
+
+# ==========================================
+# 3. 外部标准调用接口 (统一契约)
 # ==========================================
 @bridge_task_monitor
 def run_task(action: str, **kwargs) -> Any:
@@ -82,7 +107,7 @@ def run_task(action: str, **kwargs) -> Any:
 
 
 # ==========================================
-# 3. 兼容性适配器 (可选，用于兼容你之前的调用习惯)
+# 4. 兼容性适配器 (可选，用于兼容你之前的调用习惯)
 # ==========================================
 class MemPalaceCaller:
     def add_memory(self, content: str, **kwargs):
@@ -90,3 +115,20 @@ class MemPalaceCaller:
 
     def search(self, query: str, **kwargs):
         return run_task("search", query=query, **kwargs)
+
+
+# ==========================================
+# 5. 主函数
+# ==========================================
+if __name__ == "__main__":
+    # 启动健康检查服务器
+    health_thread = threading.Thread(target=start_health_check_server, daemon=True)
+    health_thread.start()
+    
+    # 保持进程运行
+    try:
+        while True:
+            pass
+    except KeyboardInterrupt:
+        print("\n❌ [Bridge] 服务已停止")
+        sys.exit(0)

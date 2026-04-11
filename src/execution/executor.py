@@ -2,13 +2,21 @@ import asyncio
 import hashlib
 import heapq
 import os
+import sys
+import time
 from collections.abc import Awaitable, Callable
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
 from typing import Any
+from pathlib import Path
 
 import httpx
 import psutil
+
+# 添加项目根目录到 Python 路径
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.access.adapters.redis_cache import redis_cache
 from src.shared.config import settings
@@ -27,31 +35,35 @@ logger = logger.bind(name="AceAgent.Execution")
 
 class RateLimiter:
     """
-    速率限制器
+    优化的速率限制器
     """
 
     def __init__(self, max_calls: int, time_frame: int):
         self.max_calls = max_calls
         self.time_frame = time_frame
         self.calls = []
+        self.lock = asyncio.Lock()
 
     async def __aenter__(self):
-        now = datetime.now()
-        # 清理过期的调用记录
-        self.calls = [
-            call for call in self.calls if now - call < timedelta(seconds=self.time_frame)
-        ]
+        async with self.lock:
+            now = datetime.now()
+            # 清理过期的调用记录
+            self.calls = [
+                call for call in self.calls if now - call < timedelta(seconds=self.time_frame)
+            ]
 
-        # 检查是否超过速率限制
-        if len(self.calls) >= self.max_calls:
-            wait_time = self.time_frame - (now - self.calls[0]).total_seconds()
-            if wait_time > 0:
-                logger.warning(f"⚠️  速率限制触发，等待 {wait_time:.2f} 秒")
-                await asyncio.sleep(wait_time)
+            # 检查是否超过速率限制
+            if len(self.calls) >= self.max_calls:
+                wait_time = self.time_frame - (now - self.calls[0]).total_seconds()
+                if wait_time > 0:
+                    # 减少日志输出频率
+                    if len(self.calls) % 3 == 0:
+                        logger.warning(f"⚠️  速率限制触发，等待 {wait_time:.2f} 秒")
+                    await asyncio.sleep(wait_time)
 
-        # 记录本次调用
-        self.calls.append(datetime.now())
-        return self
+            # 记录本次调用
+            self.calls.append(datetime.now())
+            return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         pass
@@ -100,6 +112,8 @@ class ToolExecutor:
         self._cache_ttl = settings.CACHE_TTL  # 缓存过期时间（秒）
         self._cache_hits = 0  # 缓存命中次数
         self._cache_misses = 0  # 缓存未命中次数
+        self._cache_cleanup_interval = 300  # 缓存清理间隔（秒）
+        self._last_cache_cleanup = time.time()
 
         # 权限管理
         self._permissions = {
@@ -351,8 +365,6 @@ class ToolExecutor:
             logger.info(f"💾 将 {tool_name} 的结果缓存到 Redis")
         else:
             logger.warning(f"⚠️  缓存 {tool_name} 的结果失败")
-
-
 
     def get_cache_stats(self) -> dict[str, Any]:
         """获取缓存统计信息"""
