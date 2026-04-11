@@ -183,3 +183,14 @@ dist_temp/
 
 # 忽略临时验证脚本
 scripts/temp/*!scripts/temp/.gitkeep
+scripts/temp/
+python-3.12.0-amd64.exe
+# 忽略所有 .exe 文件
+*.exe
+
+# 忽略特定的垃圾文件或临时文件
+python-3.12.0-amd64.exe
+"--date=short -n 10" 
+
+# 如果有特定目录是垃圾代码
+# garbage_folder/
