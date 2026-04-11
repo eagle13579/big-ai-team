@@ -58,7 +58,7 @@ ENV ENV_MODE=production \
 # 9. [核心安全策略] 执行 Nova v5.0 环境熔断自检
 # 如果容器环境与 Nuitka 编译目标或 3.12 基准不符，构建将在此失败。
 # ---------------------------------------------------------
-RUN python scripts/deploy_check.py
+RUN python scripts/tools/deploy_check.py
 
 # 10. 暴露服务端口 (根据 bridge.caller 的实际需求调整)
 EXPOSE 8000
