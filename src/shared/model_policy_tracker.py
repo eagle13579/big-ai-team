@@ -3,7 +3,7 @@ import logging
 import os
 from dataclasses import asdict, dataclass
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 import aiohttp
 
@@ -17,13 +17,13 @@ class ModelPolicy:
     model_name: str
     provider: str
     is_free: bool
-    free_quota: Optional[str] = None  # 免费额度描述
-    free_limit: Optional[int] = None  # 免费 token 限制
+    free_quota: str | None = None  # 免费额度描述
+    free_limit: int | None = None  # 免费 token 限制
     cost_per_1k_tokens_input: float = 0.0
     cost_per_1k_tokens_output: float = 0.0
     last_updated: str = ""
-    source_url: Optional[str] = None
-    notes: Optional[str] = None
+    source_url: str | None = None
+    notes: str | None = None
 
 
 @dataclass
@@ -35,8 +35,8 @@ class CostEstimate:
     estimated_output_tokens: int
     estimated_cost: float
     is_free: bool
-    free_quota_remaining: Optional[str] = None
-    warning: Optional[str] = None
+    free_quota_remaining: str | None = None
+    warning: str | None = None
 
 
 class ModelPolicyTracker:
@@ -48,8 +48,8 @@ class ModelPolicyTracker:
     def __init__(self, cache_file: str = "model_policies_cache.json"):
         self.cache_file = cache_file
         self.policies: dict[str, ModelPolicy] = {}
-        self.last_updated: Optional[datetime] = None
-        self.session: Optional[aiohttp.ClientSession] = None
+        self.last_updated: datetime | None = None
+        self.session: aiohttp.ClientSession | None = None
 
         # 初始化默认模型政策
         self._init_default_policies()
@@ -251,7 +251,7 @@ class ModelPolicyTracker:
         except Exception as e:
             logger.warning(f"⚠️ 保存缓存失败: {e}")
 
-    def get_policy(self, model_name: str) -> Optional[ModelPolicy]:
+    def get_policy(self, model_name: str) -> ModelPolicy | None:
         """获取指定模型的政策"""
         return self.policies.get(model_name)
 
@@ -263,7 +263,7 @@ class ModelPolicyTracker:
         """获取所有免费模型"""
         return [p for p in self.policies.values() if p.is_free]
 
-    def get_cheapest_models(self, task_type: Optional[str] = None) -> list[ModelPolicy]:
+    def get_cheapest_models(self, task_type: str | None = None) -> list[ModelPolicy]:
         """获取最便宜的模型（包括免费）"""
         policies = list(self.policies.values())
 

@@ -1,5 +1,6 @@
 import math
-from typing import Any, Callable, Dict
+from collections.abc import Callable
+from typing import Any, Dict
 
 from pydantic import BaseModel, Field, field_validator
 

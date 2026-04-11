@@ -7,7 +7,7 @@ import json
 import os
 import subprocess
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 from src.shared.base import BaseSkill
 from src.shared.logging import logger
@@ -60,7 +60,7 @@ class AgentReachSkill(BaseSkill):
         "exa": "web_search_exa",
     }
 
-    def __init__(self, config: Optional[dict[str, Any]] = None):
+    def __init__(self, config: dict[str, Any] | None = None):
         self.config = config or {}
         self.output_dir = self.config.get("output_dir", "output/agent_reach")
         self._ensure_workspace()

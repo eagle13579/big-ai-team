@@ -1,6 +1,6 @@
 import logging
 from abc import abstractmethod
-from typing import Any, Optional
+from typing import Any
 
 from .base import AdapterContext, BaseAdapter
 from .registry import adapter_registry
@@ -13,7 +13,7 @@ class MonitoringAdapter(BaseAdapter[dict[str, Any]]):
     """监控适配器基类"""
 
     async def execute(
-        self, operation: str, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, operation: str, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """执行监控操作"""
         if operation == "trace":
@@ -29,26 +29,26 @@ class MonitoringAdapter(BaseAdapter[dict[str, Any]]):
 
     @abstractmethod
     async def trace(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """追踪操作"""
         pass
 
     @abstractmethod
     async def metrics(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """指标操作"""
         pass
 
     @abstractmethod
     async def log(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """日志操作"""
         pass
 
-    async def _health_check(self, context: Optional[AdapterContext] = None) -> dict[str, Any]:
+    async def _health_check(self, context: AdapterContext | None = None) -> dict[str, Any]:
         """健康检查"""
         try:
             # 尝试记录一个简单的日志
@@ -77,7 +77,7 @@ class LangSmithAdapter(MonitoringAdapter):
         self.project_name = self.config.config.get("project_name", "default")
         self.client = None
 
-    async def initialize(self, context: Optional[AdapterContext] = None) -> bool:
+    async def initialize(self, context: AdapterContext | None = None) -> bool:
         """初始化适配器"""
         if not self.api_key:
             raise ValueError("LangSmith API key is required")
@@ -101,7 +101,7 @@ class LangSmithAdapter(MonitoringAdapter):
             raise Exception(f"Failed to initialize LangSmith adapter: {str(e)}")
 
     async def trace(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """追踪操作"""
         if not self.client:
@@ -121,7 +121,7 @@ class LangSmithAdapter(MonitoringAdapter):
             raise Exception(f"Trace operation failed: {str(e)}")
 
     async def metrics(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """指标操作"""
         if not self.client:
@@ -137,7 +137,7 @@ class LangSmithAdapter(MonitoringAdapter):
             raise Exception(f"Metrics operation failed: {str(e)}")
 
     async def log(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """日志操作"""
         if not self.client:
@@ -152,7 +152,7 @@ class LangSmithAdapter(MonitoringAdapter):
             logger.error(f"Log operation failed: {str(e)}")
             raise Exception(f"Log operation failed: {str(e)}")
 
-    async def close(self, context: Optional[AdapterContext] = None) -> bool:
+    async def close(self, context: AdapterContext | None = None) -> bool:
         """关闭适配器"""
         try:
             self.client = None
@@ -183,7 +183,7 @@ class OpenTelemetryAdapter(MonitoringAdapter):
         self.tracer = None
         self.meter = None
 
-    async def initialize(self, context: Optional[AdapterContext] = None) -> bool:
+    async def initialize(self, context: AdapterContext | None = None) -> bool:
         """初始化适配器"""
         try:
             # 导入 OpenTelemetry 相关模块
@@ -246,7 +246,7 @@ class OpenTelemetryAdapter(MonitoringAdapter):
             raise Exception(f"Failed to initialize OpenTelemetry adapter: {str(e)}")
 
     async def trace(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """追踪操作"""
         if not self.tracer:
@@ -269,7 +269,7 @@ class OpenTelemetryAdapter(MonitoringAdapter):
             raise Exception(f"Trace operation failed: {str(e)}")
 
     async def metrics(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """指标操作"""
         if not self.meter:
@@ -295,7 +295,7 @@ class OpenTelemetryAdapter(MonitoringAdapter):
             raise Exception(f"Metrics operation failed: {str(e)}")
 
     async def log(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """日志操作"""
         if not self.tracer:
@@ -315,7 +315,7 @@ class OpenTelemetryAdapter(MonitoringAdapter):
             logger.error(f"Log operation failed: {str(e)}")
             raise Exception(f"Log operation failed: {str(e)}")
 
-    async def close(self, context: Optional[AdapterContext] = None) -> bool:
+    async def close(self, context: AdapterContext | None = None) -> bool:
         """关闭适配器"""
         try:
             self.tracer = None

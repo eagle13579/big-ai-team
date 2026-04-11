@@ -180,3 +180,6 @@ core/__pycache__/
 build/
 dist/
 dist_temp/
+
+# 忽略临时验证脚本
+scripts/temp/*!scripts/temp/.gitkeep

@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import Any, Optional
+from typing import Any
 
 import httpx
 
@@ -11,7 +11,7 @@ class LLMAdapter(BaseAdapter[dict[str, Any]]):
     """LLM 适配器基类"""
 
     async def execute(
-        self, operation: str, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, operation: str, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """执行 LLM 操作"""
         if operation == "generate":
@@ -23,12 +23,12 @@ class LLMAdapter(BaseAdapter[dict[str, Any]]):
 
     @abstractmethod
     async def generate(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """生成文本"""
         pass
 
-    async def _health_check(self, context: Optional[AdapterContext] = None) -> dict[str, Any]:
+    async def _health_check(self, context: AdapterContext | None = None) -> dict[str, Any]:
         """健康检查"""
         return {
             "status": "healthy",
@@ -48,7 +48,7 @@ class OpenAIAdapter(LLMAdapter):
         )
         self.client = None
 
-    async def initialize(self, context: Optional[AdapterContext] = None) -> bool:
+    async def initialize(self, context: AdapterContext | None = None) -> bool:
         """初始化适配器"""
         if not self.api_key:
             raise ValueError("OpenAI API key is required")
@@ -57,7 +57,7 @@ class OpenAIAdapter(LLMAdapter):
         return True
 
     async def generate(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """生成文本"""
         if not self.client:
@@ -89,7 +89,7 @@ class OpenAIAdapter(LLMAdapter):
         except Exception as e:
             raise Exception(f"OpenAI API call failed: {str(e)}")
 
-    async def close(self, context: Optional[AdapterContext] = None) -> bool:
+    async def close(self, context: AdapterContext | None = None) -> bool:
         """关闭适配器"""
         if self.client:
             await self.client.aclose()
@@ -119,7 +119,7 @@ class DeepSeekAdapter(LLMAdapter):
         )
         self.client = None
 
-    async def initialize(self, context: Optional[AdapterContext] = None) -> bool:
+    async def initialize(self, context: AdapterContext | None = None) -> bool:
         """初始化适配器"""
         if not self.api_key:
             raise ValueError("DeepSeek API key is required")
@@ -128,7 +128,7 @@ class DeepSeekAdapter(LLMAdapter):
         return True
 
     async def generate(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """生成文本"""
         if not self.client:
@@ -160,7 +160,7 @@ class DeepSeekAdapter(LLMAdapter):
         except Exception as e:
             raise Exception(f"DeepSeek API call failed: {str(e)}")
 
-    async def close(self, context: Optional[AdapterContext] = None) -> bool:
+    async def close(self, context: AdapterContext | None = None) -> bool:
         """关闭适配器"""
         if self.client:
             await self.client.aclose()
@@ -186,13 +186,13 @@ class MockLLMAdapter(LLMAdapter):
         super().__init__(config)
         self.response_template = self.config.config.get("response_template", "模拟响应: {prompt}")
 
-    async def initialize(self, context: Optional[AdapterContext] = None) -> bool:
+    async def initialize(self, context: AdapterContext | None = None) -> bool:
         """初始化适配器"""
         self._set_initialized(True)
         return True
 
     async def generate(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """生成文本"""
         prompt = params.get("prompt", "")
@@ -213,7 +213,7 @@ class MockLLMAdapter(LLMAdapter):
             "finish_reason": "stop",
         }
 
-    async def close(self, context: Optional[AdapterContext] = None) -> bool:
+    async def close(self, context: AdapterContext | None = None) -> bool:
         """关闭适配器"""
         self._set_initialized(False)
         return True

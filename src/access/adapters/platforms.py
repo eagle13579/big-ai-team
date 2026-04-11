@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any, Optional, TypeVar
+from typing import Any, TypeVar
 
 # 定义泛型，用于后续类型提示
 T = TypeVar("T", bound="PlatformType")
@@ -85,7 +85,7 @@ class PlatformAdapter:
     最佳实践：定义明确的类属性，强制子类实现。
     """
 
-    PLATFORM: Optional[PlatformType] = None
+    PLATFORM: PlatformType | None = None
 
     @classmethod
     def get_info(cls) -> str:

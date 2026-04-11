@@ -3,7 +3,7 @@ import json
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 # 导入配置，用于控制最大步数等参数
 from shared.config import settings
@@ -69,7 +69,7 @@ class MemoryManager:
         )
         return sorted_memory[:limit]
 
-    def get_long_term_memory(self, key: Optional[str] = None) -> Any:
+    def get_long_term_memory(self, key: str | None = None) -> Any:
         """获取长期记忆"""
         if key:
             return self.long_term_memory.get(key)

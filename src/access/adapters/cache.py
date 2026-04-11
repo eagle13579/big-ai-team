@@ -1,6 +1,6 @@
 import time
 from abc import abstractmethod
-from typing import Any, Optional
+from typing import Any
 
 import redis
 
@@ -12,7 +12,7 @@ class CacheAdapter(BaseAdapter[dict[str, Any]]):
     """缓存适配器基类"""
 
     async def execute(
-        self, operation: str, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, operation: str, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """执行缓存操作"""
         if operation == "get":
@@ -28,26 +28,26 @@ class CacheAdapter(BaseAdapter[dict[str, Any]]):
 
     @abstractmethod
     async def get(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """获取缓存"""
         pass
 
     @abstractmethod
     async def set(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """设置缓存"""
         pass
 
     @abstractmethod
     async def delete(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """删除缓存"""
         pass
 
-    async def _health_check(self, context: Optional[AdapterContext] = None) -> dict[str, Any]:
+    async def _health_check(self, context: AdapterContext | None = None) -> dict[str, Any]:
         """健康检查"""
         try:
             await self.set({"key": "health_check", "value": "ok", "ttl": 10}, context)
@@ -85,7 +85,7 @@ class RedisAdapter(CacheAdapter):
         self.password = self.config.config.get("password")
         self.client = None
 
-    async def initialize(self, context: Optional[AdapterContext] = None) -> bool:
+    async def initialize(self, context: AdapterContext | None = None) -> bool:
         """初始化适配器"""
         try:
             self.client = redis.Redis(
@@ -103,7 +103,7 @@ class RedisAdapter(CacheAdapter):
             raise Exception(f"Failed to initialize Redis adapter: {str(e)}")
 
     async def get(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """获取缓存"""
         if not self.client:
@@ -120,7 +120,7 @@ class RedisAdapter(CacheAdapter):
             raise Exception(f"Get operation failed: {str(e)}")
 
     async def set(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """设置缓存"""
         if not self.client:
@@ -143,7 +143,7 @@ class RedisAdapter(CacheAdapter):
             raise Exception(f"Set operation failed: {str(e)}")
 
     async def delete(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """删除缓存"""
         if not self.client:
@@ -159,7 +159,7 @@ class RedisAdapter(CacheAdapter):
         except Exception as e:
             raise Exception(f"Delete operation failed: {str(e)}")
 
-    async def close(self, context: Optional[AdapterContext] = None) -> bool:
+    async def close(self, context: AdapterContext | None = None) -> bool:
         """关闭适配器"""
         if self.client:
             self.client.close()
@@ -187,7 +187,7 @@ class MemoryCacheAdapter(CacheAdapter):
         self.cache = {}
         self.expiry = {}
 
-    async def initialize(self, context: Optional[AdapterContext] = None) -> bool:
+    async def initialize(self, context: AdapterContext | None = None) -> bool:
         """初始化适配器"""
         self.cache = {}
         self.expiry = {}
@@ -195,7 +195,7 @@ class MemoryCacheAdapter(CacheAdapter):
         return True
 
     async def get(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """获取缓存"""
         key = params.get("key")
@@ -211,7 +211,7 @@ class MemoryCacheAdapter(CacheAdapter):
         return {"value": self.cache.get(key)}
 
     async def set(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """设置缓存"""
         key = params.get("key")
@@ -231,7 +231,7 @@ class MemoryCacheAdapter(CacheAdapter):
         return {"success": True}
 
     async def delete(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """删除缓存"""
         key = params.get("key")
@@ -246,7 +246,7 @@ class MemoryCacheAdapter(CacheAdapter):
 
         return {"deleted": deleted}
 
-    async def close(self, context: Optional[AdapterContext] = None) -> bool:
+    async def close(self, context: AdapterContext | None = None) -> bool:
         """关闭适配器"""
         self.cache.clear()
         self.expiry.clear()

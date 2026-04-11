@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any
 
 from sqlalchemy.orm import Session
 
@@ -40,7 +40,7 @@ class SkillRegistryManager:
             self.db.refresh(new_skill)
             return new_skill
 
-    def get_skill(self, name: str) -> Optional[SkillRegistry]:
+    def get_skill(self, name: str) -> SkillRegistry | None:
         """获取技能"""
         return (
             self.db.query(SkillRegistry)
@@ -61,7 +61,7 @@ class SkillRegistryManager:
             return True
         return False
 
-    def update_skill_manifest(self, name: str, manifest: SkillManifest) -> Optional[SkillRegistry]:
+    def update_skill_manifest(self, name: str, manifest: SkillManifest) -> SkillRegistry | None:
         """更新技能清单"""
         skill = self.get_skill(name)
         if skill:
@@ -71,7 +71,7 @@ class SkillRegistryManager:
             self.db.refresh(skill)
         return skill
 
-    def get_skill_manifest(self, name: str) -> Optional[dict[str, Any]]:
+    def get_skill_manifest(self, name: str) -> dict[str, Any] | None:
         """获取技能清单"""
         skill = self.get_skill(name)
         return skill.manifest if skill else None

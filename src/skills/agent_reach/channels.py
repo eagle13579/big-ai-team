@@ -6,7 +6,7 @@ Channel Manager - 管理 Agent-Reach 的平台渠道
 import re
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 
 class PlatformType(Enum):
@@ -208,7 +208,7 @@ class ChannelManager:
         for channel in default_channels:
             self.channels[channel.name] = channel
 
-    def get_channel(self, name: str) -> Optional[Channel]:
+    def get_channel(self, name: str) -> Channel | None:
         """获取指定渠道"""
         return self.channels.get(name)
 
@@ -220,7 +220,7 @@ class ChannelManager:
         """根据类型获取渠道"""
         return [ch for ch in self.channels.values() if ch.platform_type == platform_type]
 
-    def detect_channel_by_url(self, url: str) -> Optional[Channel]:
+    def detect_channel_by_url(self, url: str) -> Channel | None:
         """根据 URL 检测对应的渠道"""
         for channel in self.channels.values():
             for pattern in channel.url_patterns:
@@ -246,7 +246,7 @@ class ChannelManager:
         channel = self.get_channel(name)
         return channel.requires_proxy if channel else False
 
-    def get_upstream_tool(self, name: str) -> Optional[str]:
+    def get_upstream_tool(self, name: str) -> str | None:
         """获取渠道使用的上游工具"""
         channel = self.get_channel(name)
         return channel.upstream_tool if channel else None

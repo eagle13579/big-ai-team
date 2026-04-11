@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any
 
 from src.shared.utils import generate_uuid
 
@@ -14,7 +14,7 @@ class RoleFactory:
             "manager": self._create_manager,
         }
 
-    def create_role(self, role_name: str, context: dict[str, Any]) -> Optional[dict[str, Any]]:
+    def create_role(self, role_name: str, context: dict[str, Any]) -> dict[str, Any] | None:
         """创建角色"""
         if role_name in self.roles:
             return self.roles[role_name](context)

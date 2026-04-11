@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import Optional
 
 import httpx
 from pydantic import BaseModel, Field
@@ -15,7 +14,7 @@ class LLMRequest(BaseModel):
     model: str = Field(default="gpt-4", description="模型名称")
     temperature: float = Field(default=0.7, description="温度参数")
     max_tokens: int = Field(default=1000, description="最大token数")
-    stop: Optional[list[str]] = Field(default=None, description="停止词")
+    stop: list[str] | None = Field(default=None, description="停止词")
 
 
 class LLMResponse(BaseModel):

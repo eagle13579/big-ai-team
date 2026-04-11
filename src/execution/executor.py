@@ -1,9 +1,9 @@
 import asyncio
 import hashlib
 import os
-from collections.abc import Awaitable
+from collections.abc import Awaitable, Callable
 from datetime import datetime, timedelta
-from typing import Any, Callable, Optional
+from typing import Any
 
 import httpx
 
@@ -140,7 +140,7 @@ class ToolExecutor:
         data = f"{tool_name}:{str(sorted(args.items()))}"
         return hashlib.md5(data.encode()).hexdigest()
 
-    def _check_cache(self, tool_name: str, args: dict[str, Any]) -> Optional[Any]:
+    def _check_cache(self, tool_name: str, args: dict[str, Any]) -> Any | None:
         """检查缓存"""
         cache_key = self._generate_cache_key(tool_name, args)
         if cache_key in self._cache:

@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any
 
 from sqlalchemy.orm import Session
 
@@ -58,7 +58,7 @@ class Dispatcher:
         self.db.refresh(task)
         return task
 
-    def get_pending_tasks(self, assignee: Optional[str] = None) -> list[Task]:
+    def get_pending_tasks(self, assignee: str | None = None) -> list[Task]:
         """获取待处理任务
 
         查询状态为PENDING的任务，可选择按负责人过滤。
@@ -74,7 +74,7 @@ class Dispatcher:
             query = query.filter(Task.assignee == assignee)
         return query.all()
 
-    def update_task_status(self, task_id: str, status: str) -> Optional[Task]:
+    def update_task_status(self, task_id: str, status: str) -> Task | None:
         """更新任务状态
 
         根据任务ID更新任务状态。
@@ -93,7 +93,7 @@ class Dispatcher:
             self.db.refresh(task)
         return task
 
-    def update_task_output(self, task_id: str, output_data: dict[str, Any]) -> Optional[Task]:
+    def update_task_output(self, task_id: str, output_data: dict[str, Any]) -> Task | None:
         """更新任务输出
 
         根据任务ID更新任务输出数据。
@@ -112,7 +112,7 @@ class Dispatcher:
             self.db.refresh(task)
         return task
 
-    def get_task_by_id(self, task_id: str) -> Optional[Task]:
+    def get_task_by_id(self, task_id: str) -> Task | None:
         """根据ID获取任务
 
         Args:
@@ -134,7 +134,7 @@ class Dispatcher:
         """
         return self.db.query(Task).filter(Task.plan_id == plan_id).all()
 
-    def retry_task(self, task_id: str) -> Optional[Task]:
+    def retry_task(self, task_id: str) -> Task | None:
         """重试任务
 
         将任务状态设置为RETRYING并增加重试次数。

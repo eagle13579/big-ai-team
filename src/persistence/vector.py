@@ -1,4 +1,3 @@
-from typing import Optional
 
 import numpy as np
 from sqlalchemy.orm import Session
@@ -12,7 +11,7 @@ class VectorManager:
     def __init__(self, db: Session):
         self.db = db
 
-    def generate_embedding(self, text: str) -> Optional[list[float]]:
+    def generate_embedding(self, text: str) -> list[float] | None:
         """生成文本嵌入向量"""
         # 这里应该集成实际的嵌入模型，如OpenAI的API
         # 暂时返回随机向量作为示例

@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any
 
 from sqlalchemy.orm import Session
 
@@ -49,16 +49,16 @@ class MemoryManager:
             .all()
         )
 
-    def get_memory_by_id(self, memory_id: str) -> Optional[Memory]:
+    def get_memory_by_id(self, memory_id: str) -> Memory | None:
         """根据ID获取记忆"""
         return self.db.query(Memory).filter(Memory.id == memory_id).first()
 
     def update_memory(
         self,
         memory_id: str,
-        content: Optional[str] = None,
-        metadata: Optional[dict[str, Any]] = None,
-    ) -> Optional[Memory]:
+        content: str | None = None,
+        metadata: dict[str, Any] | None = None,
+    ) -> Memory | None:
         """更新记忆"""
         memory = self.get_memory_by_id(memory_id)
         if memory:

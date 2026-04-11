@@ -1,6 +1,5 @@
 import os
 import re
-from typing import Optional
 
 from pydantic import BaseModel
 
@@ -56,7 +55,7 @@ class SecurityConfig(BaseModel):
 class SecurityManager:
     """安全管理器"""
 
-    def __init__(self, config: Optional[SecurityConfig] = None):
+    def __init__(self, config: SecurityConfig | None = None):
         """初始化安全管理器"""
         self.config = config or SecurityConfig()
         # 编译敏感命令正则表达式
@@ -111,7 +110,7 @@ class SecurityManager:
         return True, "输入验证通过"
 
     def check_permission(
-        self, action: str, user_role: str, branch: Optional[str] = None
+        self, action: str, user_role: str, branch: str | None = None
     ) -> tuple[bool, str]:
         """检查用户权限"""
         # 检查用户角色是否存在
@@ -134,7 +133,7 @@ class SecurityManager:
         return True, "权限检查通过"
 
     def validate_git_operation(
-        self, action: str, files: Optional[list[str]], user_role: str, branch: str
+        self, action: str, files: list[str] | None, user_role: str, branch: str
     ) -> tuple[bool, str]:
         """验证 Git 操作"""
         # 检查权限
@@ -152,7 +151,7 @@ class SecurityManager:
         return True, "Git 操作验证通过"
 
     def validate_file_operation(
-        self, operation: str, file_path: str, target_path: Optional[str] = None
+        self, operation: str, file_path: str, target_path: str | None = None
     ) -> tuple[bool, str]:
         """验证文件操作"""
         # 检查文件路径
