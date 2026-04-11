@@ -14,6 +14,8 @@ Adding a fourth test content to test the failure scenario with debug info.
 
 Adding a fifth test content to test with PowerShell execution.
 
+Adding a sixth test content to test with fixed deploy.bat script.
+
 ## Project Structure
 
 - `bridge/` - Bridge components
