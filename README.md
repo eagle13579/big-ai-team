@@ -6,6 +6,8 @@ This is a test README file for the Big AI Team project.
 
 Adding test content to verify the pre-commit hook functionality.
 
+Adding another test content to test the failure scenario.
+
 ## Project Structure
 
 - `bridge/` - Bridge components
