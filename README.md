@@ -8,6 +8,8 @@ Adding test content to verify the pre-commit hook functionality.
 
 Adding another test content to test the failure scenario.
 
+Adding a third test content to test the failure scenario again.
+
 ## Project Structure
 
 - `bridge/` - Bridge components
