@@ -1,0 +1,5914 @@
+{
+  "total_requests": 1000,
+  "success_count": 0,
+  "error_count": 1000,
+  "total_time": 5.329416036605835,
+  "average_response_time": 0.005657464027404785,
+  "95th_percentile": 0.0462033748626709,
+  "99th_percentile": 0.08318376541137695,
+  "throughput": 187.63781868995795,
+  "results": [
+    {
+      "scenario": "search_github_repos",
+      "status_code": 401,
+      "response_time": 0.04285383224487305
+    },
+    {
+      "scenario": "search_twitter",
+      "status_code": 401,
+      "response_time": 0.04189467430114746
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 401,
+      "response_time": 0.043059349060058594
+    },
+    {
+      "scenario": "search_github_repos",
+      "status_code": 401,
+      "response_time": 0.04200410842895508
+    },
+    {
+      "scenario": "get_youtube_transcript",
+      "status_code": 401,
+      "response_time": 0.04057025909423828
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 401,
+      "response_time": 0.04068279266357422
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 401,
+      "response_time": 0.042568206787109375
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 401,
+      "response_time": 0.04356646537780762
+    },
+    {
+      "scenario": "search_twitter",
+      "status_code": 401,
+      "response_time": 0.042670249938964844
+    },
+    {
+      "scenario": "get_youtube_transcript",
+      "status_code": 401,
+      "response_time": 0.042348384857177734
+    },
+    {
+      "scenario": "get_youtube_transcript",
+      "status_code": 401,
+      "response_time": 0.042688608169555664
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 401,
+      "response_time": 0.0423433780670166
+    },
+    {
+      "scenario": "get_youtube_transcript",
+      "status_code": 401,
+      "response_time": 0.04219675064086914
+    },
+    {
+      "scenario": "search_twitter",
+      "status_code": 401,
+      "response_time": 0.042772769927978516
+    },
+    {
+      "scenario": "search_github_repos",
+      "status_code": 401,
+      "response_time": 0.04106545448303223
+    },
+    {
+      "scenario": "search_twitter",
+      "status_code": 401,
+      "response_time": 0.04251503944396973
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 401,
+      "response_time": 0.04346060752868652
+    },
+    {
+      "scenario": "get_youtube_transcript",
+      "status_code": 401,
+      "response_time": 0.041457414627075195
+    },
+    {
+      "scenario": "search_github_repos",
+      "status_code": 401,
+      "response_time": 0.04365897178649902
+    },
+    {
+      "scenario": "search_twitter",
+      "status_code": 401,
+      "response_time": 0.042307376861572266
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 401,
+      "response_time": 0.04421544075012207
+    },
+    {
+      "scenario": "search_twitter",
+      "status_code": 401,
+      "response_time": 0.04153013229370117
+    },
+    {
+      "scenario": "search_github_repos",
+      "status_code": 401,
+      "response_time": 0.043297767639160156
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 401,
+      "response_time": 0.042061805725097656
+    },
+    {
+      "scenario": "get_youtube_transcript",
+      "status_code": 401,
+      "response_time": 0.043869733810424805
+    },
+    {
+      "scenario": "get_youtube_transcript",
+      "status_code": 401,
+      "response_time": 0.041904449462890625
+    },
+    {
+      "scenario": "search_twitter",
+      "status_code": 401,
+      "response_time": 0.04365277290344238
+    },
+    {
+      "scenario": "get_youtube_transcript",
+      "status_code": 401,
+      "response_time": 0.04164600372314453
+    },
+    {
+      "scenario": "search_twitter",
+      "status_code": 401,
+      "response_time": 0.04230213165283203
+    },
+    {
+      "scenario": "search_github_repos",
+      "status_code": 401,
+      "response_time": 0.04394030570983887
+    },
+    {
+      "scenario": "get_youtube_transcript",
+      "status_code": 401,
+      "response_time": 0.04369091987609863
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 401,
+      "response_time": 0.043334245681762695
+    },
+    {
+      "scenario": "get_youtube_transcript",
+      "status_code": 401,
+      "response_time": 0.044300079345703125
+    },
+    {
+      "scenario": "search_github_repos",
+      "status_code": 401,
+      "response_time": 0.04190659523010254
+    },
+    {
+      "scenario": "search_github_repos",
+      "status_code": 401,
+      "response_time": 0.04201531410217285
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 401,
+      "response_time": 0.043805599212646484
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 401,
+      "response_time": 0.04439735412597656
+    },
+    {
+      "scenario": "search_github_repos",
+      "status_code": 401,
+      "response_time": 0.04455208778381348
+    },
+    {
+      "scenario": "search_twitter",
+      "status_code": 401,
+      "response_time": 0.044440269470214844
+    },
+    {
+      "scenario": "search_github_repos",
+      "status_code": 401,
+      "response_time": 0.04520726203918457
+    },
+    {
+      "scenario": "search_github_repos",
+      "status_code": 401,
+      "response_time": 0.04335498809814453
+    },
+    {
+      "scenario": "search_github_repos",
+      "status_code": 401,
+      "response_time": 0.04409432411193848
+    },
+    {
+      "scenario": "search_twitter",
+      "status_code": 401,
+      "response_time": 0.04496002197265625
+    },
+    {
+      "scenario": "search_twitter",
+      "status_code": 401,
+      "response_time": 0.04237246513366699
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 401,
+      "response_time": 0.04431271553039551
+    },
+    {
+      "scenario": "search_github_repos",
+      "status_code": 401,
+      "response_time": 0.0439455509185791
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 401,
+      "response_time": 0.04393720626831055
+    },
+    {
+      "scenario": "search_github_repos",
+      "status_code": 401,
+      "response_time": 0.04456639289855957
+    },
+    {
+      "scenario": "search_twitter",
+      "status_code": 401,
+      "response_time": 0.04224729537963867
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 401,
+      "response_time": 0.042482852935791016
+    },
+    {
+      "scenario": "get_youtube_transcript",
+      "status_code": 401,
+      "response_time": 0.0462033748626709
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 401,
+      "response_time": 0.04926633834838867
+    },
+    {
+      "scenario": "search_github_repos",
+      "status_code": 401,
+      "response_time": 0.04879426956176758
+    },
+    {
+      "scenario": "search_twitter",
+      "status_code": 401,
+      "response_time": 0.04997873306274414
+    },
+    {
+      "scenario": "search_github_repos",
+      "status_code": 401,
+      "response_time": 0.04956960678100586
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 401,
+      "response_time": 0.05110001564025879
+    },
+    {
+      "scenario": "search_github_repos",
+      "status_code": 401,
+      "response_time": 0.052874088287353516
+    },
+    {
+      "scenario": "get_youtube_transcript",
+      "status_code": 401,
+      "response_time": 0.05355191230773926
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 401,
+      "response_time": 0.05255556106567383
+    },
+    {
+      "scenario": "search_github_repos",
+      "status_code": 401,
+      "response_time": 0.056044816970825195
+    },
+    {
+      "scenario": "search_twitter",
+      "status_code": 401,
+      "response_time": 0.05522656440734863
+    },
+    {
+      "scenario": "search_twitter",
+      "status_code": 401,
+      "response_time": 0.057593345642089844
+    },
+    {
+      "scenario": "search_github_repos",
+      "status_code": 401,
+      "response_time": 0.058001041412353516
+    },
+    {
+      "scenario": "search_twitter",
+      "status_code": 401,
+      "response_time": 0.05795168876647949
+    },
+    {
+      "scenario": "search_github_repos",
+      "status_code": 401,
+      "response_time": 0.05945754051208496
+    },
+    {
+      "scenario": "search_twitter",
+      "status_code": 401,
+      "response_time": 0.059206485748291016
+    },
+    {
+      "scenario": "get_youtube_transcript",
+      "status_code": 401,
+      "response_time": 0.0673360824584961
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 401,
+      "response_time": 0.06641864776611328
+    },
+    {
+      "scenario": "search_github_repos",
+      "status_code": 401,
+      "response_time": 0.06616044044494629
+    },
+    {
+      "scenario": "search_twitter",
+      "status_code": 401,
+      "response_time": 0.06867337226867676
+    },
+    {
+      "scenario": "get_youtube_transcript",
+      "status_code": 401,
+      "response_time": 0.06531429290771484
+    },
+    {
+      "scenario": "search_github_repos",
+      "status_code": 401,
+      "response_time": 0.06713676452636719
+    },
+    {
+      "scenario": "search_twitter",
+      "status_code": 401,
+      "response_time": 0.06892943382263184
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 401,
+      "response_time": 0.06969237327575684
+    },
+    {
+      "scenario": "get_youtube_transcript",
+      "status_code": 401,
+      "response_time": 0.07121825218200684
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 401,
+      "response_time": 0.0702214241027832
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 401,
+      "response_time": 0.07107663154602051
+    },
+    {
+      "scenario": "get_youtube_transcript",
+      "status_code": 401,
+      "response_time": 0.07345414161682129
+    },
+    {
+      "scenario": "search_twitter",
+      "status_code": 401,
+      "response_time": 0.0747368335723877
+    },
+    {
+      "scenario": "get_youtube_transcript",
+      "status_code": 401,
+      "response_time": 0.073486328125
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 401,
+      "response_time": 0.07628107070922852
+    },
+    {
+      "scenario": "get_youtube_transcript",
+      "status_code": 401,
+      "response_time": 0.07523703575134277
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 401,
+      "response_time": 0.07773780822753906
+    },
+    {
+      "scenario": "search_twitter",
+      "status_code": 401,
+      "response_time": 0.07899689674377441
+    },
+    {
+      "scenario": "search_github_repos",
+      "status_code": 401,
+      "response_time": 0.07818269729614258
+    },
+    {
+      "scenario": "search_github_repos",
+      "status_code": 401,
+      "response_time": 0.07886695861816406
+    },
+    {
+      "scenario": "get_youtube_transcript",
+      "status_code": 401,
+      "response_time": 0.08112573623657227
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 401,
+      "response_time": 0.07985615730285645
+    },
+    {
+      "scenario": "search_twitter",
+      "status_code": 401,
+      "response_time": 0.08217549324035645
+    },
+    {
+      "scenario": "search_twitter",
+      "status_code": 401,
+      "response_time": 0.08318376541137695
+    },
+    {
+      "scenario": "search_github_repos",
+      "status_code": 401,
+      "response_time": 0.08162283897399902
+    },
+    {
+      "scenario": "get_youtube_transcript",
+      "status_code": 401,
+      "response_time": 0.08528828620910645
+    },
+    {
+      "scenario": "get_youtube_transcript",
+      "status_code": 401,
+      "response_time": 0.08781790733337402
+    },
+    {
+      "scenario": "search_twitter",
+      "status_code": 401,
+      "response_time": 0.08571386337280273
+    },
+    {
+      "scenario": "get_youtube_transcript",
+      "status_code": 401,
+      "response_time": 0.08738851547241211
+    },
+    {
+      "scenario": "get_youtube_transcript",
+      "status_code": 401,
+      "response_time": 0.08849716186523438
+    },
+    {
+      "scenario": "get_youtube_transcript",
+      "status_code": 401,
+      "response_time": 0.08799171447753906
+    },
+    {
+      "scenario": "get_youtube_transcript",
+      "status_code": 401,
+      "response_time": 0.09172725677490234
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 401,
+      "response_time": 0.09381365776062012
+    },
+    {
+      "scenario": "search_twitter",
+      "status_code": 401,
+      "response_time": 0.09529304504394531
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 1.6689300537109375e-06,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 1.430511474609375e-06,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 9.5367431640625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.86102294921875e-06,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.152557373046875e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 9.5367431640625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 1.1920928955078125e-06,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.152557373046875e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 9.5367431640625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.152557373046875e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-06,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 1.6689300537109375e-06,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 1.9073486328125e-06,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.152557373046875e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 9.5367431640625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.152557373046875e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 1.1205673217773438e-05,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 1.1920928955078125e-06,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.152557373046875e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.6226043701171875e-06,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 1.1920928955078125e-06,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.152557373046875e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 9.5367431640625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 9.5367431640625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 1.1920928955078125e-06,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 9.5367431640625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.152557373046875e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.1457672119140625e-06,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.152557373046875e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 9.5367431640625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-05,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.152557373046875e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 9.5367431640625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.3909759521484375e-06,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.152557373046875e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 1.1920928955078125e-06,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.152557373046875e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.152557373046875e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 1.430511474609375e-06,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 1.6689300537109375e-06,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 9.5367431640625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.152557373046875e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 9.5367431640625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.152557373046875e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 9.5367431640625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 9.5367431640625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 9.5367431640625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.152557373046875e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 9.5367431640625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.152557373046875e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 1.1920928955078125e-06,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.152557373046875e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.152557373046875e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 9.5367431640625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.152557373046875e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.152557373046875e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.152557373046875e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.152557373046875e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 9.5367431640625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 1.430511474609375e-06,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 1.1920928955078125e-06,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.152557373046875e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 9.5367431640625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.367134094238281e-05,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 1.430511474609375e-06,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 9.5367431640625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.152557373046875e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 9.5367431640625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.152557373046875e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 1.1920928955078125e-06,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 1.1920928955078125e-06,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.152557373046875e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.152557373046875e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 9.5367431640625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 1.430511474609375e-06,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.152557373046875e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.152557373046875e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.152557373046875e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.152557373046875e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 1.1920928955078125e-06,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 1.430511474609375e-06,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 9.5367431640625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.152557373046875e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 1.1920928955078125e-06,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 1.1920928955078125e-06,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 1.239776611328125e-05,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 9.5367431640625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 9.5367431640625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.152557373046875e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 1.430511474609375e-06,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.152557373046875e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.152557373046875e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 9.5367431640625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.384185791015625e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 2.1457672119140625e-06,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 4.76837158203125e-07,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 0.0,
+      "error": "Circuit breaker is open"
+    },
+    {
+      "scenario": "read_webpage",
+      "status_code": 503,
+      "response_time": 7.152557373046875e-07,
+      "error": "Circuit breaker is open"
+    }
+  ],
+  "circuit_breaker_state": "OPEN",
+  "service_degraded": true
+}

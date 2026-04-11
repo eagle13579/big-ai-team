@@ -1,745 +1,299 @@
-"""
-Agent-Reach Skill 主类
-集成 Agent-Reach 的 17+ 平台能力到 Big-AI-Team
-"""
-
+import asyncio
 import json
 import os
-import subprocess
 from datetime import datetime
 from typing import Any
 
 from src.shared.base import BaseSkill
-from src.shared.logging import logger
-
-logger = logger.bind(name="AgentReach.Skill")
+from src.skills.agent_reach.channels import channel_manager
+from src.skills.agent_reach.interface import ResultWrapper
+from src.skills.agent_reach.router import ChannelRouter
 
 
 class AgentReachSkill(BaseSkill):
-    """
-    Agent-Reach Skill - 互联网能力扩展
-
-    支持平台:
-    - Web: 任意网页读取 (Jina Reader)
-    - Twitter/X: 推文搜索、读取、时间线 (bird CLI)
-    - YouTube: 视频字幕提取、搜索 (yt-dlp)
-    - Bilibili: 视频字幕提取 (yt-dlp)
-    - Reddit: 帖子搜索、读取
-    - GitHub: 仓库搜索、代码搜索 (gh CLI)
-    - 小红书: 笔记搜索、详情 (mcporter)
-    - 抖音: 视频解析 (mcporter)
-    - 微信公众号: 文章搜索、阅读
-    - 微博: 热搜、搜索、用户动态
-    - LinkedIn: Profile 搜索
-    - V2EX: 热门帖子、节点
-    - 雪球: 股票行情
-    - RSS: 订阅源解析
-    - Exa: AI 语义搜索
-    """
-
+    """Agent-Reach 技能实现"""
+    
     name = "agent_reach"
-    description = "互联网多平台搜索与内容获取能力"
-    version = "1.0.0"
-
-    # 平台到工具的映射
-    PLATFORM_TOOLS = {
-        "web": "read_webpage",
-        "twitter": "search_twitter",
-        "youtube": "get_youtube_transcript",
-        "bilibili": "get_bilibili_transcript",
-        "reddit": "search_reddit",
-        "github": "search_github",
-        "xiaohongshu": "search_xiaohongshu",
-        "douyin": "parse_douyin",
-        "wechat": "search_wechat",
-        "weibo": "search_weibo",
-        "linkedin": "search_linkedin",
-        "v2ex": "get_v2ex_topics",
-        "xueqiu": "get_stock_quote",
-        "rss": "parse_rss",
-        "exa": "web_search_exa",
-    }
-
-    def __init__(self, config: dict[str, Any] | None = None):
-        self.config = config or {}
-        self.output_dir = self.config.get("output_dir", "output/agent_reach")
-        self._ensure_workspace()
-
-    def _ensure_workspace(self):
-        """初始化工作目录"""
-        if not os.path.exists(self.output_dir):
-            os.makedirs(self.output_dir, exist_ok=True)
-            logger.info(f"📁 已创建 Agent-Reach 工作目录: {self.output_dir}")
-
-    def execute(self, args: dict[str, Any]) -> dict[str, Any]:
-        """
-        执行 Agent-Reach 工具调用
-
+    description = "Agent-Reach 多平台互联网访问能力"
+    
+    def __init__(self):
+        super().__init__()
+        self.channel_router = ChannelRouter(channel_manager)
+        self.runtime_state_path = "memory/agent_reach/runtime_state.json"
+        self.trace_log_path = "memory/agent_reach/reach_trace.md"
+        self._ensure_memory_structure()
+    
+    def _ensure_memory_structure(self):
+        """确保内存结构存在"""
+        os.makedirs("memory/agent_reach", exist_ok=True)
+        if not os.path.exists(self.runtime_state_path):
+            with open(self.runtime_state_path, 'w', encoding='utf-8') as f:
+                json.dump({
+                    "api_rate_limits": {},
+                    "cookie_status": {},
+                    "last_used": {}
+                }, f, ensure_ascii=False, indent=2)
+        if not os.path.exists(self.trace_log_path):
+            with open(self.trace_log_path, 'w', encoding='utf-8') as f:
+                f.write("# Agent-Reach Trace Log\n\n")
+                f.write("| Timestamp | Channel | Action | Status |\n")
+                f.write("|-----------|---------|--------|--------|\n")
+    
+    def _update_runtime_state(self, channel_name: str, action: str, status: str):
+        """更新运行时状态"""
+        with open(self.runtime_state_path, encoding='utf-8') as f:
+            state = json.load(f)
+        
+        # 更新 API 速率限制
+        if channel_name not in state["api_rate_limits"]:
+            state["api_rate_limits"][channel_name] = {
+                "count": 0,
+                "last_reset": datetime.utcnow().isoformat()
+            }
+        state["api_rate_limits"][channel_name]["count"] += 1
+        
+        # 更新最后使用时间
+        state["last_used"][channel_name] = datetime.utcnow().isoformat()
+        
+        with open(self.runtime_state_path, 'w', encoding='utf-8') as f:
+            json.dump(state, f, ensure_ascii=False, indent=2)
+    
+    def _log_trace(self, channel_name: str, action: str, status: str):
+        """记录操作轨迹"""
+        timestamp = datetime.utcnow().isoformat()
+        with open(self.trace_log_path, 'a', encoding='utf-8') as f:
+            f.write(f"| {timestamp} | {channel_name} | {action} | {status} |\n")
+    
+    def execute(self, params: dict[str, Any]) -> dict[str, Any]:
+        """执行 Agent-Reach 操作（同步）
+        
         Args:
-            args: {
-                "action": "search_twitter" | "read_webpage" | ...,
-                "params": {...}
-            }
+            params: 操作参数，包含 action 和 params 字段
+            
+        Returns:
+            执行结果
         """
-        action = args.get("action")
-        params = args.get("params", {})
-
-        if not action:
-            return {
-                "status": "error",
-                "observation": {
-                    "data": None,
-                    "message": "缺少 action 参数",
-                    "timestamp": datetime.now().isoformat(),
-                },
-            }
-
-        # 映射到具体方法
-        method_map = {
-            # Web
-            "read_webpage": self._read_webpage,
-            # Twitter
-            "search_twitter": self._search_twitter,
-            "read_tweet": self._read_tweet,
-            "get_user_tweets": self._get_user_tweets,
-            # YouTube
-            "get_youtube_transcript": self._get_youtube_transcript,
-            "search_youtube": self._search_youtube,
-            # Bilibili
-            "get_bilibili_transcript": self._get_bilibili_transcript,
-            # Reddit
-            "search_reddit": self._search_reddit,
-            # GitHub
-            "search_github_repos": self._search_github_repos,
-            "search_github_code": self._search_github_code,
-            "view_github_repo": self._view_github_repo,
-            # 小红书
-            "search_xiaohongshu": self._search_xiaohongshu,
-            "get_xiaohongshu_detail": self._get_xiaohongshu_detail,
-            # 抖音
-            "parse_douyin": self._parse_douyin,
-            # 微博
-            "search_weibo": self._search_weibo,
-            "get_weibo_trending": self._get_weibo_trending,
-            # Exa 搜索
-            "web_search_exa": self._web_search_exa,
-            # 诊断
-            "doctor": self._doctor_check,
-        }
-
-        method = method_map.get(action)
-        if not method:
-            return {
-                "status": "error",
-                "observation": {
-                    "data": None,
-                    "message": f"未知的 action: {action}。可用: {list(method_map.keys())}",
-                    "timestamp": datetime.now().isoformat(),
-                },
-            }
-
+        import asyncio
         try:
-            result = method(**params)
-            return {
-                "status": "success",
-                "observation": {
-                    "data": result,
-                    "message": f"成功执行 {action}",
-                    "timestamp": datetime.now().isoformat(),
-                },
-            }
-        except Exception as e:
-            logger.error(f"Agent-Reach 执行失败: {action} - {str(e)}")
-            return {
-                "status": "error",
-                "observation": {
-                    "data": None,
-                    "message": f"执行失败: {str(e)}",
-                    "timestamp": datetime.now().isoformat(),
-                },
-            }
-
-    # ───────────────────────────────────────────
-    # Web 读取 (Jina Reader)
-    # ───────────────────────────────────────────
-    def _read_webpage(self, url: str, **kwargs) -> dict[str, Any]:
-        """读取任意网页内容"""
-        import httpx
-
-        jina_url = f"https://r.jina.ai/{url}"
-
-        try:
-            response = httpx.get(jina_url, timeout=30)
-            response.raise_for_status()
-
-            return {
-                "url": url,
-                "content": response.text,
-                "length": len(response.text),
-                "method": "jina_reader",
-            }
-        except Exception as e:
-            # Fallback: 直接请求
-            try:
-                response = httpx.get(
-                    url,
-                    timeout=30,
-                    headers={
-                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-                    },
-                )
-                return {
-                    "url": url,
-                    "content": response.text[:5000],  # 限制长度
-                    "length": len(response.text),
-                    "method": "direct",
-                    "warning": "使用直接请求，可能包含 HTML",
-                }
-            except Exception as e2:
-                raise Exception(f"无法读取网页: {str(e)}, fallback: {str(e2)}")
-
-    # ───────────────────────────────────────────
-    # Twitter/X (bird CLI)
-    # ───────────────────────────────────────────
-    def _search_twitter(self, query: str, limit: int = 10, **kwargs) -> dict[str, Any]:
-        """搜索 Twitter 推文"""
-        try:
-            result = subprocess.run(
-                ["bird", "search", query, "-n", str(limit)],
-                capture_output=True,
-                text=True,
-                timeout=60,
-            )
-
-            if result.returncode != 0:
-                raise Exception(f"bird CLI 错误: {result.stderr}")
-
-            # 解析输出
-            tweets = self._parse_bird_output(result.stdout)
-
-            return {"query": query, "tweets": tweets, "count": len(tweets), "platform": "twitter"}
-        except FileNotFoundError:
-            raise Exception("bird CLI 未安装。请运行: npm install -g @steipete/bird")
-        except Exception as e:
-            raise Exception(f"Twitter 搜索失败: {str(e)}")
-
-    def _read_tweet(self, url_or_id: str, **kwargs) -> dict[str, Any]:
-        """读取单条推文"""
-        try:
-            result = subprocess.run(
-                ["bird", "read", url_or_id], capture_output=True, text=True, timeout=30
-            )
-
-            if result.returncode != 0:
-                raise Exception(f"bird CLI 错误: {result.stderr}")
-
-            return {"tweet": result.stdout, "platform": "twitter"}
-        except FileNotFoundError:
-            raise Exception("bird CLI 未安装")
-
-    def _get_user_tweets(self, username: str, limit: int = 20, **kwargs) -> dict[str, Any]:
-        """获取用户时间线"""
-        try:
-            result = subprocess.run(
-                ["bird", "user-tweets", f"@{username}", "-n", str(limit)],
-                capture_output=True,
-                text=True,
-                timeout=60,
-            )
-
-            if result.returncode != 0:
-                raise Exception(f"bird CLI 错误: {result.stderr}")
-
-            tweets = self._parse_bird_output(result.stdout)
-
-            return {
-                "username": username,
-                "tweets": tweets,
-                "count": len(tweets),
-                "platform": "twitter",
-            }
-        except FileNotFoundError:
-            raise Exception("bird CLI 未安装")
-
-    def _parse_bird_output(self, output: str) -> list[dict[str, Any]]:
-        """解析 bird CLI 输出"""
-        tweets = []
-        # 简单解析，实际可能需要更复杂的逻辑
-        lines = output.strip().split("\n")
-        for line in lines:
-            if line.strip():
-                tweets.append({"text": line.strip()})
-        return tweets
-
-    # ───────────────────────────────────────────
-    # YouTube (yt-dlp)
-    # ───────────────────────────────────────────
-    def _get_youtube_transcript(
-        self, url: str, languages: list[str] = None, **kwargs
-    ) -> dict[str, Any]:
-        """获取 YouTube 视频字幕"""
-        import tempfile
-
-        languages = languages or ["zh-Hans", "zh", "en"]
-        lang_str = ",".join(languages)
-
-        with tempfile.TemporaryDirectory() as tmpdir:
-            try:
-                # 下载字幕
-                subprocess.run(
-                    [
-                        "yt-dlp",
-                        "--write-sub",
-                        "--write-auto-sub",
-                        "--sub-langs",
-                        lang_str,
-                        "--skip-download",
-                        "--output",
-                        f"{tmpdir}/%(id)s",
-                        url,
-                    ],
-                    capture_output=True,
-                    text=True,
-                    timeout=120,
-                )
-
-                # 查找生成的字幕文件
-                subtitle_files = [f for f in os.listdir(tmpdir) if f.endswith((".vtt", ".srt"))]
-
-                if not subtitle_files:
-                    # 尝试获取视频信息
-                    info_result = subprocess.run(
-                        ["yt-dlp", "--dump-json", url], capture_output=True, text=True, timeout=60
-                    )
-
-                    if info_result.returncode == 0:
-                        video_info = json.loads(info_result.stdout)
-                        return {
-                            "url": url,
-                            "title": video_info.get("title"),
-                            "description": video_info.get("description", "")[:500],
-                            "subtitles": None,
-                            "message": "该视频没有字幕",
-                            "platform": "youtube",
-                        }
-                    else:
-                        raise Exception("无法获取视频信息")
-
-                # 读取字幕内容
-                subtitle_path = os.path.join(tmpdir, subtitle_files[0])
-                with open(subtitle_path, encoding="utf-8") as f:
-                    subtitle_content = f.read()
-
-                # 清理字幕格式
-                cleaned_text = self._clean_subtitle(subtitle_content)
-
-                return {
-                    "url": url,
-                    "subtitles": cleaned_text,
-                    "subtitle_file": subtitle_files[0],
-                    "length": len(cleaned_text),
-                    "platform": "youtube",
-                }
-
-            except FileNotFoundError:
-                raise Exception("yt-dlp 未安装。请运行: pip install yt-dlp")
-
-    def _search_youtube(self, query: str, limit: int = 5, **kwargs) -> dict[str, Any]:
-        """搜索 YouTube 视频"""
-        try:
-            result = subprocess.run(
-                ["yt-dlp", "--dump-json", f"ytsearch{limit}:{query}"],
-                capture_output=True,
-                text=True,
-                timeout=60,
-            )
-
-            if result.returncode != 0:
-                raise Exception(f"yt-dlp 错误: {result.stderr}")
-
-            # 解析每行 JSON
-            videos = []
-            for line in result.stdout.strip().split("\n"):
-                if line.strip():
-                    try:
-                        video = json.loads(line)
-                        videos.append(
-                            {
-                                "title": video.get("title"),
-                                "url": video.get("webpage_url"),
-                                "duration": video.get("duration_string"),
-                                "channel": video.get("channel"),
-                                "description": video.get("description", "")[:200],
-                            }
-                        )
-                    except json.JSONDecodeError:
-                        continue
-
-            return {"query": query, "videos": videos, "count": len(videos), "platform": "youtube"}
-
-        except FileNotFoundError:
-            raise Exception("yt-dlp 未安装")
-
-    def _get_bilibili_transcript(self, url: str, **kwargs) -> dict[str, Any]:
-        """获取 Bilibili 视频字幕"""
-        import tempfile
-
-        with tempfile.TemporaryDirectory() as tmpdir:
-            try:
-                subprocess.run(
-                    [
-                        "yt-dlp",
-                        "--write-sub",
-                        "--write-auto-sub",
-                        "--sub-langs",
-                        "zh-Hans,zh,en",
-                        "--convert-subs",
-                        "vtt",
-                        "--skip-download",
-                        "--output",
-                        f"{tmpdir}/%(id)s",
-                        url,
-                    ],
-                    capture_output=True,
-                    text=True,
-                    timeout=120,
-                )
-
-                subtitle_files = [f for f in os.listdir(tmpdir) if f.endswith(".vtt")]
-
-                if subtitle_files:
-                    subtitle_path = os.path.join(tmpdir, subtitle_files[0])
-                    with open(subtitle_path, encoding="utf-8") as f:
-                        subtitle_content = f.read()
-                    cleaned_text = self._clean_subtitle(subtitle_content)
-
-                    return {"url": url, "subtitles": cleaned_text, "platform": "bilibili"}
-                else:
-                    return {
-                        "url": url,
-                        "subtitles": None,
-                        "message": "该视频没有字幕",
-                        "platform": "bilibili",
-                    }
-
-            except FileNotFoundError:
-                raise Exception("yt-dlp 未安装")
-
-    def _clean_subtitle(self, subtitle_text: str) -> str:
-        """清理字幕格式，提取纯文本"""
-        import re
-
-        # 移除 VTT/SRT 时间戳和标记
-        lines = subtitle_text.split("\n")
-        cleaned_lines = []
-
-        for line in lines:
-            # 跳过空行和时间戳行
-            if not line.strip():
-                continue
-            if re.match(r"^\d+$", line.strip()):  # 序号
-                continue
-            if "-->" in line:  # 时间戳
-                continue
-            if line.startswith("WEBVTT"):
-                continue
-
-            # 移除 HTML 标签
-            line = re.sub(r"<[^>]+>", "", line)
-
-            if line.strip():
-                cleaned_lines.append(line.strip())
-
-        return "\n".join(cleaned_lines)
-
-    # ───────────────────────────────────────────
-    # Reddit
-    # ───────────────────────────────────────────
-    def _search_reddit(
-        self, query: str, subreddit: str = None, limit: int = 10, **kwargs
-    ) -> dict[str, Any]:
-        """搜索 Reddit"""
-        import httpx
-
-        headers = {"User-Agent": "agent-reach/1.0"}
-
-        try:
-            if subreddit:
-                url = f"https://www.reddit.com/r/{subreddit}/search.json?q={query}&limit={limit}"
+            # 检查是否已经在事件循环中
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                # 在事件循环中，使用 create_task
+                return loop.run_until_complete(self._execute_async(params))
             else:
-                url = f"https://www.reddit.com/search.json?q={query}&limit={limit}"
-
-            response = httpx.get(url, headers=headers, timeout=30)
-            response.raise_for_status()
-
-            data = response.json()
-            posts = []
-
-            for child in data.get("data", {}).get("children", []):
-                post = child.get("data", {})
-                posts.append(
-                    {
-                        "title": post.get("title"),
-                        "url": f"https://reddit.com{post.get('permalink', '')}",
-                        "author": post.get("author"),
-                        "score": post.get("score"),
-                        "subreddit": post.get("subreddit"),
-                        "selftext": post.get("selftext", "")[:500],
-                    }
+                # 不在事件循环中，使用 asyncio.run
+                return asyncio.run(self._execute_async(params))
+        except RuntimeError:
+            # 没有事件循环，创建一个新的
+            return asyncio.run(self._execute_async(params))
+    
+    async def _execute_async(self, params: dict[str, Any]) -> dict[str, Any]:
+        """执行 Agent-Reach 操作（异步）
+        
+        Args:
+            params: 操作参数，包含 action 和 params 字段
+            
+        Returns:
+            执行结果
+        """
+        action = params.get("action")
+        action_params = params.get("params", {})
+        
+        if not action:
+            return ResultWrapper.wrap_error("agent_reach", "execute", "Action is required")
+        
+        # 解析意图，确定目标渠道
+        intent = self._parse_intent(action, action_params)
+        channel = self.channel_router.route_by_intent(intent)
+        
+        if not channel:
+            # 尝试根据操作名称匹配渠道
+            channel = self._match_channel_by_action(action)
+        
+        if not channel:
+            return ResultWrapper.wrap_error("agent_reach", action, "No suitable channel found")
+        
+        # 验证渠道配置
+        if not channel.validate_config():
+            # 尝试降级
+            fallback_channel = self.channel_router.get_fallback_channel(channel.name)
+            if fallback_channel:
+                channel = fallback_channel
+            else:
+                return ResultWrapper.wrap_error(
+                    channel.name, 
+                    action, 
+                    "Channel configuration is invalid. Please check dependencies."
                 )
-
-            return {
-                "query": query,
-                "subreddit": subreddit,
-                "posts": posts,
-                "count": len(posts),
-                "platform": "reddit",
-            }
-
+        
+        try:
+            # 执行渠道操作
+            result = await channel.execute(action, action_params)
+            status = result.get("status", "success")
+            
+            # 更新运行时状态和轨迹
+            self._update_runtime_state(channel.name, action, status)
+            self._log_trace(channel.name, action, status)
+            
+            return result
         except Exception as e:
-            raise Exception(f"Reddit 搜索失败: {str(e)}")
-
-    # ───────────────────────────────────────────
-    # GitHub (gh CLI)
-    # ───────────────────────────────────────────
-    def _search_github_repos(
-        self, query: str, language: str = None, limit: int = 10, **kwargs
-    ) -> dict[str, Any]:
-        """搜索 GitHub 仓库"""
-        try:
-            cmd = ["gh", "search", "repos", query, "--limit", str(limit)]
-            if language:
-                cmd.extend(["--language", language])
-
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
-
-            if result.returncode != 0:
-                raise Exception(f"gh CLI 错误: {result.stderr}")
-
-            return {
-                "query": query,
-                "language": language,
-                "output": result.stdout,
-                "platform": "github",
-            }
-
-        except FileNotFoundError:
-            raise Exception("gh CLI 未安装。请访问: https://cli.github.com")
-
-    def _search_github_code(
-        self, query: str, language: str = None, limit: int = 10, **kwargs
-    ) -> dict[str, Any]:
-        """搜索 GitHub 代码"""
-        try:
-            cmd = ["gh", "search", "code", query, "--limit", str(limit)]
-            if language:
-                cmd.extend(["--language", language])
-
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
-
-            if result.returncode != 0:
-                raise Exception(f"gh CLI 错误: {result.stderr}")
-
-            return {
-                "query": query,
-                "language": language,
-                "output": result.stdout,
-                "platform": "github",
-            }
-
-        except FileNotFoundError:
-            raise Exception("gh CLI 未安装")
-
-    def _view_github_repo(self, owner: str, repo: str, **kwargs) -> dict[str, Any]:
-        """查看 GitHub 仓库详情"""
-        try:
-            result = subprocess.run(
-                ["gh", "repo", "view", f"{owner}/{repo}"],
-                capture_output=True,
-                text=True,
-                timeout=30,
-            )
-
-            if result.returncode != 0:
-                raise Exception(f"gh CLI 错误: {result.stderr}")
-
-            return {"owner": owner, "repo": repo, "info": result.stdout, "platform": "github"}
-
-        except FileNotFoundError:
-            raise Exception("gh CLI 未安装")
-
-    # ───────────────────────────────────────────
-    # 小红书 (mcporter MCP)
-    # ───────────────────────────────────────────
-    def _search_xiaohongshu(self, keyword: str, limit: int = 10, **kwargs) -> dict[str, Any]:
-        """搜索小红书笔记"""
-        try:
-            result = subprocess.run(
-                ["mcporter", "call", f"xiaohongshu.search_feeds(keyword: '{keyword}')"],
-                capture_output=True,
-                text=True,
-                timeout=60,
-            )
-
-            if result.returncode != 0:
-                raise Exception(f"mcporter 错误: {result.stderr}")
-
-            # 尝试解析 JSON
-            try:
-                data = json.loads(result.stdout)
-                return {"keyword": keyword, "feeds": data, "platform": "xiaohongshu"}
-            except json.JSONDecodeError:
-                return {"keyword": keyword, "raw_output": result.stdout, "platform": "xiaohongshu"}
-
-        except FileNotFoundError:
-            raise Exception("mcporter 未安装。请运行: npm install -g @steipete/mcporter")
-
-    def _get_xiaohongshu_detail(self, feed_id: str, xsec_token: str, **kwargs) -> dict[str, Any]:
-        """获取小红书笔记详情"""
-        try:
-            result = subprocess.run(
-                [
-                    "mcporter",
-                    "call",
-                    f"xiaohongshu.get_feed_detail(feed_id: '{feed_id}', xsec_token: '{xsec_token}')",
-                ],
-                capture_output=True,
-                text=True,
-                timeout=60,
-            )
-
-            if result.returncode != 0:
-                raise Exception(f"mcporter 错误: {result.stderr}")
-
-            try:
-                data = json.loads(result.stdout)
-                return {"feed_id": feed_id, "detail": data, "platform": "xiaohongshu"}
-            except json.JSONDecodeError:
-                return {"feed_id": feed_id, "raw_output": result.stdout, "platform": "xiaohongshu"}
-
-        except FileNotFoundError:
-            raise Exception("mcporter 未安装")
-
-    # ───────────────────────────────────────────
-    # 抖音 (mcporter MCP)
-    # ───────────────────────────────────────────
-    def _parse_douyin(self, share_link: str, **kwargs) -> dict[str, Any]:
-        """解析抖音视频"""
-        try:
-            result = subprocess.run(
-                ["mcporter", "call", f"douyin.parse_douyin_video_info(share_link: '{share_link}')"],
-                capture_output=True,
-                text=True,
-                timeout=60,
-            )
-
-            if result.returncode != 0:
-                raise Exception(f"mcporter 错误: {result.stderr}")
-
-            try:
-                data = json.loads(result.stdout)
-                return {"share_link": share_link, "video_info": data, "platform": "douyin"}
-            except json.JSONDecodeError:
-                return {"share_link": share_link, "raw_output": result.stdout, "platform": "douyin"}
-
-        except FileNotFoundError:
-            raise Exception("mcporter 未安装")
-
-    # ───────────────────────────────────────────
-    # 微博 (mcporter MCP)
-    # ───────────────────────────────────────────
-    def _search_weibo(self, keyword: str, limit: int = 20, **kwargs) -> dict[str, Any]:
-        """搜索微博内容"""
-        try:
-            result = subprocess.run(
-                ["mcporter", "call", f"weibo.search_content(keyword: '{keyword}', limit: {limit})"],
-                capture_output=True,
-                text=True,
-                timeout=60,
-            )
-
-            if result.returncode != 0:
-                raise Exception(f"mcporter 错误: {result.stderr}")
-
-            try:
-                data = json.loads(result.stdout)
-                return {"keyword": keyword, "feeds": data, "platform": "weibo"}
-            except json.JSONDecodeError:
-                return {"keyword": keyword, "raw_output": result.stdout, "platform": "weibo"}
-
-        except FileNotFoundError:
-            raise Exception("mcporter 未安装")
-
-    def _get_weibo_trending(self, limit: int = 20, **kwargs) -> dict[str, Any]:
-        """获取微博热搜"""
-        try:
-            result = subprocess.run(
-                ["mcporter", "call", f"weibo.get_trendings(limit: {limit})"],
-                capture_output=True,
-                text=True,
-                timeout=60,
-            )
-
-            if result.returncode != 0:
-                raise Exception(f"mcporter 错误: {result.stderr}")
-
-            try:
-                data = json.loads(result.stdout)
-                return {"trendings": data, "platform": "weibo"}
-            except json.JSONDecodeError:
-                return {"raw_output": result.stdout, "platform": "weibo"}
-
-        except FileNotFoundError:
-            raise Exception("mcporter 未安装")
-
-    # ───────────────────────────────────────────
-    # Exa AI 搜索 (mcporter MCP)
-    # ───────────────────────────────────────────
-    def _web_search_exa(self, query: str, num_results: int = 5, **kwargs) -> dict[str, Any]:
-        """使用 Exa 进行 AI 语义搜索"""
-        try:
-            result = subprocess.run(
-                [
-                    "mcporter",
-                    "call",
-                    f"exa.web_search_exa(query: '{query}', numResults: {num_results})",
-                ],
-                capture_output=True,
-                text=True,
-                timeout=60,
-            )
-
-            if result.returncode != 0:
-                raise Exception(f"mcporter 错误: {result.stderr}")
-
-            try:
-                data = json.loads(result.stdout)
-                return {"query": query, "results": data, "platform": "exa"}
-            except json.JSONDecodeError:
-                return {"query": query, "raw_output": result.stdout, "platform": "exa"}
-
-        except FileNotFoundError:
-            raise Exception("mcporter 未安装")
-
-    # ───────────────────────────────────────────
-    # 诊断检查
-    # ───────────────────────────────────────────
-    def _doctor_check(self, **kwargs) -> dict[str, Any]:
-        """运行 Agent-Reach 诊断检查"""
-        try:
-            result = subprocess.run(
-                ["agent-reach", "doctor"], capture_output=True, text=True, timeout=60
-            )
-
-            return {
-                "status": "completed",
-                "output": result.stdout,
-                "errors": result.stderr if result.stderr else None,
-                "returncode": result.returncode,
-            }
-
-        except FileNotFoundError:
-            return {
-                "status": "not_installed",
-                "message": "agent-reach 未安装。请运行: pip install agent-reach",
-            }
+            # 记录错误
+            self._log_trace(channel.name, action, "error")
+            return ResultWrapper.wrap_error(channel.name, action, str(e))
+    
+    async def execute_batch(self, batch_params: list[dict[str, Any]], max_concurrency: int = 10) -> list[dict[str, Any]]:
+        """批量执行操作
+        
+        Args:
+            batch_params: 批量操作参数列表
+            max_concurrency: 最大并发数，默认 10
+            
+        Returns:
+            批量执行结果列表
+        """
+        results = []
+        # 分批执行，控制并发数
+        for i in range(0, len(batch_params), max_concurrency):
+            batch = batch_params[i:i + max_concurrency]
+            tasks = []
+            for params in batch:
+                tasks.append(self._execute_async(params))
+            
+            batch_results = await asyncio.gather(*tasks)
+            results.extend(batch_results)
+        
+        return results
+    
+    async def execute_batch_with_priority(self, batch_params: list[dict[str, Any]], max_concurrency: int = 10) -> list[dict[str, Any]]:
+        """带优先级的批量执行操作
+        
+        Args:
+            batch_params: 批量操作参数列表，每个参数可包含 priority 字段
+            max_concurrency: 最大并发数，默认 10
+            
+        Returns:
+            批量执行结果列表
+        """
+        # 按优先级排序
+        sorted_params = sorted(batch_params, key=lambda x: x.get("priority", 5))
+        
+        results = []
+        # 分批执行，控制并发数
+        for i in range(0, len(sorted_params), max_concurrency):
+            batch = sorted_params[i:i + max_concurrency]
+            tasks = []
+            for params in batch:
+                # 移除 priority 字段，因为 _execute_async 不接受这个参数
+                params_copy = params.copy()
+                params_copy.pop("priority", None)
+                tasks.append(self._execute_async(params_copy))
+            
+            batch_results = await asyncio.gather(*tasks)
+            results.extend(batch_results)
+        
+        return results
+    
+    def _parse_intent(self, action: str, params: dict[str, Any]) -> dict[str, Any]:
+        """解析操作意图
+        
+        Args:
+            action: 操作名称
+            params: 操作参数
+            
+        Returns:
+            意图字典
+        """
+        intent = {
+            "action": action,
+            "params": params
+        }
+        
+        # 从操作名称中提取目标平台
+        platform_map = {
+            "twitter": ["twitter", "x"],
+            "youtube": ["youtube"],
+            "bilibili": ["bilibili"],
+            "github": ["github"],
+            "web": ["web", "read"],
+            "exa": ["exa"],
+            "reddit": ["reddit"],
+            "v2ex": ["v2ex"],
+            "xiaohongshu": ["xiaohongshu"],
+            "weibo": ["weibo"],
+            "douyin": ["douyin"],
+            "linkedin": ["linkedin"],
+            "rss": ["rss"],
+            "xueqiu": ["xueqiu"]
+        }
+        
+        for platform, keywords in platform_map.items():
+            for keyword in keywords:
+                if keyword in action.lower():
+                    intent["target_platform"] = platform
+                    break
+            if "target_platform" in intent:
+                break
+        
+        # 从参数中提取 URL
+        if "url" in params:
+            intent["url"] = params["url"]
+        
+        return intent
+    
+    def _match_channel_by_action(self, action: str) -> Any:
+        """根据操作名称匹配渠道
+        
+        Args:
+            action: 操作名称
+            
+        Returns:
+            匹配的渠道实例
+        """
+        action_channel_map = {
+            "search_twitter": "twitter",
+            "get_twitter_user": "twitter",
+            "get_twitter_timeline": "twitter",
+            "get_youtube_transcript": "youtube",
+            "search_youtube": "youtube",
+            "get_youtube_video": "youtube",
+            "get_bilibili_transcript": "bilibili",
+            "get_bilibili_video": "bilibili",
+            "search_github_repos": "github",
+            "search_github_code": "github",
+            "get_github_repo": "github",
+            "read_webpage": "web",
+            "search_web": "web",
+            "search_exa": "exa",
+            "search_reddit": "reddit",
+            "get_reddit_post": "reddit",
+            "search_v2ex": "v2ex",
+            "get_v2ex_post": "v2ex",
+            "search_xiaohongshu": "xiaohongshu",
+            "get_xiaohongshu_note": "xiaohongshu",
+            "search_weibo": "weibo",
+            "get_weibo_hot": "weibo",
+            "get_weibo_user": "weibo",
+            "get_douyin_video": "douyin",
+            "search_linkedin": "linkedin",
+            "get_linkedin_profile": "linkedin",
+            "read_rss": "rss",
+            "search_xueqiu": "xueqiu",
+            "get_xueqiu_stock": "xueqiu"
+        }
+        
+        channel_name = action_channel_map.get(action)
+        if channel_name:
+            return channel_manager.get_channel_by_name(channel_name)
+        
+        return None
+    
+    def get_capabilities(self) -> list[str]:
+        """获取技能能力列表
+        
+        Returns:
+            能力列表
+        """
+        capabilities = []
+        for channel in channel_manager.get_all_channels():
+            capabilities.extend(channel.capabilities)
+        return list(set(capabilities))

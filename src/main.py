@@ -1,20 +1,29 @@
 import asyncio
 import sys
 from contextlib import asynccontextmanager
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import uvicorn
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
 
-from execution.executor import ToolExecutor
+from src.execution.executor import ToolExecutor
+from src.shared.auth import (
+    User,
+    authenticate_user,
+    create_access_token,
+    get_current_active_user,
+    require_permissions,
+)
 
 # 导入项目核心组件
-from shared.config import config_manager, settings
-from shared.logging import logger
-from workflow.loop import ExecutionLoop
+from src.shared.config import config_manager, settings
+from src.shared.logging import logger
+from src.shared.security_audit import security_audit_logger
+from src.workflow.loop import ExecutionLoop
 
 logger = logger.bind(name="AceAgent.Main")
 
@@ -39,6 +48,15 @@ class HealthResponse(BaseModel):
     version: str
     timestamp: str
     components: dict
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    username: str = None
 
 
 # --- 3. 应用生命周期管理 ---
@@ -96,7 +114,7 @@ class AceAgentApp:
 
 # 导入监控模块
 try:
-    from shared.monitoring import init_monitoring
+    from src.shared.monitoring import init_monitoring
 except ImportError:
     init_monitoring = None
 
@@ -150,11 +168,54 @@ def get_agent_app(request: Request):
 
 
 # --- 6. 路由定义 ---
+@app.post("/api/v1/auth/token", response_model=Token)
+async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    """
+    用户登录获取访问令牌
+    """
+    user = authenticate_user(form_data.username, form_data.password)
+    if not user:
+        security_audit_logger.log_authentication(
+            user=form_data.username,
+            status="failure",
+            details={"reason": "Invalid username or password"}
+        )
+        raise HTTPException(
+            status_code=401,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user.username, "role": user.role},
+        expires_delta=access_token_expires
+    )
+    
+    security_audit_logger.log_authentication(
+        user=user.username,
+        status="success"
+    )
+    
+    return {"access_token": access_token, "token_type": "bearer"}
+
+
 @app.post("/api/v1/tasks", response_model=TaskResponse)
-async def create_task(task: TaskRequest, agent_app: AceAgentApp = Depends(get_agent_app)):
+async def create_task(
+    task: TaskRequest, 
+    agent_app: AceAgentApp = Depends(get_agent_app),
+    current_user: User = Depends(get_current_active_user)
+):
     """
     创建并执行任务
     """
+    security_audit_logger.log_access(
+        user=current_user.username,
+        resource="tasks",
+        action="create",
+        status="success"
+    )
+    
     logger.info(f"📋 接收到任务: {task.query}")
     result = await agent_app.run_task(task.query, task.max_steps)
     return TaskResponse(
@@ -203,21 +264,67 @@ async def health_check(agent_app: AceAgentApp = Depends(get_agent_app)):
 
 
 @app.get("/api/v1/tools")
-async def get_available_tools(agent_app: AceAgentApp = Depends(get_agent_app)):
+async def get_available_tools(
+    agent_app: AceAgentApp = Depends(get_agent_app),
+    current_user: User = Depends(get_current_active_user)
+):
     """
     获取可用工具列表
     """
+    security_audit_logger.log_access(
+        user=current_user.username,
+        resource="tools",
+        action="list",
+        status="success"
+    )
+    
     tools = agent_app.executor.get_available_tools()
     return {"tools": tools}
 
 
 @app.get("/api/v1/config")
-async def get_config():
+async def get_config(
+    current_user: User = Depends(require_permissions(["admin"]))
+):
     """
-    获取当前配置
+    获取当前配置（仅管理员）
     """
+    security_audit_logger.log_access(
+        user=current_user.username,
+        resource="config",
+        action="read",
+        status="success"
+    )
+    
     config = config_manager.get_settings()
-    return config.model_dump()
+    # 移除敏感信息
+    config_dict = config.model_dump()
+    sensitive_keys = ["SECRET_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY", "GOOGLE_API_KEY", "DEEPSEEK_API_KEY", "ZHIPU_API_KEY", "MOONSHOT_API_KEY", "E2B_API_KEY"]
+    for key in sensitive_keys:
+        if key in config_dict:
+            config_dict[key] = "[REDACTED]"
+    return config_dict
+
+
+@app.get("/api/v1/audit/logs")
+async def get_audit_logs(
+    limit: int = 100,
+    event_type: str = None,
+    status: str = None,
+    current_user: User = Depends(require_permissions(["admin"]))
+):
+    """
+    获取安全审计日志（仅管理员）
+    """
+    security_audit_logger.log_access(
+        user=current_user.username,
+        resource="audit/logs",
+        action="read",
+        status="success"
+    )
+    
+    logs = security_audit_logger.get_audit_logs(limit=limit, event_type=event_type, status=status)
+    return {"logs": logs}
 
 
 # --- 7. 异常处理 ---
