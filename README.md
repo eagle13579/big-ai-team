@@ -10,6 +10,8 @@ Adding another test content to test the failure scenario.
 
 Adding a third test content to test the failure scenario again.
 
+Adding a fourth test content to test the failure scenario with debug info.
+
 ## Project Structure
 
 - `bridge/` - Bridge components
