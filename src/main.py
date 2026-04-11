@@ -114,7 +114,7 @@ class AceAgentApp:
 
 # 导入监控模块
 try:
-    from shared.monitoring import init_monitoring
+    from src.shared.monitoring import init_monitoring
 except ImportError:
     init_monitoring = None
 

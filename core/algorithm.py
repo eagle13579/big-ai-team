@@ -1,9 +1,19 @@
-import logging
 import os
 from typing import Any
 
-# 配置核心层日志，确保与 Bridge 层隔离
-logger = logging.getLogger("MemPalace.Core")
+# 添加项目根目录到 Python 路径
+import sys
+from pathlib import Path
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+# 导入监控模块
+from core.monitoring import init_core_monitoring, core_performance_monitor
+from src.shared.logging import logger
+
+# 初始化监控
+init_core_monitoring()
 
 
 class MemPalaceCore:
@@ -31,21 +41,24 @@ class MemPalaceCore:
         except Exception as e:
             logger.error(f"无法创建存储目录: {e}")
 
+    @core_performance_monitor
     def add_memory(
         self, content: Any, context: dict | None = None, tags: list[str] | None = None
     ) -> bool:
         """添加记忆项。"""
         # 实际业务逻辑应在此扩展，例如写入数据库或本地文件
-        print(f"✅ [Core] 已处理记忆内容: {content}")
+        logger.info(f"✅ [Core] 已处理记忆内容: {content}")
         return True
 
+    @core_performance_monitor
     def search(
         self, query: str, limit: int = 5, context: dict | None = None
     ) -> list[dict[str, Any]]:
         """检索相关记忆。"""
-        print(f"🔍 [Core] 正在检索: {query} (Limit: {limit})")
+        logger.info(f"🔍 [Core] 正在检索: {query} (Limit: {limit})")
         return []
 
+    @core_performance_monitor
     def run(self, params: dict[str, Any]) -> Any:
         """
         [契约适配器]
@@ -73,6 +86,7 @@ class MemPalaceCore:
 
 
 # 向后兼容：如果外部直接引用函数而非类
+@core_performance_monitor
 def run(params: dict[str, Any]) -> Any:
     """函数式调用入口。"""
     return MemPalaceCore().run(params)

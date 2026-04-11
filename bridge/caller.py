@@ -11,6 +11,13 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+# 导入监控模块
+from bridge.monitoring import init_bridge_monitoring, bridge_task_monitor
+from src.shared.logging import logger
+
+# 初始化监控
+init_bridge_monitoring()
+
 
 class LoaderError(Exception):
     """自定义加载异常"""
@@ -44,7 +51,7 @@ class CoreLoader:
                     # 如果类名不匹配，降级使用模块内的 run 函数
                     cls._cached_core = module
 
-                print(f"✅ [Bridge] 核心引擎加载成功 (ROOT: {PROJECT_ROOT})")
+                logger.info(f"✅ [Bridge] 核心引擎加载成功 (ROOT: {PROJECT_ROOT})")
             except ImportError as e:
                 raise LoaderError(
                     f"CRITICAL: 找不到核心模块 core.algorithm。请检查文件是否存在。具体错误: {e}"
@@ -58,6 +65,7 @@ class CoreLoader:
 # ==========================================
 # 2. 外部标准调用接口 (统一契约)
 # ==========================================
+@bridge_task_monitor
 def run_task(action: str, **kwargs) -> Any:
     """
     [契约入口]
@@ -69,7 +77,7 @@ def run_task(action: str, **kwargs) -> Any:
         params = {"action": action, **kwargs}
         return core.run(params)
     except Exception as e:
-        print(f"❌ [Bridge] 任务执行失败: {e}")
+        logger.error(f"❌ [Bridge] 任务执行失败: {e}")
         return None
 
 
