@@ -3,7 +3,7 @@ Ace AI Engine - 基础类模块
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel
 
@@ -21,7 +21,7 @@ class BaseSkill(ABC):
     description: str = ""
 
     # 参数校验架构
-    args_schema: Optional[type[BaseModel]] = None
+    args_schema: type[BaseModel] | None = None
 
     @abstractmethod
     def execute(self, args: dict[str, Any]) -> dict[str, Any]:

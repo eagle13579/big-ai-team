@@ -1,8 +1,9 @@
 import os
 import time
+from collections.abc import Callable
 from datetime import datetime
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from tenacity import retry, stop_after_attempt, wait_exponential
@@ -109,16 +110,16 @@ class GitArgsSchema(BaseModel):
     """Git 操作的参数校验架构"""
 
     action: GitAction = Field(..., description="Git 操作类型")
-    files: Optional[list[str]] = Field(default=None, description="要操作的文件列表")
-    message: Optional[str] = Field(default=None, description="提交信息")
-    remote: Optional[str] = Field(default="origin", description="远程仓库名称")
-    branch: Optional[str] = Field(default=None, description="分支名称")
-    user_role: Optional[str] = Field(default="user", description="用户角色")
-    tag_name: Optional[str] = Field(default=None, description="标签名称")
-    target_branch: Optional[str] = Field(default=None, description="目标分支")
-    stash_index: Optional[int] = Field(default=0, description="stash 索引")
-    hook_name: Optional[str] = Field(default=None, description="钩子名称")
-    hook_content: Optional[str] = Field(default=None, description="钩子内容")
+    files: list[str] | None = Field(default=None, description="要操作的文件列表")
+    message: str | None = Field(default=None, description="提交信息")
+    remote: str | None = Field(default="origin", description="远程仓库名称")
+    branch: str | None = Field(default=None, description="分支名称")
+    user_role: str | None = Field(default="user", description="用户角色")
+    tag_name: str | None = Field(default=None, description="标签名称")
+    target_branch: str | None = Field(default=None, description="目标分支")
+    stash_index: int | None = Field(default=0, description="stash 索引")
+    hook_name: str | None = Field(default=None, description="钩子名称")
+    hook_content: str | None = Field(default=None, description="钩子内容")
 
     model_config = ConfigDict(use_enum_values=True)
 
@@ -158,19 +159,19 @@ class GitInterface:
         """提交更改"""
         raise NotImplementedError
 
-    def push(self, remote: str, branch: Optional[str]) -> dict[str, Any]:
+    def push(self, remote: str, branch: str | None) -> dict[str, Any]:
         """推送更改到远程仓库"""
         raise NotImplementedError
 
-    def pull(self, remote: str, branch: Optional[str]) -> dict[str, Any]:
+    def pull(self, remote: str, branch: str | None) -> dict[str, Any]:
         """从远程仓库拉取更改"""
         raise NotImplementedError
 
-    def branch(self, branch_name: Optional[str]) -> dict[str, Any]:
+    def branch(self, branch_name: str | None) -> dict[str, Any]:
         """管理分支"""
         raise NotImplementedError
 
-    def tag(self, tag_name: str, message: Optional[str]) -> dict[str, Any]:
+    def tag(self, tag_name: str, message: str | None) -> dict[str, Any]:
         """创建标签"""
         raise NotImplementedError
 
@@ -178,7 +179,7 @@ class GitInterface:
         """合并分支"""
         raise NotImplementedError
 
-    def stash(self, message: Optional[str]) -> dict[str, Any]:
+    def stash(self, message: str | None) -> dict[str, Any]:
         """暂存更改"""
         raise NotImplementedError
 
@@ -259,7 +260,7 @@ class GitPythonClient(GitInterface):
         return {"hexsha": commit_obj.hexsha, "message": f"提交成功: {commit_obj.hexsha[:7]}"}
 
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
-    def push(self, remote: str, branch: Optional[str]) -> dict[str, Any]:
+    def push(self, remote: str, branch: str | None) -> dict[str, Any]:
         """推送更改到远程仓库"""
         if not branch:
             branch = self.repo.active_branch.name
@@ -268,7 +269,7 @@ class GitPythonClient(GitInterface):
         return {"message": f"成功推送到 {remote}/{branch}"}
 
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
-    def pull(self, remote: str, branch: Optional[str]) -> dict[str, Any]:
+    def pull(self, remote: str, branch: str | None) -> dict[str, Any]:
         """从远程仓库拉取更改"""
         if not branch:
             branch = self.repo.active_branch.name
@@ -276,7 +277,7 @@ class GitPythonClient(GitInterface):
         remote_obj.pull(branch)
         return {"message": f"已从 {remote}/{branch} 拉取更改"}
 
-    def branch(self, branch_name: Optional[str]) -> dict[str, Any]:
+    def branch(self, branch_name: str | None) -> dict[str, Any]:
         """管理分支"""
         if branch_name:
             # 创建新分支
@@ -296,7 +297,7 @@ class GitPythonClient(GitInterface):
                 "message": "成功列出分支",
             }
 
-    def tag(self, tag_name: str, message: Optional[str] = None) -> dict[str, Any]:
+    def tag(self, tag_name: str, message: str | None = None) -> dict[str, Any]:
         """创建标签"""
         if message:
             self.repo.create_tag(tag_name, message=message)
@@ -309,7 +310,7 @@ class GitPythonClient(GitInterface):
         self.repo.git.merge(branch)
         return {"message": f"成功合并分支: {branch}"}
 
-    def stash(self, message: Optional[str]) -> dict[str, Any]:
+    def stash(self, message: str | None) -> dict[str, Any]:
         """暂存更改"""
         if message:
             self.repo.git.stash("push", "-m", message)
@@ -408,8 +409,8 @@ class SecurityManager:
     def __init__(
         self,
         repo_path: str,
-        protected_branches: Optional[list[str]] = None,
-        permission_matrix: Optional[dict[str, list[str]]] = None,
+        protected_branches: list[str] | None = None,
+        permission_matrix: dict[str, list[str]] | None = None,
     ):
         self.repo_path = repo_path
         # 使用默认值或自定义值
@@ -438,7 +439,7 @@ class SecurityManager:
                 raise GitPermissionError(f"权限不足，无法对受保护分支 {branch} 执行 {action} 操作")
         return True
 
-    def validate_input(self, files: Optional[list[str]]) -> bool:
+    def validate_input(self, files: list[str] | None) -> bool:
         """验证输入的文件路径"""
         if files:
             for file_path in files:
@@ -474,8 +475,8 @@ class GitHelperTool(BaseSkill):
         repo_path: str = ".",
         git_client_factory=None,
         user_role: str = "admin",
-        protected_branches: Optional[list[str]] = None,
-        permission_matrix: Optional[dict[str, list[str]]] = None,
+        protected_branches: list[str] | None = None,
+        permission_matrix: dict[str, list[str]] | None = None,
         cache_ttl: int = 300,
     ):
         """
@@ -909,7 +910,7 @@ class GitHelperTool(BaseSkill):
             logger.error(f"分支操作失败: {str(e)}")
             return {"data": None, "message": f"分支操作失败: {str(e)}"}
 
-    def _tag(self, tag_name: str, message: Optional[str]) -> dict[str, Any]:
+    def _tag(self, tag_name: str, message: str | None) -> dict[str, Any]:
         """创建标签"""
         logger.info(f"创建标签: {tag_name}")
         try:
@@ -1065,8 +1066,8 @@ class GitHelperTool(BaseSkill):
 def create_git_helper(
     repo_path: str = ".",
     user_role: str = "admin",
-    protected_branches: Optional[list[str]] = None,
-    permission_matrix: Optional[dict[str, list[str]]] = None,
+    protected_branches: list[str] | None = None,
+    permission_matrix: dict[str, list[str]] | None = None,
     cache_ttl: int = 300,
 ) -> GitHelperTool:
     """

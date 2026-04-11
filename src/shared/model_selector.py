@@ -1,7 +1,7 @@
 import logging
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 try:
     from .model_policy_tracker import CostEstimate, policy_tracker
@@ -314,8 +314,8 @@ class ModelSelector:
     def select_model(
         self,
         task: str,
-        budget: Optional[float] = None,
-        preferred_models: Optional[list[str]] = None,
+        budget: float | None = None,
+        preferred_models: list[str] | None = None,
         prefer_free: bool = True,
         estimated_input_tokens: int = 1000,
         estimated_output_tokens: int = 500,
@@ -483,7 +483,7 @@ class ModelSelector:
         model_name: str,
         estimated_input_tokens: int = 1000,
         estimated_output_tokens: int = 500,
-    ) -> Optional[CostEstimate]:
+    ) -> CostEstimate | None:
         """
         获取成本预估
         """
@@ -508,7 +508,7 @@ class ModelSelector:
             )
         return False
 
-    def get_roi_report(self) -> Optional[dict[str, Any]]:
+    def get_roi_report(self) -> dict[str, Any] | None:
         """
         获取 ROI 报告
         """
@@ -516,7 +516,7 @@ class ModelSelector:
             return policy_tracker.get_roi_report()
         return None
 
-    def get_model_info(self, model_name: str) -> Optional[ModelInfo]:
+    def get_model_info(self, model_name: str) -> ModelInfo | None:
         """
         获取指定模型的信息
         """
@@ -535,8 +535,8 @@ model_selector = ModelSelector()
 
 def select_model_for_task(
     task: str,
-    budget: Optional[float] = None,
-    preferred_models: Optional[list[str]] = None,
+    budget: float | None = None,
+    preferred_models: list[str] | None = None,
     prefer_free: bool = True,
 ) -> str:
     """

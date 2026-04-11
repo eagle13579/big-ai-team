@@ -1,6 +1,5 @@
 import asyncio
 import logging
-from typing import Optional
 
 import pytest
 
@@ -35,7 +34,7 @@ class AgenticLoop:
         self.max_steps = max_steps
         self.history: list[MockRunResponse] = []
 
-    async def run_until_complete(self, task: str) -> Optional[MockRunResponse]:
+    async def run_until_complete(self, task: str) -> MockRunResponse | None:
         step = 0
         current_prompt = task
         while step < self.max_steps:

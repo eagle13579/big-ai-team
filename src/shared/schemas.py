@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -20,8 +20,8 @@ class TaskRequest(BaseModel):
     plan_id: str
     description: str
     assignee: str
-    input_params: Optional[dict[str, Any]] = None
-    dependencies: Optional[list[str]] = []
+    input_params: dict[str, Any] | None = None
+    dependencies: list[str] | None = []
 
 
 class TaskResponse(BaseModel):
@@ -38,17 +38,17 @@ class MCPRequest(BaseModel):
 
     method: str
     params: dict[str, Any]
-    agent_token: Optional[str] = None
-    id: Optional[str] = Field(default_factory=lambda: str(uuid.uuid4()))
+    agent_token: str | None = None
+    id: str | None = Field(default_factory=lambda: str(uuid.uuid4()))
 
 
 class MCPResponse(BaseModel):
     """MCP响应模型"""
 
     jsonrpc: str = "2.0"
-    result: Optional[Any] = None
-    error: Optional[dict[str, Any]] = None
-    id: Optional[str] = None
+    result: Any | None = None
+    error: dict[str, Any] | None = None
+    id: str | None = None
 
 
 class MemoryCreate(BaseModel):
@@ -56,10 +56,10 @@ class MemoryCreate(BaseModel):
 
     session_id: str
     user_id: str
-    role_name: Optional[str] = None
+    role_name: str | None = None
     content: str
-    embedding: Optional[list[float]] = None
-    metadata: Optional[dict[str, Any]] = {}
+    embedding: list[float] | None = None
+    metadata: dict[str, Any] | None = {}
 
 
 class MemoryResponse(BaseModel):
@@ -68,7 +68,7 @@ class MemoryResponse(BaseModel):
     id: str
     session_id: str
     user_id: str
-    role_name: Optional[str] = None
+    role_name: str | None = None
     content: str
     created_at: datetime
 

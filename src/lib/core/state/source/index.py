@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any
 
 from sqlalchemy.orm import Session
 
@@ -22,7 +22,7 @@ class TaskStateMachine:
         """
         self.db = db
 
-    def transition(self, task_id: str, new_status: str) -> Optional[Task]:
+    def transition(self, task_id: str, new_status: str) -> Task | None:
         """状态转换
 
         将任务从当前状态转换到新状态。
@@ -76,7 +76,7 @@ class TaskStateMachine:
 
         return new_status in valid_transitions.get(current_status, [])
 
-    def get_task_state(self, task_id: str) -> Optional[str]:
+    def get_task_state(self, task_id: str) -> str | None:
         """获取任务状态
 
         Args:
@@ -130,7 +130,7 @@ class TaskStateMachine:
 
         return {"status": plan_status, "tasks": status_counts, "total_tasks": len(tasks)}
 
-    def get_next_pending_task(self, assignee: Optional[str] = None) -> Optional[Task]:
+    def get_next_pending_task(self, assignee: str | None = None) -> Task | None:
         """获取下一个待处理任务
 
         获取最早创建的待处理任务，可选择按负责人过滤。

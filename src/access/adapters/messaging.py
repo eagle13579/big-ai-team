@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import Any, Optional
+from typing import Any
 
 import pika
 from kafka import KafkaConsumer, KafkaProducer
@@ -12,7 +12,7 @@ class MessagingAdapter(BaseAdapter[dict[str, Any]]):
     """消息队列适配器基类"""
 
     async def execute(
-        self, operation: str, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, operation: str, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """执行消息队列操作"""
         if operation == "send":
@@ -26,19 +26,19 @@ class MessagingAdapter(BaseAdapter[dict[str, Any]]):
 
     @abstractmethod
     async def send(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """发送消息"""
         pass
 
     @abstractmethod
     async def receive(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """接收消息"""
         pass
 
-    async def _health_check(self, context: Optional[AdapterContext] = None) -> dict[str, Any]:
+    async def _health_check(self, context: AdapterContext | None = None) -> dict[str, Any]:
         """健康检查"""
         try:
             # 尝试发送一个测试消息
@@ -78,7 +78,7 @@ class RabbitMQAdapter(MessagingAdapter):
         self.connection = None
         self.channel = None
 
-    async def initialize(self, context: Optional[AdapterContext] = None) -> bool:
+    async def initialize(self, context: AdapterContext | None = None) -> bool:
         """初始化适配器"""
         try:
             # 创建连接
@@ -94,7 +94,7 @@ class RabbitMQAdapter(MessagingAdapter):
             raise Exception(f"Failed to initialize RabbitMQ adapter: {str(e)}")
 
     async def send(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """发送消息"""
         if not self.channel:
@@ -123,7 +123,7 @@ class RabbitMQAdapter(MessagingAdapter):
             raise Exception(f"Send operation failed: {str(e)}")
 
     async def receive(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """接收消息"""
         if not self.channel:
@@ -146,7 +146,7 @@ class RabbitMQAdapter(MessagingAdapter):
         except Exception as e:
             raise Exception(f"Receive operation failed: {str(e)}")
 
-    async def close(self, context: Optional[AdapterContext] = None) -> bool:
+    async def close(self, context: AdapterContext | None = None) -> bool:
         """关闭适配器"""
         if self.channel:
             self.channel.close()
@@ -177,7 +177,7 @@ class KafkaAdapter(MessagingAdapter):
         self.producer = None
         self.consumer = None
 
-    async def initialize(self, context: Optional[AdapterContext] = None) -> bool:
+    async def initialize(self, context: AdapterContext | None = None) -> bool:
         """初始化适配器"""
         try:
             # 创建生产者
@@ -191,7 +191,7 @@ class KafkaAdapter(MessagingAdapter):
             raise Exception(f"Failed to initialize Kafka adapter: {str(e)}")
 
     async def send(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """发送消息"""
         if not self.producer:
@@ -213,7 +213,7 @@ class KafkaAdapter(MessagingAdapter):
             raise Exception(f"Send operation failed: {str(e)}")
 
     async def receive(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """接收消息"""
         topic = params.get("queue")  # Kafka 使用 topic 而不是 queue
@@ -236,7 +236,7 @@ class KafkaAdapter(MessagingAdapter):
         except Exception as e:
             raise Exception(f"Receive operation failed: {str(e)}")
 
-    async def close(self, context: Optional[AdapterContext] = None) -> bool:
+    async def close(self, context: AdapterContext | None = None) -> bool:
         """关闭适配器"""
         if self.producer:
             self.producer.close()

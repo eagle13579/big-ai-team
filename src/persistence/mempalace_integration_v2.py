@@ -24,7 +24,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import networkx as nx
 import numpy as np
@@ -458,7 +458,7 @@ class MemPalaceIntegrationV2:
             logger.error(f"查找相似记忆失败: {str(e)}")
             return []
 
-    def _check_duplicate(self, content: str) -> Optional[str]:
+    def _check_duplicate(self, content: str) -> str | None:
         """检查是否存在重复记忆"""
         if not self.config["enable_deduplication"]:
             return None
@@ -1002,7 +1002,7 @@ class MemPalaceIntegrationV2:
             logger.error(f"向量搜索失败: {str(e)}")
             return []
 
-    def _get_memory_by_id(self, memory_id: str) -> Optional[dict[str, Any]]:
+    def _get_memory_by_id(self, memory_id: str) -> dict[str, Any] | None:
         """根据ID获取记忆"""
         for tier in MemoryTier:
             if memory_id in self.memory_tiers[tier]:

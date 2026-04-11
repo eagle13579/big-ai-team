@@ -1,4 +1,3 @@
-from typing import Optional
 
 from .base import AdapterConfig, BaseAdapter
 
@@ -21,7 +20,7 @@ class AdapterRegistry:
         if platform in self._adapters:
             del self._adapters[platform]
 
-    def get_adapter_class(self, platform: str) -> Optional[type[BaseAdapter]]:
+    def get_adapter_class(self, platform: str) -> type[BaseAdapter] | None:
         """获取适配器类"""
         return self._adapters.get(platform)
 
@@ -36,7 +35,7 @@ class AdapterRegistry:
         self._instances[config.name] = instance
         return instance
 
-    def get_instance(self, name: str) -> Optional[BaseAdapter]:
+    def get_instance(self, name: str) -> BaseAdapter | None:
         """获取适配器实例"""
         return self._instances.get(name)
 

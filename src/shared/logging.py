@@ -3,9 +3,10 @@ import json
 import os
 import sys
 import traceback
+from collections.abc import Callable
 from contextvars import ContextVar
 from pathlib import Path
-from typing import Any, Callable, Optional
+from typing import Any
 
 from loguru import logger
 
@@ -221,7 +222,7 @@ class LoggingMiddleware:
             request_id_var.reset(token)
 
 
-def get_logger(name: Optional[str] = None) -> Callable:
+def get_logger(name: str | None = None) -> Callable:
     """获取日志记录器"""
 
     def logger_with_context(message, **kwargs):
@@ -240,7 +241,7 @@ def get_logger(name: Optional[str] = None) -> Callable:
     return logger_with_context
 
 
-def get_structured_logger(name: Optional[str] = None):
+def get_structured_logger(name: str | None = None):
     """获取结构化日志记录器"""
 
     def structured_logger(level: str, message: str, **kwargs):

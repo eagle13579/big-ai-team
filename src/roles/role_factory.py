@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any
 
 from src.shared.logging import logger
 
@@ -149,7 +149,7 @@ class RoleFactory:
     def __init__(self):
         self.roles = {"analyst": AnalystRole, "executor": ExecutorRole, "reviewer": ReviewerRole}
 
-    def create_role(self, role_type: str) -> Optional[Role]:
+    def create_role(self, role_type: str) -> Role | None:
         """创建角色"""
         try:
             if role_type in self.roles:
@@ -165,7 +165,7 @@ class RoleFactory:
         """列出所有可用角色"""
         return list(self.roles.keys())
 
-    def get_role_info(self, role_type: str) -> Optional[dict[str, Any]]:
+    def get_role_info(self, role_type: str) -> dict[str, Any] | None:
         """获取角色信息"""
         try:
             if role_type in self.roles:

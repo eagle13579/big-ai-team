@@ -1,6 +1,6 @@
 import os
 from abc import abstractmethod
-from typing import Any, Optional
+from typing import Any
 
 import boto3
 from botocore.exceptions import NoCredentialsError
@@ -13,7 +13,7 @@ class StorageAdapter(BaseAdapter[dict[str, Any]]):
     """存储适配器基类"""
 
     async def execute(
-        self, operation: str, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, operation: str, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """执行存储操作"""
         if operation == "read":
@@ -31,33 +31,33 @@ class StorageAdapter(BaseAdapter[dict[str, Any]]):
 
     @abstractmethod
     async def read(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """读取文件"""
         pass
 
     @abstractmethod
     async def write(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """写入文件"""
         pass
 
     @abstractmethod
     async def delete(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """删除文件"""
         pass
 
     @abstractmethod
     async def list(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """列出文件"""
         pass
 
-    async def _health_check(self, context: Optional[AdapterContext] = None) -> dict[str, Any]:
+    async def _health_check(self, context: AdapterContext | None = None) -> dict[str, Any]:
         """健康检查"""
         try:
             # 尝试列出文件
@@ -85,7 +85,7 @@ class LocalStorageAdapter(StorageAdapter):
         # 确保基础路径存在
         os.makedirs(self.base_path, exist_ok=True)
 
-    async def initialize(self, context: Optional[AdapterContext] = None) -> bool:
+    async def initialize(self, context: AdapterContext | None = None) -> bool:
         """初始化适配器"""
         # 确保基础路径存在
         os.makedirs(self.base_path, exist_ok=True)
@@ -93,7 +93,7 @@ class LocalStorageAdapter(StorageAdapter):
         return True
 
     async def read(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """读取文件"""
         file_path = params.get("path")
@@ -110,7 +110,7 @@ class LocalStorageAdapter(StorageAdapter):
             raise Exception(f"Read operation failed: {str(e)}")
 
     async def write(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """写入文件"""
         file_path = params.get("path")
@@ -131,7 +131,7 @@ class LocalStorageAdapter(StorageAdapter):
             raise Exception(f"Write operation failed: {str(e)}")
 
     async def delete(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """删除文件"""
         file_path = params.get("path")
@@ -150,7 +150,7 @@ class LocalStorageAdapter(StorageAdapter):
             raise Exception(f"Delete operation failed: {str(e)}")
 
     async def list(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """列出文件"""
         directory = params.get("directory", ".")
@@ -166,7 +166,7 @@ class LocalStorageAdapter(StorageAdapter):
         except Exception as e:
             raise Exception(f"List operation failed: {str(e)}")
 
-    async def close(self, context: Optional[AdapterContext] = None) -> bool:
+    async def close(self, context: AdapterContext | None = None) -> bool:
         """关闭适配器"""
         self._set_initialized(False)
         return True
@@ -193,7 +193,7 @@ class S3Adapter(StorageAdapter):
         self.region_name = self.config.config.get("region_name", "us-east-1")
         self.client = None
 
-    async def initialize(self, context: Optional[AdapterContext] = None) -> bool:
+    async def initialize(self, context: AdapterContext | None = None) -> bool:
         """初始化适配器"""
         if not self.bucket_name:
             raise ValueError("Bucket name is required")
@@ -215,7 +215,7 @@ class S3Adapter(StorageAdapter):
             raise Exception(f"Failed to initialize S3 adapter: {str(e)}")
 
     async def read(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """读取文件"""
         if not self.client:
@@ -233,7 +233,7 @@ class S3Adapter(StorageAdapter):
             raise Exception(f"Read operation failed: {str(e)}")
 
     async def write(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """写入文件"""
         if not self.client:
@@ -257,7 +257,7 @@ class S3Adapter(StorageAdapter):
             raise Exception(f"Write operation failed: {str(e)}")
 
     async def delete(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """删除文件"""
         if not self.client:
@@ -274,7 +274,7 @@ class S3Adapter(StorageAdapter):
             raise Exception(f"Delete operation failed: {str(e)}")
 
     async def list(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """列出文件"""
         if not self.client:
@@ -292,7 +292,7 @@ class S3Adapter(StorageAdapter):
         except Exception as e:
             raise Exception(f"List operation failed: {str(e)}")
 
-    async def close(self, context: Optional[AdapterContext] = None) -> bool:
+    async def close(self, context: AdapterContext | None = None) -> bool:
         """关闭适配器"""
         self.client = None
         self._set_initialized(False)

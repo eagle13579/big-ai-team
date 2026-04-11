@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Any, Optional
+from typing import Any
 
 # 配置核心层日志，确保与 Bridge 层隔离
 logger = logging.getLogger("MemPalace.Core")
@@ -32,7 +32,7 @@ class MemPalaceCore:
             logger.error(f"无法创建存储目录: {e}")
 
     def add_memory(
-        self, content: Any, context: Optional[dict] = None, tags: Optional[list[str]] = None
+        self, content: Any, context: dict | None = None, tags: list[str] | None = None
     ) -> bool:
         """添加记忆项。"""
         # 实际业务逻辑应在此扩展，例如写入数据库或本地文件
@@ -40,7 +40,7 @@ class MemPalaceCore:
         return True
 
     def search(
-        self, query: str, limit: int = 5, context: Optional[dict] = None
+        self, query: str, limit: int = 5, context: dict | None = None
     ) -> list[dict[str, Any]]:
         """检索相关记忆。"""
         print(f"🔍 [Core] 正在检索: {query} (Limit: {limit})")

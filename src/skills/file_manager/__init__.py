@@ -16,9 +16,9 @@ class FileManagerArgsSchema(BaseModel):
         ..., description="操作类型: read, write, list, delete, copy, move, mkdir, rename, stat"
     )
     file_path: str = Field(..., description="文件或目录路径")
-    content: Optional[str] = Field(default=None, description="写入文件的内容")
-    target_path: Optional[str] = Field(default=None, description="复制、移动或重命名的目标路径")
-    max_size: Optional[int] = Field(
+    content: str | None = Field(default=None, description="写入文件的内容")
+    target_path: str | None = Field(default=None, description="复制、移动或重命名的目标路径")
+    max_size: int | None = Field(
         default=10485760, description="文件大小限制（字节），默认为10MB"
     )
 

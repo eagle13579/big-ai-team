@@ -4,7 +4,6 @@ import os
 import time
 from functools import lru_cache
 from pathlib import Path
-from typing import Optional
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -45,13 +44,13 @@ class Settings(BaseSettings):
 
     # --- 4. AI 与 Agent 核心配置 ---
     # 外部模型 API
-    OPENAI_API_KEY: Optional[str] = None
-    LANGSMITH_API_KEY: Optional[str] = None
-    ANTHROPIC_API_KEY: Optional[str] = None
-    GOOGLE_API_KEY: Optional[str] = None
-    DEEPSEEK_API_KEY: Optional[str] = None
-    ZHIPU_API_KEY: Optional[str] = None
-    MOONSHOT_API_KEY: Optional[str] = None
+    OPENAI_API_KEY: str | None = None
+    LANGSMITH_API_KEY: str | None = None
+    ANTHROPIC_API_KEY: str | None = None
+    GOOGLE_API_KEY: str | None = None
+    DEEPSEEK_API_KEY: str | None = None
+    ZHIPU_API_KEY: str | None = None
+    MOONSHOT_API_KEY: str | None = None
 
     # Agent 行为控制
     AGENT_MAX_STEPS: int = Field(default=10, ge=1, le=100)  # 允许 Agent 自适应循环的最大次数
@@ -60,10 +59,10 @@ class Settings(BaseSettings):
     AGENT_TEMPERATURE: float = Field(default=0.7, ge=0.0, le=1.0)  # 模型采样温度
 
     # 沙箱与执行环境
-    E2B_API_KEY: Optional[str] = None
+    E2B_API_KEY: str | None = None
 
     # --- 5. 链路追踪与监控 ---
-    OTEL_EXPORTER_OTLP_ENDPOINT: Optional[str] = None
+    OTEL_EXPORTER_OTLP_ENDPOINT: str | None = None
 
     # --- 6. 环境配置 ---
     ENV_MODE: str = Field(default="development", pattern="^(development|production|test)$")
@@ -110,7 +109,7 @@ class Settings(BaseSettings):
         return v
 
     # 获取解密后的敏感信息
-    def get_secret(self, key: str) -> Optional[str]:
+    def get_secret(self, key: str) -> str | None:
         """
         获取解密后的敏感信息
         """

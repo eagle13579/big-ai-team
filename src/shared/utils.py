@@ -2,7 +2,7 @@ import logging
 import os
 import uuid
 from datetime import datetime, timedelta
-from typing import Any, Optional
+from typing import Any
 
 from jose import JWTError, jwt
 
@@ -16,7 +16,7 @@ def generate_uuid() -> str:
     return str(uuid.uuid4())
 
 
-def create_access_token(data: dict[str, Any], expires_delta: Optional[timedelta] = None) -> str:
+def create_access_token(data: dict[str, Any], expires_delta: timedelta | None = None) -> str:
     """创建访问令牌"""
     to_encode = data.copy()
     if expires_delta:
@@ -28,7 +28,7 @@ def create_access_token(data: dict[str, Any], expires_delta: Optional[timedelta]
     return encoded_jwt
 
 
-def verify_token(token: str) -> Optional[dict[str, Any]]:
+def verify_token(token: str) -> dict[str, Any] | None:
     """验证令牌"""
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
@@ -46,7 +46,7 @@ def setup_logger() -> logging.Logger:
     return logger
 
 
-def safe_json_loads(data: str) -> Optional[dict[str, Any]]:
+def safe_json_loads(data: str) -> dict[str, Any] | None:
     """安全地解析JSON"""
     import json
 

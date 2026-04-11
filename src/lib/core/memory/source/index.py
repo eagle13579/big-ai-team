@@ -3,7 +3,7 @@
 Memory management module
 """
 
-from typing import Any, Optional
+from typing import Any
 
 
 class MemoryManager:
@@ -37,7 +37,7 @@ class MemoryManager:
         self.memory_store[key] = value
         return True
 
-    def retrieve(self, key: str) -> Optional[Any]:
+    def retrieve(self, key: str) -> Any | None:
         """检索内存数据
 
         从内存中检索数据。

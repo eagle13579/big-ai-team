@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any
 
 import redis
 
@@ -21,7 +21,7 @@ class ContextManager:
         except Exception:
             return False
 
-    def get_context(self, session_id: str) -> Optional[dict[str, Any]]:
+    def get_context(self, session_id: str) -> dict[str, Any] | None:
         """获取会话上下文"""
         try:
             context = self.redis_client.hgetall(f"context:{session_id}")
@@ -45,7 +45,7 @@ class ContextManager:
         except Exception:
             return False
 
-    def get_hot_memory(self, session_id: str) -> Optional[dict[str, Any]]:
+    def get_hot_memory(self, session_id: str) -> dict[str, Any] | None:
         """获取热记忆"""
         return self.get_context(session_id)
 

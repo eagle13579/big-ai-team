@@ -1,7 +1,7 @@
 import logging
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import Any, Generic, Optional, TypeVar
+from typing import Any, Generic, TypeVar
 
 from pydantic import BaseModel, Field
 
@@ -13,8 +13,8 @@ class AdapterContext(BaseModel):
     """适配器上下文"""
 
     session_id: str = Field(..., description="会话ID")
-    user_id: Optional[str] = Field(None, description="用户ID")
-    request_id: Optional[str] = Field(None, description="请求ID")
+    user_id: str | None = Field(None, description="用户ID")
+    request_id: str | None = Field(None, description="请求ID")
     timestamp: datetime = Field(default_factory=datetime.now, description="时间戳")
     metadata: dict[str, Any] = Field(default_factory=dict, description="元数据")
 
@@ -46,19 +46,19 @@ class BaseAdapter(ABC, Generic[T]):
         self._initialized = False
 
     @abstractmethod
-    async def initialize(self, context: Optional[AdapterContext] = None) -> bool:
+    async def initialize(self, context: AdapterContext | None = None) -> bool:
         """初始化适配器"""
         pass
 
     @abstractmethod
     async def execute(
-        self, operation: str, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, operation: str, params: dict[str, Any], context: AdapterContext | None = None
     ) -> T:
         """执行操作"""
         pass
 
     @abstractmethod
-    async def close(self, context: Optional[AdapterContext] = None) -> bool:
+    async def close(self, context: AdapterContext | None = None) -> bool:
         """关闭适配器"""
         pass
 
@@ -67,7 +67,7 @@ class BaseAdapter(ABC, Generic[T]):
         """获取适配器状态"""
         pass
 
-    async def health_check(self, context: Optional[AdapterContext] = None) -> dict[str, Any]:
+    async def health_check(self, context: AdapterContext | None = None) -> dict[str, Any]:
         """健康检查"""
         try:
             # 执行一个简单的操作来检查健康状态

@@ -1,7 +1,7 @@
 import os
 import subprocess
 from abc import abstractmethod
-from typing import Any, Optional
+from typing import Any
 
 from .base import AdapterContext, BaseAdapter
 from .registry import adapter_registry
@@ -11,7 +11,7 @@ class SandboxAdapter(BaseAdapter[dict[str, Any]]):
     """执行沙箱适配器基类"""
 
     async def execute(
-        self, operation: str, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, operation: str, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """执行沙箱操作"""
         if operation == "run":
@@ -23,12 +23,12 @@ class SandboxAdapter(BaseAdapter[dict[str, Any]]):
 
     @abstractmethod
     async def run(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """运行代码"""
         pass
 
-    async def _health_check(self, context: Optional[AdapterContext] = None) -> dict[str, Any]:
+    async def _health_check(self, context: AdapterContext | None = None) -> dict[str, Any]:
         """健康检查"""
         try:
             # 尝试运行一个简单的命令
@@ -62,7 +62,7 @@ class DockerAdapter(SandboxAdapter):
         super().__init__(config)
         self.image = self.config.config.get("image", "python:3.12-slim")
 
-    async def initialize(self, context: Optional[AdapterContext] = None) -> bool:
+    async def initialize(self, context: AdapterContext | None = None) -> bool:
         """初始化适配器"""
         # 检查 Docker 是否可用
         try:
@@ -75,7 +75,7 @@ class DockerAdapter(SandboxAdapter):
             raise Exception(f"Failed to initialize Docker adapter: {str(e)}")
 
     async def run(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """运行代码"""
         if not self.is_initialized():
@@ -125,7 +125,7 @@ class DockerAdapter(SandboxAdapter):
             if os.path.exists(temp_file):
                 os.remove(temp_file)
 
-    async def close(self, context: Optional[AdapterContext] = None) -> bool:
+    async def close(self, context: AdapterContext | None = None) -> bool:
         """关闭适配器"""
         self._set_initialized(False)
         return True
@@ -149,7 +149,7 @@ class E2BAdapter(SandboxAdapter):
         self.template = self.config.config.get("template", "python3")
         self.client = None
 
-    async def initialize(self, context: Optional[AdapterContext] = None) -> bool:
+    async def initialize(self, context: AdapterContext | None = None) -> bool:
         """初始化适配器"""
         if not self.api_key:
             raise ValueError("E2B API key is required")
@@ -167,7 +167,7 @@ class E2BAdapter(SandboxAdapter):
             raise Exception(f"Failed to initialize E2B adapter: {str(e)}")
 
     async def run(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """运行代码"""
         if not self.client:
@@ -193,7 +193,7 @@ class E2BAdapter(SandboxAdapter):
         except Exception as e:
             raise Exception(f"Run operation failed: {str(e)}")
 
-    async def close(self, context: Optional[AdapterContext] = None) -> bool:
+    async def close(self, context: AdapterContext | None = None) -> bool:
         """关闭适配器"""
         self.client = None
         self._set_initialized(False)

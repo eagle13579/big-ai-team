@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import Any, Optional
+from typing import Any
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -12,7 +12,7 @@ class DatabaseAdapter(BaseAdapter[dict[str, Any]]):
     """数据库适配器基类"""
 
     async def execute(
-        self, operation: str, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, operation: str, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """执行数据库操作"""
         if operation == "query":
@@ -26,19 +26,19 @@ class DatabaseAdapter(BaseAdapter[dict[str, Any]]):
 
     @abstractmethod
     async def query(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """执行查询"""
         pass
 
     @abstractmethod
     async def execute_statement(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """执行语句"""
         pass
 
-    async def _health_check(self, context: Optional[AdapterContext] = None) -> dict[str, Any]:
+    async def _health_check(self, context: AdapterContext | None = None) -> dict[str, Any]:
         """健康检查"""
         try:
             await self.query({"query": "SELECT 1"}, context)
@@ -65,7 +65,7 @@ class PostgreSQLAdapter(DatabaseAdapter):
         self.engine = None
         self.SessionLocal = None
 
-    async def initialize(self, context: Optional[AdapterContext] = None) -> bool:
+    async def initialize(self, context: AdapterContext | None = None) -> bool:
         """初始化适配器"""
         if not self.connection_string:
             raise ValueError("Connection string is required")
@@ -82,7 +82,7 @@ class PostgreSQLAdapter(DatabaseAdapter):
             raise Exception(f"Failed to initialize PostgreSQL adapter: {str(e)}")
 
     async def query(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """执行查询"""
         if not self.engine:
@@ -99,7 +99,7 @@ class PostgreSQLAdapter(DatabaseAdapter):
                 columns = result.keys()
 
                 return {
-                    "rows": [dict(zip(columns, row)) for row in rows],
+                    "rows": [dict(zip(columns, row, strict=False)) for row in rows],
                     "row_count": len(rows),
                     "columns": list(columns),
                 }
@@ -107,7 +107,7 @@ class PostgreSQLAdapter(DatabaseAdapter):
             raise Exception(f"Query execution failed: {str(e)}")
 
     async def execute_statement(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """执行语句"""
         if not self.engine:
@@ -126,7 +126,7 @@ class PostgreSQLAdapter(DatabaseAdapter):
         except Exception as e:
             raise Exception(f"Statement execution failed: {str(e)}")
 
-    async def close(self, context: Optional[AdapterContext] = None) -> bool:
+    async def close(self, context: AdapterContext | None = None) -> bool:
         """关闭适配器"""
         if self.engine:
             self.engine.dispose()
@@ -154,7 +154,7 @@ class SQLiteAdapter(DatabaseAdapter):
         self.engine = None
         self.SessionLocal = None
 
-    async def initialize(self, context: Optional[AdapterContext] = None) -> bool:
+    async def initialize(self, context: AdapterContext | None = None) -> bool:
         """初始化适配器"""
         try:
             self.engine = create_engine(
@@ -170,7 +170,7 @@ class SQLiteAdapter(DatabaseAdapter):
             raise Exception(f"Failed to initialize SQLite adapter: {str(e)}")
 
     async def query(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """执行查询"""
         if not self.engine:
@@ -187,7 +187,7 @@ class SQLiteAdapter(DatabaseAdapter):
                 columns = result.keys()
 
                 return {
-                    "rows": [dict(zip(columns, row)) for row in rows],
+                    "rows": [dict(zip(columns, row, strict=False)) for row in rows],
                     "row_count": len(rows),
                     "columns": list(columns),
                 }
@@ -195,7 +195,7 @@ class SQLiteAdapter(DatabaseAdapter):
             raise Exception(f"Query execution failed: {str(e)}")
 
     async def execute_statement(
-        self, params: dict[str, Any], context: Optional[AdapterContext] = None
+        self, params: dict[str, Any], context: AdapterContext | None = None
     ) -> dict[str, Any]:
         """执行语句"""
         if not self.engine:
@@ -214,7 +214,7 @@ class SQLiteAdapter(DatabaseAdapter):
         except Exception as e:
             raise Exception(f"Statement execution failed: {str(e)}")
 
-    async def close(self, context: Optional[AdapterContext] = None) -> bool:
+    async def close(self, context: AdapterContext | None = None) -> bool:
         """关闭适配器"""
         if self.engine:
             self.engine.dispose()
