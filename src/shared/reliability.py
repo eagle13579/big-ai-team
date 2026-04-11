@@ -1,7 +1,8 @@
 import asyncio
 import time
+from collections.abc import Callable
 from datetime import datetime, timedelta
-from typing import Callable, Dict, List, TypeVar
+from typing import TypeVar
 
 from src.shared.logging import logger
 
@@ -186,7 +187,7 @@ class ServiceDegrader:
         self.degraded_services = set()
         self.degradation_time = None
     
-    def degrade(self, services: List[str]):
+    def degrade(self, services: list[str]):
         """
         降级服务
         
@@ -219,7 +220,7 @@ class ServiceDegrader:
         """
         return self.degraded and service in self.degraded_services
     
-    def get_degraded_services(self) -> List[str]:
+    def get_degraded_services(self) -> list[str]:
         """
         获取已降级的服务列表
         
@@ -288,14 +289,14 @@ class FaultRecoveryManager:
             return False
         
         try:
-            result = await strategy()
+            await strategy()
             logger.info(f"服务 {service} 恢复成功")
             return True
         except Exception as e:
             logger.error(f"服务 {service} 恢复失败: {str(e)}")
             return False
     
-    def get_fault_history(self, service: str = None, hours: int = 24) -> List[Dict]:
+    def get_fault_history(self, service: str = None, hours: int = 24) -> list[dict]:
         """
         获取故障历史
         

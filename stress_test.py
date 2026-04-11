@@ -4,13 +4,13 @@
 """
 
 import asyncio
-import aiohttp
-import time
 import json
-from concurrent.futures import ThreadPoolExecutor
-import threading
-import statistics
 import random
+import statistics
+import threading
+import time
+
+import aiohttp
 
 # 测试配置
 BASE_URL = "http://localhost:8000"
@@ -74,13 +74,13 @@ class RetryMechanism:
         while retries <= self.max_retries:
             try:
                 return await func(*args, **kwargs)
-            except aiohttp.ClientError as e:
+            except aiohttp.ClientError:
                 if retries >= self.max_retries:
                     raise
                 retries += 1
                 wait_time = self.backoff_factor * (2 ** (retries - 1)) + random.uniform(0, 0.1)
                 await asyncio.sleep(wait_time)
-            except Exception as e:
+            except Exception:
                 # 其他异常不重试
                 raise
 
@@ -241,7 +241,7 @@ async def run_user(session, user_id):
 
 async def main():
     """主测试函数"""
-    print(f"开始压力测试...")
+    print("开始压力测试...")
     print(f"并发用户数: {CONCURRENT_USERS}")
     print(f"每个用户请求数: {REQUESTS_PER_USER}")
     print(f"总请求数: {TOTAL_REQUESTS}")
@@ -313,7 +313,7 @@ async def main():
     print("\n系统状态:")
     print(f"熔断状态: {circuit_breaker.state}")
     print(f"服务降级: {'已降级' if service_degrader.degraded else '正常'}")
-    print(f"\n测试结果已保存到 stress_test_results.json")
+    print("\n测试结果已保存到 stress_test_results.json")
 
 if __name__ == "__main__":
     asyncio.run(main())

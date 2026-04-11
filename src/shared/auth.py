@@ -1,10 +1,11 @@
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
+
 from shared.config import settings
 
 # 密码加密上下文
@@ -53,7 +54,7 @@ def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
 
-def get_user(username: str) -> Optional[User]:
+def get_user(username: str) -> User | None:
     """获取用户"""
     if username in fake_users_db:
         user_dict = fake_users_db[username]
@@ -61,7 +62,7 @@ def get_user(username: str) -> Optional[User]:
     return None
 
 
-def authenticate_user(username: str, password: str) -> Optional[User]:
+def authenticate_user(username: str, password: str) -> User | None:
     """认证用户"""
     user = get_user(username)
     if not user:
@@ -71,7 +72,7 @@ def authenticate_user(username: str, password: str) -> Optional[User]:
     return user
 
 
-def create_access_token(data: Dict[str, Any], expires_delta: Optional[timedelta] = None) -> str:
+def create_access_token(data: dict[str, Any], expires_delta: timedelta | None = None) -> str:
     """创建访问令牌"""
     to_encode = data.copy()
     if expires_delta:
@@ -109,12 +110,12 @@ async def get_current_active_user(current_user: User = Depends(get_current_user)
     return current_user
 
 
-def check_permissions(required_roles: List[str], user_role: str) -> bool:
+def check_permissions(required_roles: list[str], user_role: str) -> bool:
     """检查权限"""
     return user_role in required_roles
 
 
-async def require_permissions(required_roles: List[str]):
+async def require_permissions(required_roles: list[str]):
     """权限依赖"""
     async def permission_checker(current_user: User = Depends(get_current_active_user)):
         if not check_permissions(required_roles, current_user.role):

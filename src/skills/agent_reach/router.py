@@ -1,5 +1,5 @@
 import re
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from src.skills.agent_reach.interface import BaseReachChannel
 
@@ -22,7 +22,7 @@ class ChannelRouter:
             "douyin": [r"douyin\.com", r"tiktok\.com"]
         }
     
-    def route_by_intent(self, intent: Dict[str, Any]) -> Optional[BaseReachChannel]:
+    def route_by_intent(self, intent: dict[str, Any]) -> BaseReachChannel | None:
         """基于意图智能路由到最合适的渠道
         
         Args:
@@ -53,7 +53,7 @@ class ChannelRouter:
         
         return None
     
-    def detect_channel_by_url(self, url: str) -> Optional[BaseReachChannel]:
+    def detect_channel_by_url(self, url: str) -> BaseReachChannel | None:
         """通过 URL 自动检测渠道
         
         Args:
@@ -68,7 +68,7 @@ class ChannelRouter:
                     return self.channel_manager.get_channel_by_name(channel_name)
         return None
     
-    def _match_by_content_type(self, content_type: str) -> Optional[BaseReachChannel]:
+    def _match_by_content_type(self, content_type: str) -> BaseReachChannel | None:
         """通过内容类型匹配渠道
         
         Args:
@@ -96,7 +96,7 @@ class ChannelRouter:
         
         return None
     
-    def get_fallback_channel(self, original_channel_name: str) -> Optional[BaseReachChannel]:
+    def get_fallback_channel(self, original_channel_name: str) -> BaseReachChannel | None:
         """获取降级渠道
         
         Args:
@@ -122,7 +122,7 @@ class ChannelRouter:
         
         return None
     
-    def get_available_channels(self, action: str) -> List[BaseReachChannel]:
+    def get_available_channels(self, action: str) -> list[BaseReachChannel]:
         """获取支持特定操作的可用渠道
         
         Args:

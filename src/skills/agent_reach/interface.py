@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional, TypeVar
+from typing import Any, TypeVar
 
 from pydantic import BaseModel, Field
 
@@ -16,7 +16,7 @@ class BaseReachChannel(ABC):
     requires_proxy: bool = False
     
     @abstractmethod
-    async def execute(self, action: str, params: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, action: str, params: dict[str, Any]) -> dict[str, Any]:
         """执行渠道操作"""
         pass
     
@@ -26,7 +26,7 @@ class BaseReachChannel(ABC):
         pass
     
     @abstractmethod
-    def check_health(self) -> Dict[str, Any]:
+    def check_health(self) -> dict[str, Any]:
         """检查渠道健康状态"""
         pass
 
@@ -34,7 +34,7 @@ class ResultWrapper:
     """结果包装器，将原始输出标准化为 Big-AI-Team 可理解的 Observation 格式"""
     
     @staticmethod
-    def wrap_result(channel_name: str, action: str, original_result: Any, metadata: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def wrap_result(channel_name: str, action: str, original_result: Any, metadata: dict[str, Any] | None = None) -> dict[str, Any]:
         """包装结果
         
         Args:
@@ -64,7 +64,7 @@ class ResultWrapper:
         }
     
     @staticmethod
-    def wrap_error(channel_name: str, action: str, error_message: str) -> Dict[str, Any]:
+    def wrap_error(channel_name: str, action: str, error_message: str) -> dict[str, Any]:
         """包装错误结果
         
         Args:
@@ -119,14 +119,14 @@ class ChannelConfig(BaseModel):
     capabilities: list = Field(default_factory=list, description="渠道能力")
     requires_auth: bool = Field(False, description="是否需要认证")
     requires_proxy: bool = Field(False, description="是否需要代理")
-    config: Dict[str, Any] = Field(default_factory=dict, description="渠道特定配置")
+    config: dict[str, Any] = Field(default_factory=dict, description="渠道特定配置")
 
 class ReachAction(BaseModel):
     """Agent-Reach 操作模型"""
     action: str = Field(..., description="执行的操作")
-    params: Dict[str, Any] = Field(..., description="操作参数")
+    params: dict[str, Any] = Field(..., description="操作参数")
 
 class ReachResult(BaseModel):
     """Agent-Reach 结果模型"""
     status: str = Field(..., description="执行状态")
-    observation: Dict[str, Any] = Field(..., description="观察结果")
+    observation: dict[str, Any] = Field(..., description="观察结果")

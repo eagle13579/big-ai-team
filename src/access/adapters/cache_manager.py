@@ -1,6 +1,8 @@
-from typing import Any, Optional, Dict, List, Callable
+from collections.abc import Callable
+from typing import Any
 
 from src.shared.logging import logger
+
 from .multi_level_cache import multi_level_cache
 
 
@@ -29,7 +31,7 @@ class CacheManager:
         prefix = self.cache_prefixes.get(category, "default")
         return multi_level_cache._generate_cache_key(prefix, *args, **kwargs)
     
-    def get(self, category: str, *args, **kwargs) -> Optional[Any]:
+    def get(self, category: str, *args, **kwargs) -> Any | None:
         """
         获取缓存
         """
@@ -67,7 +69,7 @@ class CacheManager:
         def decorator(func: Callable) -> Callable:
             def wrapper(*args, **kwargs):
                 # 生成缓存键
-                cache_key = self.get_cache_key(category, *args, **kwargs)
+                self.get_cache_key(category, *args, **kwargs)
                 
                 # 尝试从缓存获取
                 cached_value = multi_level_cache.get(category, *args, **kwargs)
@@ -86,7 +88,7 @@ class CacheManager:
             return wrapper
         return decorator
     
-    def cache_warmup(self, items: List[Dict[str, Any]]) -> int:
+    def cache_warmup(self, items: list[dict[str, Any]]) -> int:
         """
         缓存预热
         
@@ -114,7 +116,7 @@ class CacheManager:
         
         return multi_level_cache.cache_warmup(warmup_items)
     
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         """
         获取缓存统计信息
         """

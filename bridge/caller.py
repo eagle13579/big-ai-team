@@ -12,7 +12,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 # 导入监控模块
-from bridge.monitoring import init_bridge_monitoring, bridge_task_monitor
+from bridge.monitoring import bridge_task_monitor, init_bridge_monitoring
 from src.shared.logging import logger
 
 # 初始化监控

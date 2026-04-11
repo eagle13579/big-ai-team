@@ -3,6 +3,7 @@
 """
 
 import time
+
 from src.access.adapters.cache_manager import cache_manager
 from src.shared.logging import logger
 

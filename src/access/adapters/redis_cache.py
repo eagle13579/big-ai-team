@@ -1,11 +1,10 @@
 import json
-from typing import Any, Optional
+from typing import Any
 
 import redis
 
-from src.shared.config import settings
-from src.shared.logging import logger
 from src.shared.cache_config import cache_settings
+from src.shared.logging import logger
 
 
 class RedisCacheAdapter:
@@ -24,7 +23,7 @@ class RedisCacheAdapter:
             logger.error(f"❌ Redis 连接失败: {str(e)}")
             self.redis_client = None
     
-    def get(self, key: str) -> Optional[Any]:
+    def get(self, key: str) -> Any | None:
         """
         获取缓存值
         

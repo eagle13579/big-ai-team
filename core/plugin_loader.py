@@ -1,7 +1,6 @@
 import importlib
 import os
 import sys
-from typing import Dict, List, Optional
 
 from core.plugin_interface import ChannelPlugin
 
@@ -16,7 +15,7 @@ class PluginLoader:
             plugin_dir: 插件目录
         """
         self.plugin_dir = plugin_dir
-        self.plugins: Dict[str, ChannelPlugin] = {}
+        self.plugins: dict[str, ChannelPlugin] = {}
         self._ensure_plugin_dir()
     
     def _ensure_plugin_dir(self):
@@ -28,7 +27,7 @@ class PluginLoader:
         if self.plugin_dir not in sys.path:
             sys.path.insert(0, self.plugin_dir)
     
-    def load_plugins(self) -> List[str]:
+    def load_plugins(self) -> list[str]:
         """加载所有插件
         
         Returns:
@@ -64,7 +63,7 @@ class PluginLoader:
         
         return loaded_plugins
     
-    def _load_plugin(self, plugin_name: str) -> Optional[ChannelPlugin]:
+    def _load_plugin(self, plugin_name: str) -> ChannelPlugin | None:
         """加载单个插件
         
         Args:
@@ -89,7 +88,7 @@ class PluginLoader:
             print(f"加载插件 {plugin_name} 出错: {e}")
             return None
     
-    def get_plugin(self, plugin_name: str) -> Optional[ChannelPlugin]:
+    def get_plugin(self, plugin_name: str) -> ChannelPlugin | None:
         """获取插件实例
         
         Args:
@@ -100,7 +99,7 @@ class PluginLoader:
         """
         return self.plugins.get(plugin_name)
     
-    def list_plugins(self) -> List[str]:
+    def list_plugins(self) -> list[str]:
         """列出所有加载的插件
         
         Returns:
@@ -108,7 +107,7 @@ class PluginLoader:
         """
         return list(self.plugins.keys())
     
-    def reload_plugins(self) -> List[str]:
+    def reload_plugins(self) -> list[str]:
         """重新加载所有插件
         
         Returns:

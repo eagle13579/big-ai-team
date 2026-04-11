@@ -1,4 +1,3 @@
-from typing import Dict, List, Optional
 
 from core.plugin_interface import ChannelPlugin
 from core.plugin_loader import PluginLoader
@@ -14,9 +13,9 @@ class ChannelManager:
             plugin_dir: 插件目录
         """
         self.plugin_loader = PluginLoader(plugin_dir)
-        self.active_channels: Dict[str, ChannelPlugin] = {}
+        self.active_channels: dict[str, ChannelPlugin] = {}
     
-    def load_channels(self) -> List[str]:
+    def load_channels(self) -> list[str]:
         """加载所有渠道
         
         Returns:
@@ -88,7 +87,7 @@ class ChannelManager:
             print(f"发送消息到渠道 {channel_name} 失败: {e}")
             return False
     
-    def get_channel_status(self, channel_name: str) -> Optional[dict]:
+    def get_channel_status(self, channel_name: str) -> dict | None:
         """获取渠道状态
         
         Args:
@@ -106,7 +105,7 @@ class ChannelManager:
             print(f"获取渠道 {channel_name} 状态失败: {e}")
             return None
     
-    def list_channels(self) -> Dict[str, dict]:
+    def list_channels(self) -> dict[str, dict]:
         """列出所有渠道及其状态
         
         Returns:
@@ -129,7 +128,7 @@ class ChannelManager:
         
         return channels
     
-    def reload_channels(self) -> List[str]:
+    def reload_channels(self) -> list[str]:
         """重新加载所有渠道
         
         Returns:

@@ -5,7 +5,7 @@ import os
 from collections.abc import Awaitable, Callable
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 import httpx
 import psutil
@@ -112,7 +112,7 @@ class ToolExecutor:
         self._thread_pool = self._create_thread_pool()
         
         # 任务优先级队列
-        self._task_queue: List[Tuple[int, Callable]] = []
+        self._task_queue: list[tuple[int, Callable]] = []
         self._task_counter = 0  # 用于确保任务顺序的计数器
         
         # 可靠性机制
@@ -819,7 +819,7 @@ class ToolExecutor:
         else:
             logger.warning(f"⚠️  工具 {name} 不存在")
 
-    def degrade_service(self, services: List[str]):
+    def degrade_service(self, services: list[str]):
         """
         降级服务
         
@@ -834,7 +834,7 @@ class ToolExecutor:
         """
         self._service_degrader.recover()
 
-    def get_degraded_services(self) -> List[str]:
+    def get_degraded_services(self) -> list[str]:
         """
         获取已降级的服务列表
         
@@ -843,7 +843,7 @@ class ToolExecutor:
         """
         return self._service_degrader.get_degraded_services()
 
-    def get_fault_history(self, service: str = None, hours: int = 24) -> List[Dict]:
+    def get_fault_history(self, service: str = None, hours: int = 24) -> list[dict]:
         """
         获取故障历史
         
@@ -856,7 +856,7 @@ class ToolExecutor:
         """
         return self._fault_recovery_manager.get_fault_history(service, hours)
 
-    def get_reliability_status(self) -> Dict[str, Any]:
+    def get_reliability_status(self) -> dict[str, Any]:
         """
         获取可靠性状态
         

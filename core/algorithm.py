@@ -1,15 +1,16 @@
 import os
-from typing import Any
 
 # 添加项目根目录到 Python 路径
 import sys
 from pathlib import Path
+from typing import Any
+
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 # 导入监控模块
-from core.monitoring import init_core_monitoring, core_performance_monitor
+from core.monitoring import core_performance_monitor, init_core_monitoring
 from src.shared.logging import logger
 
 # 初始化监控

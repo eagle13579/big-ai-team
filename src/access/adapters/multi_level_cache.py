@@ -1,10 +1,10 @@
-import time
 import hashlib
-from typing import Any, Optional, Dict, List, Tuple
+import time
+from typing import Any
 
-from src.shared.config import settings
-from src.shared.logging import logger
 from src.shared.cache_config import cache_settings
+from src.shared.logging import logger
+
 from .redis_cache import redis_cache
 
 
@@ -48,7 +48,7 @@ class MultiLevelCache:
         
         return key_string
     
-    def get(self, prefix: str, *args, **kwargs) -> Optional[Any]:
+    def get(self, prefix: str, *args, **kwargs) -> Any | None:
         """
         获取缓存
         1. 先从本地缓存获取
@@ -150,7 +150,7 @@ class MultiLevelCache:
         logger.debug(f"删除匹配模式的缓存: {pattern}, 共删除 {total_deleted} 个")
         return total_deleted
     
-    def cache_warmup(self, items: List[Tuple[str, Any, int, List[Any], Dict[str, Any]]]) -> int:
+    def cache_warmup(self, items: list[tuple[str, Any, int, list[Any], dict[str, Any]]]) -> int:
         """
         缓存预热
         
@@ -169,7 +169,7 @@ class MultiLevelCache:
         logger.info(f"缓存预热完成，成功预热 {success_count} 个项目")
         return success_count
     
-    def get_cache_stats(self) -> Dict[str, Any]:
+    def get_cache_stats(self) -> dict[str, Any]:
         """
         获取缓存统计信息
         """

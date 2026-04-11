@@ -27,13 +27,13 @@ async def test_redis_cache_performance():
     start_time = time.time()
     
     # 第一次执行，应该不命中缓存
-    result1 = await executor.execute("web_search", {"query": "AI Agent 2026"})
+    await executor.execute("web_search", {"query": "AI Agent 2026"})
     time1 = time.time() - start_time
     print(f"第一次执行时间: {time1:.4f} 秒")
     
     # 第二次执行，应该命中缓存
     start_time = time.time()
-    result2 = await executor.execute("web_search", {"query": "AI Agent 2026"})
+    await executor.execute("web_search", {"query": "AI Agent 2026"})
     time2 = time.time() - start_time
     print(f"第二次执行时间: {time2:.4f} 秒")
     print(f"缓存加速比: {time1/time2:.2f}x")
@@ -59,7 +59,7 @@ async def test_thread_pool_performance():
         tasks.append(task)
     
     # 等待所有任务完成
-    results = await asyncio.gather(*tasks)
+    await asyncio.gather(*tasks)
     total_time = time.time() - start_time
     print(f"并发执行 20 个任务时间: {total_time:.4f} 秒")
     print(f"平均每个任务时间: {total_time/20:.4f} 秒")
@@ -79,7 +79,7 @@ async def test_task_priority():
         tasks.append(task)
     
     # 等待所有任务完成
-    results = await asyncio.gather(*tasks)
+    await asyncio.gather(*tasks)
     print("任务优先级调度测试完成")
     
     executor.close()
@@ -100,7 +100,7 @@ async def test_batch_execution():
     
     # 测试普通批量执行
     start_time = time.time()
-    results1 = await executor.execute_multiple(tool_calls, max_concurrency=5)
+    await executor.execute_multiple(tool_calls, max_concurrency=5)
     time1 = time.time() - start_time
     print(f"普通批量执行时间: {time1:.4f} 秒")
     
@@ -110,7 +110,7 @@ async def test_batch_execution():
             print(f"进度: {progress}/{total}")
     
     start_time = time.time()
-    results2 = await executor.execute_batch_with_callback(tool_calls, callback, max_concurrency=5)
+    await executor.execute_batch_with_callback(tool_calls, callback, max_concurrency=5)
     time2 = time.time() - start_time
     print(f"带回调的批量执行时间: {time2:.4f} 秒")
     
@@ -123,7 +123,7 @@ async def test_agent_reach_batch():
     
     # 创建批量任务
     batch_params = []
-    for i in range(10):
+    for _i in range(10):
         batch_params.append({
             "action": "read_webpage",
             "params": {"url": "https://example.com"},
@@ -132,13 +132,13 @@ async def test_agent_reach_batch():
     
     # 测试普通批量执行
     start_time = time.time()
-    results1 = await skill.execute_batch(batch_params, max_concurrency=3)
+    await skill.execute_batch(batch_params, max_concurrency=3)
     time1 = time.time() - start_time
     print(f"AgentReach 普通批量执行时间: {time1:.4f} 秒")
     
     # 测试带优先级的批量执行
     start_time = time.time()
-    results2 = await skill.execute_batch_with_priority(batch_params, max_concurrency=3)
+    await skill.execute_batch_with_priority(batch_params, max_concurrency=3)
     time2 = time.time() - start_time
     print(f"AgentReach 带优先级的批量执行时间: {time2:.4f} 秒")
 

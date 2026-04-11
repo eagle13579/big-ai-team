@@ -1,6 +1,6 @@
 import os
 import subprocess
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from src.skills.agent_reach.interface import BaseReachChannel, ResultWrapper
 
@@ -40,7 +40,7 @@ class ChannelManager:
         self.channels["rss"] = RSSChannel()
         self.channels["xueqiu"] = XueQiuChannel()
     
-    def get_channel_by_name(self, name: str) -> Optional[BaseReachChannel]:
+    def get_channel_by_name(self, name: str) -> BaseReachChannel | None:
         """根据名称获取渠道
         
         Args:
@@ -51,7 +51,7 @@ class ChannelManager:
         """
         return self.channels.get(name)
     
-    def get_all_channels(self) -> List[BaseReachChannel]:
+    def get_all_channels(self) -> list[BaseReachChannel]:
         """获取所有渠道
         
         Returns:
@@ -59,7 +59,7 @@ class ChannelManager:
         """
         return list(self.channels.values())
     
-    def get_channel_stats(self) -> Dict[str, Any]:
+    def get_channel_stats(self) -> dict[str, Any]:
         """获取渠道统计信息
         
         Returns:
@@ -83,7 +83,7 @@ class ChannelManager:
         
         return stats
     
-    def detect_channel_by_url(self, url: str) -> Optional[BaseReachChannel]:
+    def detect_channel_by_url(self, url: str) -> BaseReachChannel | None:
         """通过 URL 检测渠道
         
         Args:
@@ -106,7 +106,7 @@ class TwitterChannel(BaseReachChannel):
     requires_auth = True
     requires_proxy = False
     
-    async def execute(self, action: str, params: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, action: str, params: dict[str, Any]) -> dict[str, Any]:
         """执行 Twitter 操作"""
         try:
             if action == "search_twitter":
@@ -138,7 +138,7 @@ class TwitterChannel(BaseReachChannel):
         except:
             return False
     
-    def check_health(self) -> Dict[str, Any]:
+    def check_health(self) -> dict[str, Any]:
         """检查 Twitter 渠道健康状态"""
         try:
             if self.validate_config():
@@ -148,7 +148,7 @@ class TwitterChannel(BaseReachChannel):
         except Exception as e:
             return {"status": "unhealthy", "message": str(e)}
     
-    def _run_bird_command(self, command: str) -> Dict[str, Any]:
+    def _run_bird_command(self, command: str) -> dict[str, Any]:
         """运行 bird CLI 命令"""
         # 实际实现中需要调用 bird CLI
         # 这里返回模拟结果
@@ -164,7 +164,7 @@ class YouTubeChannel(BaseReachChannel):
     requires_auth = False
     requires_proxy = False
     
-    async def execute(self, action: str, params: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, action: str, params: dict[str, Any]) -> dict[str, Any]:
         """执行 YouTube 操作"""
         try:
             if action == "get_youtube_transcript":
@@ -195,7 +195,7 @@ class YouTubeChannel(BaseReachChannel):
         except:
             return False
     
-    def check_health(self) -> Dict[str, Any]:
+    def check_health(self) -> dict[str, Any]:
         """检查 YouTube 渠道健康状态"""
         try:
             if self.validate_config():
@@ -205,7 +205,7 @@ class YouTubeChannel(BaseReachChannel):
         except Exception as e:
             return {"status": "unhealthy", "message": str(e)}
     
-    def _run_yt_dlp_command(self, command: str) -> Dict[str, Any]:
+    def _run_yt_dlp_command(self, command: str) -> dict[str, Any]:
         """运行 yt-dlp 命令"""
         # 实际实现中需要调用 yt-dlp
         # 这里返回模拟结果
@@ -221,7 +221,7 @@ class BilibiliChannel(BaseReachChannel):
     requires_auth = False
     requires_proxy = True
     
-    async def execute(self, action: str, params: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, action: str, params: dict[str, Any]) -> dict[str, Any]:
         """执行 Bilibili 操作"""
         try:
             if action == "get_bilibili_transcript":
@@ -249,7 +249,7 @@ class BilibiliChannel(BaseReachChannel):
         except:
             return False
     
-    def check_health(self) -> Dict[str, Any]:
+    def check_health(self) -> dict[str, Any]:
         """检查 Bilibili 渠道健康状态"""
         try:
             if self.validate_config():
@@ -259,7 +259,7 @@ class BilibiliChannel(BaseReachChannel):
         except Exception as e:
             return {"status": "unhealthy", "message": str(e)}
     
-    def _run_yt_dlp_command(self, command: str) -> Dict[str, Any]:
+    def _run_yt_dlp_command(self, command: str) -> dict[str, Any]:
         """运行 yt-dlp 命令"""
         # 实际实现中需要调用 yt-dlp
         # 这里返回模拟结果
@@ -275,7 +275,7 @@ class GitHubChannel(BaseReachChannel):
     requires_auth = False
     requires_proxy = False
     
-    async def execute(self, action: str, params: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, action: str, params: dict[str, Any]) -> dict[str, Any]:
         """执行 GitHub 操作"""
         try:
             if action == "search_github_repos":
@@ -307,7 +307,7 @@ class GitHubChannel(BaseReachChannel):
         except:
             return False
     
-    def check_health(self) -> Dict[str, Any]:
+    def check_health(self) -> dict[str, Any]:
         """检查 GitHub 渠道健康状态"""
         try:
             if self.validate_config():
@@ -317,7 +317,7 @@ class GitHubChannel(BaseReachChannel):
         except Exception as e:
             return {"status": "unhealthy", "message": str(e)}
     
-    def _run_gh_command(self, command: str) -> Dict[str, Any]:
+    def _run_gh_command(self, command: str) -> dict[str, Any]:
         """运行 gh CLI 命令"""
         # 实际实现中需要调用 gh CLI
         # 这里返回模拟结果
@@ -333,7 +333,7 @@ class WebChannel(BaseReachChannel):
     requires_auth = False
     requires_proxy = False
     
-    async def execute(self, action: str, params: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, action: str, params: dict[str, Any]) -> dict[str, Any]:
         """执行 Web 操作"""
         try:
             if action == "read_webpage":
@@ -355,17 +355,17 @@ class WebChannel(BaseReachChannel):
         """验证 Web 配置"""
         return True  # Web 渠道不需要特殊配置
     
-    def check_health(self) -> Dict[str, Any]:
+    def check_health(self) -> dict[str, Any]:
         """检查 Web 渠道健康状态"""
         return {"status": "healthy", "message": "Web channel is healthy"}
     
-    def _read_webpage(self, url: str) -> Dict[str, Any]:
+    def _read_webpage(self, url: str) -> dict[str, Any]:
         """读取网页"""
         # 实际实现中需要使用 Jina Reader
         # 这里返回模拟结果
         return {"content": f"Content of {url}", "url": url}
     
-    def _search_web(self, query: str, limit: int) -> Dict[str, Any]:
+    def _search_web(self, query: str, limit: int) -> dict[str, Any]:
         """搜索 Web"""
         # 实际实现中需要使用 Web 搜索引擎
         # 这里返回模拟结果
@@ -381,7 +381,7 @@ class ExaChannel(BaseReachChannel):
     requires_auth = True
     requires_proxy = False
     
-    async def execute(self, action: str, params: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, action: str, params: dict[str, Any]) -> dict[str, Any]:
         """执行 Exa 操作"""
         try:
             if action == "search_exa":
@@ -404,7 +404,7 @@ class ExaChannel(BaseReachChannel):
         except:
             return False
     
-    def check_health(self) -> Dict[str, Any]:
+    def check_health(self) -> dict[str, Any]:
         """检查 Exa 渠道健康状态"""
         try:
             if self.validate_config():
@@ -414,7 +414,7 @@ class ExaChannel(BaseReachChannel):
         except Exception as e:
             return {"status": "unhealthy", "message": str(e)}
     
-    def _run_exa_search(self, query: str, limit: int) -> Dict[str, Any]:
+    def _run_exa_search(self, query: str, limit: int) -> dict[str, Any]:
         """运行 Exa 搜索"""
         # 实际实现中需要使用 mcporter MCP
         # 这里返回模拟结果
@@ -430,7 +430,7 @@ class RedditChannel(BaseReachChannel):
     requires_auth = False
     requires_proxy = True
     
-    async def execute(self, action: str, params: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, action: str, params: dict[str, Any]) -> dict[str, Any]:
         """执行 Reddit 操作"""
         try:
             if action == "search_reddit":
@@ -453,7 +453,7 @@ class RedditChannel(BaseReachChannel):
         proxy = os.environ.get("REDDIT_PROXY")
         return proxy is not None
     
-    def check_health(self) -> Dict[str, Any]:
+    def check_health(self) -> dict[str, Any]:
         """检查 Reddit 渠道健康状态"""
         try:
             if self.validate_config():
@@ -463,13 +463,13 @@ class RedditChannel(BaseReachChannel):
         except Exception as e:
             return {"status": "unhealthy", "message": str(e)}
     
-    def _search_reddit(self, query: str, limit: int) -> Dict[str, Any]:
+    def _search_reddit(self, query: str, limit: int) -> dict[str, Any]:
         """搜索 Reddit"""
         # 实际实现中需要访问 Reddit API
         # 这里返回模拟结果
         return {"results": [f"Reddit result {i} for {query}" for i in range(limit)]}
     
-    def _get_reddit_post(self, url: str) -> Dict[str, Any]:
+    def _get_reddit_post(self, url: str) -> dict[str, Any]:
         """获取 Reddit 帖子"""
         # 实际实现中需要访问 Reddit API
         # 这里返回模拟结果
@@ -485,7 +485,7 @@ class V2EXChannel(BaseReachChannel):
     requires_auth = False
     requires_proxy = False
     
-    async def execute(self, action: str, params: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, action: str, params: dict[str, Any]) -> dict[str, Any]:
         """执行 V2EX 操作"""
         try:
             if action == "search_v2ex":
@@ -506,17 +506,17 @@ class V2EXChannel(BaseReachChannel):
         """验证 V2EX 配置"""
         return True  # V2EX 渠道不需要特殊配置
     
-    def check_health(self) -> Dict[str, Any]:
+    def check_health(self) -> dict[str, Any]:
         """检查 V2EX 渠道健康状态"""
         return {"status": "healthy", "message": "V2EX channel is healthy"}
     
-    def _search_v2ex(self, query: str, limit: int) -> Dict[str, Any]:
+    def _search_v2ex(self, query: str, limit: int) -> dict[str, Any]:
         """搜索 V2EX"""
         # 实际实现中需要访问 V2EX API
         # 这里返回模拟结果
         return {"results": [f"V2EX result {i} for {query}" for i in range(limit)]}
     
-    def _get_v2ex_post(self, url: str) -> Dict[str, Any]:
+    def _get_v2ex_post(self, url: str) -> dict[str, Any]:
         """获取 V2EX 帖子"""
         # 实际实现中需要访问 V2EX API
         # 这里返回模拟结果
@@ -532,7 +532,7 @@ class XiaohongshuChannel(BaseReachChannel):
     requires_auth = True
     requires_proxy = False
     
-    async def execute(self, action: str, params: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, action: str, params: dict[str, Any]) -> dict[str, Any]:
         """执行小红书操作"""
         try:
             if action == "search_xiaohongshu":
@@ -559,7 +559,7 @@ class XiaohongshuChannel(BaseReachChannel):
         except:
             return False
     
-    def check_health(self) -> Dict[str, Any]:
+    def check_health(self) -> dict[str, Any]:
         """检查小红书渠道健康状态"""
         try:
             if self.validate_config():
@@ -569,7 +569,7 @@ class XiaohongshuChannel(BaseReachChannel):
         except Exception as e:
             return {"status": "unhealthy", "message": str(e)}
     
-    def _run_mcporter_command(self, command: str) -> Dict[str, Any]:
+    def _run_mcporter_command(self, command: str) -> dict[str, Any]:
         """运行 mcporter 命令"""
         # 实际实现中需要调用 mcporter
         # 这里返回模拟结果
@@ -585,7 +585,7 @@ class WeiboChannel(BaseReachChannel):
     requires_auth = True
     requires_proxy = False
     
-    async def execute(self, action: str, params: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, action: str, params: dict[str, Any]) -> dict[str, Any]:
         """执行微博操作"""
         try:
             if action == "search_weibo":
@@ -615,7 +615,7 @@ class WeiboChannel(BaseReachChannel):
         except:
             return False
     
-    def check_health(self) -> Dict[str, Any]:
+    def check_health(self) -> dict[str, Any]:
         """检查微博渠道健康状态"""
         try:
             if self.validate_config():
@@ -625,7 +625,7 @@ class WeiboChannel(BaseReachChannel):
         except Exception as e:
             return {"status": "unhealthy", "message": str(e)}
     
-    def _run_mcporter_command(self, command: str) -> Dict[str, Any]:
+    def _run_mcporter_command(self, command: str) -> dict[str, Any]:
         """运行 mcporter 命令"""
         # 实际实现中需要调用 mcporter
         # 这里返回模拟结果
@@ -641,7 +641,7 @@ class DouyinChannel(BaseReachChannel):
     requires_auth = True
     requires_proxy = False
     
-    async def execute(self, action: str, params: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, action: str, params: dict[str, Any]) -> dict[str, Any]:
         """执行抖音操作"""
         try:
             if action == "get_douyin_video":
@@ -662,7 +662,7 @@ class DouyinChannel(BaseReachChannel):
         except:
             return False
     
-    def check_health(self) -> Dict[str, Any]:
+    def check_health(self) -> dict[str, Any]:
         """检查抖音渠道健康状态"""
         try:
             if self.validate_config():
@@ -672,7 +672,7 @@ class DouyinChannel(BaseReachChannel):
         except Exception as e:
             return {"status": "unhealthy", "message": str(e)}
     
-    def _run_mcporter_command(self, command: str) -> Dict[str, Any]:
+    def _run_mcporter_command(self, command: str) -> dict[str, Any]:
         """运行 mcporter 命令"""
         # 实际实现中需要调用 mcporter
         # 这里返回模拟结果
@@ -688,7 +688,7 @@ class LinkedInChannel(BaseReachChannel):
     requires_auth = True
     requires_proxy = False
     
-    async def execute(self, action: str, params: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, action: str, params: dict[str, Any]) -> dict[str, Any]:
         """执行 LinkedIn 操作"""
         try:
             if action == "search_linkedin":
@@ -714,7 +714,7 @@ class LinkedInChannel(BaseReachChannel):
         except:
             return False
     
-    def check_health(self) -> Dict[str, Any]:
+    def check_health(self) -> dict[str, Any]:
         """检查 LinkedIn 渠道健康状态"""
         try:
             if self.validate_config():
@@ -724,7 +724,7 @@ class LinkedInChannel(BaseReachChannel):
         except Exception as e:
             return {"status": "unhealthy", "message": str(e)}
     
-    def _run_mcporter_command(self, command: str) -> Dict[str, Any]:
+    def _run_mcporter_command(self, command: str) -> dict[str, Any]:
         """运行 mcporter 命令"""
         # 实际实现中需要调用 mcporter
         # 这里返回模拟结果
@@ -740,7 +740,7 @@ class RSSChannel(BaseReachChannel):
     requires_auth = False
     requires_proxy = False
     
-    async def execute(self, action: str, params: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, action: str, params: dict[str, Any]) -> dict[str, Any]:
         """执行 RSS 操作"""
         try:
             if action == "read_rss":
@@ -756,11 +756,11 @@ class RSSChannel(BaseReachChannel):
         """验证 RSS 配置"""
         return True  # RSS 渠道不需要特殊配置
     
-    def check_health(self) -> Dict[str, Any]:
+    def check_health(self) -> dict[str, Any]:
         """检查 RSS 渠道健康状态"""
         return {"status": "healthy", "message": "RSS channel is healthy"}
     
-    def _read_rss(self, url: str) -> Dict[str, Any]:
+    def _read_rss(self, url: str) -> dict[str, Any]:
         """读取 RSS"""
         # 实际实现中需要解析 RSS  feed
         # 这里返回模拟结果
@@ -776,7 +776,7 @@ class XueQiuChannel(BaseReachChannel):
     requires_auth = False
     requires_proxy = False
     
-    async def execute(self, action: str, params: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, action: str, params: dict[str, Any]) -> dict[str, Any]:
         """执行雪球操作"""
         try:
             if action == "search_xueqiu":
@@ -797,17 +797,17 @@ class XueQiuChannel(BaseReachChannel):
         """验证雪球配置"""
         return True  # 雪球渠道不需要特殊配置
     
-    def check_health(self) -> Dict[str, Any]:
+    def check_health(self) -> dict[str, Any]:
         """检查雪球渠道健康状态"""
         return {"status": "healthy", "message": "XueQiu channel is healthy"}
     
-    def _search_xueqiu(self, query: str, limit: int) -> Dict[str, Any]:
+    def _search_xueqiu(self, query: str, limit: int) -> dict[str, Any]:
         """搜索雪球"""
         # 实际实现中需要访问雪球 API
         # 这里返回模拟结果
         return {"results": [f"XueQiu result {i} for {query}" for i in range(limit)]}
     
-    def _get_xueqiu_stock(self, symbol: str) -> Dict[str, Any]:
+    def _get_xueqiu_stock(self, symbol: str) -> dict[str, Any]:
         """获取雪球股票信息"""
         # 实际实现中需要访问雪球 API
         # 这里返回模拟结果

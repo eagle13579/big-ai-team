@@ -461,7 +461,7 @@ class HealthChecker:
             
             async for db in get_db():
                 # 执行简单查询测试数据库连接
-                result = await db.execute("SELECT 1")
+                await db.execute("SELECT 1")
                 return {
                     "status": "healthy",
                     "connection": "ok"
