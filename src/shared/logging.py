@@ -68,7 +68,7 @@ class LoggingConfig:
         logger.add(
             str(self.log_dir / f"agent_{datetime.datetime.now().strftime('%Y%m%d')}.json"),
             level=self.log_level,
-            format=self.json_format,
+            format='{"timestamp": "{time}", "level": "{level}", "logger": "{name}", "function": "{function}", "line": {line}, "message": "{message}", "request_id": "{extra[request_id]}", "session_id": "{extra[session_id]}", "user_id": "{extra[user_id]}", "task_id": "{extra[task_id]}", "environment": "{extra[environment]}", "service": "{extra[service]}"}',
             rotation=self.max_log_size,
             retention=self.log_retention,
             compression="zip",
@@ -232,6 +232,8 @@ def get_logger(name: str | None = None) -> Callable:
             "session_id": session_id_var.get(),
             "user_id": user_id_var.get(),
             "task_id": task_id_var.get(),
+            "environment": os.getenv("ENV_MODE", "development"),
+            "service": os.getenv("SERVICE_NAME", "ace-agent"),
         }
         # 脱敏敏感数据
         kwargs = SensitiveDataFilter.mask_sensitive_data(kwargs)
@@ -250,6 +252,8 @@ def get_structured_logger(name: str | None = None):
             "session_id": session_id_var.get(),
             "user_id": user_id_var.get(),
             "task_id": task_id_var.get(),
+            "environment": os.getenv("ENV_MODE", "development"),
+            "service": os.getenv("SERVICE_NAME", "ace-agent"),
         }
         # 脱敏敏感数据
         kwargs = SensitiveDataFilter.mask_sensitive_data(kwargs)
@@ -269,6 +273,8 @@ def log_exception(exc: Exception, message: str = "未处理的异常"):
         "session_id": session_id_var.get(),
         "user_id": user_id_var.get(),
         "task_id": task_id_var.get(),
+        "environment": os.getenv("ENV_MODE", "development"),
+        "service": os.getenv("SERVICE_NAME", "ace-agent"),
     }
     logger.error(message, error=str(exc), traceback=traceback.format_exc(), **extra)
 

@@ -7,18 +7,42 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9090']
   
-  - job_name: 'ace_agent'
+  - job_name: 'ace_agent_bridge'
     metrics_path: '/metrics'
     static_configs:
-      - targets: ['app:8000']
+      - targets: ['bridge:8000']
         labels:
-          service: 'ace-agent'
+          service: 'bridge'
+          environment: 'production'
+
+  - job_name: 'ace_agent_core'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['core:8001']
+        labels:
+          service: 'core'
+          environment: 'production'
+
+  - job_name: 'ace_agent_api'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['api:8002']
+        labels:
+          service: 'api'
           environment: 'production'
 
   - job_name: 'ace_agent_local'
     metrics_path: '/metrics'
     static_configs:
+      - targets: ['host.docker.internal:8000']
+        labels:
+          service: 'bridge'
+          environment: 'development'
       - targets: ['host.docker.internal:8001']
         labels:
-          service: 'ace-agent'
+          service: 'core'
+          environment: 'development'
+      - targets: ['host.docker.internal:8002']
+        labels:
+          service: 'api'
           environment: 'development'

@@ -1,22 +1,68 @@
 version: '3.8'
 
 services:
-  app:
+  bridge:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile.bridge
     ports:
       - "8000:8000"
     environment:
       - ENV_MODE=production
+      - SERVICE_NAME=bridge
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/ace_agent
       - REDIS_URL=redis://redis:6379/0
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
     depends_on:
       - db
       - redis
+      - jaeger
     volumes:
       - ./output:/app/output
       - ./.secret_key:/app/.secret_key
+      - ./logs:/app/logs
+
+  core:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.core
+    ports:
+      - "8001:8001"
+    environment:
+      - ENV_MODE=production
+      - SERVICE_NAME=core
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/ace_agent
+      - REDIS_URL=redis://redis:6379/0
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
+    depends_on:
+      - db
+      - redis
+      - jaeger
+    volumes:
+      - ./output:/app/output
+      - ./.secret_key:/app/.secret_key
+      - ./logs:/app/logs
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    ports:
+      - "8002:8002"
+    environment:
+      - ENV_MODE=production
+      - SERVICE_NAME=api
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/ace_agent
+      - REDIS_URL=redis://redis:6379/0
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
+    depends_on:
+      - db
+      - redis
+      - jaeger
+    volumes:
+      - ./output:/app/output
+      - ./.secret_key:/app/.secret_key
+      - ./logs:/app/logs
 
   db:
     image: postgres:15-alpine
@@ -65,8 +111,60 @@ services:
       - prometheus
     restart: unless-stopped
 
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    restart: unless-stopped
+
+  # ELK Stack for log aggregation and analysis
+  elasticsearch:
+    image: elasticsearch:8.11.0
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - ELASTIC_PASSWORD=elastic123
+      - xpack.security.enabled=true
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    restart: unless-stopped
+
+  logstash:
+    image: logstash:8.11.0
+    ports:
+      - "5044:5044"
+      - "9600:9600"
+    volumes:
+      - ./logstash/pipeline:/usr/share/logstash/pipeline
+      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - ./logs:/app/logs
+    depends_on:
+      - elasticsearch
+    restart: unless-stopped
+
+  kibana:
+    image: kibana:8.11.0
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=elastic123
+    depends_on:
+      - elasticsearch
+    restart: unless-stopped
+
 volumes:
   postgres_data:
   redis_data:
   prometheus_data:
   grafana_data:
+  jaeger_data:
+  elasticsearch_data:
