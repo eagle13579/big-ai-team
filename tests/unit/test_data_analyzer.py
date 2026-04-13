@@ -1,9 +1,10 @@
-import unittest
 import asyncio
+import csv
+import json
 import os
 import tempfile
-import json
-import csv
+import unittest
+
 from src.skills.data_analyzer import DataAnalyzerSkill
 
 
@@ -97,7 +98,7 @@ class TestDataAnalyzerSkill(unittest.IsolatedAsyncioTestCase):
         
         # 验证文件已创建并包含正确内容
         self.assertTrue(os.path.exists(output_path))
-        with open(output_path, "r") as f:
+        with open(output_path) as f:
             exported_data = json.load(f)
         self.assertEqual(exported_data, test_data)
     

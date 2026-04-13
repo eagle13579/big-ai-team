@@ -1,9 +1,11 @@
-from src.skills.registry import register_skill
-from src.shared.logging import logger
 import asyncio
 import os
+from typing import Any, Dict, List
+
 import httpx
-from typing import List, Dict, Any
+
+from src.shared.logging import logger
+from src.skills.registry import register_skill
 
 
 class WebSearchSkill:
@@ -72,7 +74,7 @@ class WebSearchSkill:
                 "error": str(e)
             }
     
-    async def _serpapi_search(self, params: Dict[str, Any], timeout: int) -> List[Dict[str, Any]]:
+    async def _serpapi_search(self, params: dict[str, Any], timeout: int) -> list[dict[str, Any]]:
         """
         使用 SerpAPI 执行搜索
         
@@ -105,7 +107,7 @@ class WebSearchSkill:
         
         return results
     
-    def _mock_search(self, query: str, num: int) -> List[Dict[str, Any]]:
+    def _mock_search(self, query: str, num: int) -> list[dict[str, Any]]:
         """
         模拟搜索结果
         
@@ -125,7 +127,7 @@ class WebSearchSkill:
             })
         return mock_results
     
-    def _process_results(self, results: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def _process_results(self, results: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """
         处理搜索结果
         

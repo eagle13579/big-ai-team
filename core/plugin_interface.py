@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Any, List, Optional
+from typing import Any
 
 
 class BasePlugin(ABC):
@@ -36,7 +36,7 @@ class BasePlugin(ABC):
         pass
     
     @abstractmethod
-    def initialize(self, config: Dict[str, Any]) -> bool:
+    def initialize(self, config: dict[str, Any]) -> bool:
         """初始化插件
         
         Args:
@@ -48,7 +48,7 @@ class BasePlugin(ABC):
         pass
     
     @abstractmethod
-    def get_status(self) -> Dict[str, Any]:
+    def get_status(self) -> dict[str, Any]:
         """获取插件状态
         
         Returns:
@@ -65,7 +65,7 @@ class BasePlugin(ABC):
         """
         pass
     
-    def get_dependencies(self) -> List[str]:
+    def get_dependencies(self) -> list[str]:
         """获取插件依赖
         
         Returns:
@@ -73,7 +73,7 @@ class BasePlugin(ABC):
         """
         return []
     
-    def get_config_schema(self) -> Dict[str, Any]:
+    def get_config_schema(self) -> dict[str, Any]:
         """获取配置 schema
         
         Returns:
@@ -81,7 +81,7 @@ class BasePlugin(ABC):
         """
         return {}
     
-    def validate_config(self, config: Dict[str, Any]) -> bool:
+    def validate_config(self, config: dict[str, Any]) -> bool:
         """验证配置
         
         Args:
@@ -92,7 +92,7 @@ class BasePlugin(ABC):
         """
         return True
     
-    def get_health_check(self) -> Dict[str, Any]:
+    def get_health_check(self) -> dict[str, Any]:
         """健康检查
         
         Returns:
@@ -113,7 +113,7 @@ class ChannelPlugin(BasePlugin):
         return "channel"
     
     @abstractmethod
-    def send_message(self, message: Dict[str, Any]) -> bool:
+    def send_message(self, message: dict[str, Any]) -> bool:
         """发送消息
         
         Args:
@@ -125,7 +125,7 @@ class ChannelPlugin(BasePlugin):
         pass
     
     @abstractmethod
-    def receive_message(self) -> Optional[Dict[str, Any]]:
+    def receive_message(self) -> dict[str, Any] | None:
         """接收消息
         
         Returns:
@@ -142,7 +142,7 @@ class ToolPlugin(BasePlugin):
         return "tool"
     
     @abstractmethod
-    def execute(self, args: Dict[str, Any]) -> Dict[str, Any]:
+    def execute(self, args: dict[str, Any]) -> dict[str, Any]:
         """执行工具操作
         
         Args:
@@ -153,7 +153,7 @@ class ToolPlugin(BasePlugin):
         """
         pass
     
-    def get_parameters(self) -> Dict[str, Any]:
+    def get_parameters(self) -> dict[str, Any]:
         """获取参数定义
         
         Returns:
@@ -216,7 +216,7 @@ class PluginManagerInterface(ABC):
         pass
     
     @abstractmethod
-    def get_plugin(self, plugin_name: str) -> Optional[BasePlugin]:
+    def get_plugin(self, plugin_name: str) -> BasePlugin | None:
         """获取插件
         
         Args:
@@ -228,7 +228,7 @@ class PluginManagerInterface(ABC):
         pass
     
     @abstractmethod
-    def get_all_plugins(self) -> Dict[str, BasePlugin]:
+    def get_all_plugins(self) -> dict[str, BasePlugin]:
         """获取所有插件
         
         Returns:
@@ -237,7 +237,7 @@ class PluginManagerInterface(ABC):
         pass
     
     @abstractmethod
-    def initialize_all(self, config: Dict[str, Any]) -> bool:
+    def initialize_all(self, config: dict[str, Any]) -> bool:
         """初始化所有插件
         
         Args:
@@ -258,7 +258,7 @@ class PluginManagerInterface(ABC):
         pass
     
     @abstractmethod
-    def get_plugin_status(self, plugin_name: str) -> Dict[str, Any]:
+    def get_plugin_status(self, plugin_name: str) -> dict[str, Any]:
         """获取插件状态
         
         Args:
@@ -270,7 +270,7 @@ class PluginManagerInterface(ABC):
         pass
     
     @abstractmethod
-    def get_health_status(self) -> Dict[str, Any]:
+    def get_health_status(self) -> dict[str, Any]:
         """获取健康状态
         
         Returns:

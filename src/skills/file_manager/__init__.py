@@ -241,12 +241,12 @@ class FileManagerTool(BaseSkill):
                     "status": "error",
                     "observation": {
                         "data": None,
-                        "message": f"文件过大，最大支持10MB",
+                        "message": "文件过大，最大支持10MB",
                         "timestamp": self._get_timestamp(),
                     },
                 }
 
-            with open(file_path, "r", encoding="utf-8", errors="replace") as f:
+            with open(file_path, encoding="utf-8", errors="replace") as f:
                 content = f.read()
 
             return {

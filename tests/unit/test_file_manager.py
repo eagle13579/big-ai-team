@@ -1,7 +1,8 @@
-import unittest
 import os
 import tempfile
-from src.skills.file_manager import FileManagerTool, FileManagerArgsSchema
+import unittest
+
+from src.skills.file_manager import FileManagerTool
 
 
 class TestFileManagerTool(unittest.IsolatedAsyncioTestCase):
@@ -34,7 +35,7 @@ class TestFileManagerTool(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result["status"], "success")
         
         # 验证文件内容
-        with open(file_path, "r", encoding="utf-8") as f:
+        with open(file_path, encoding="utf-8") as f:
             self.assertEqual(f.read(), content)
     
     def test_read_file(self):
@@ -154,7 +155,7 @@ class TestFileManagerTool(unittest.IsolatedAsyncioTestCase):
         # 验证文件已复制
         self.assertTrue(os.path.exists(source_path))
         self.assertTrue(os.path.exists(target_path))
-        with open(target_path, "r") as f:
+        with open(target_path) as f:
             self.assertEqual(f.read(), "content")
     
     def test_move_file(self):

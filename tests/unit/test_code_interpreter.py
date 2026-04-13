@@ -1,5 +1,6 @@
-import unittest
 import asyncio
+import unittest
+
 from src.skills.code_interpreter import CodeInterpreterSkill
 
 

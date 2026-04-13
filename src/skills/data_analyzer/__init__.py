@@ -1,10 +1,11 @@
-from src.skills.registry import register_skill
-from src.shared.logging import logger
 import asyncio
-import os
-import json
 import csv
-from typing import List, Dict, Any, Optional
+import json
+import os
+from typing import Any, Dict, List, Optional
+
+from src.shared.logging import logger
+from src.skills.registry import register_skill
 
 
 class DataAnalyzerSkill:
@@ -105,7 +106,7 @@ class DataAnalyzerSkill:
         delimiter = kwargs.get("delimiter", ",")
         
         data = []
-        with open(file_path, "r", encoding=encoding, newline="") as f:
+        with open(file_path, encoding=encoding, newline="") as f:
             reader = csv.DictReader(f, delimiter=delimiter)
             for row in reader:
                 data.append(row)
@@ -131,7 +132,7 @@ class DataAnalyzerSkill:
         """
         encoding = kwargs.get("encoding", "utf-8")
         
-        with open(file_path, "r", encoding=encoding) as f:
+        with open(file_path, encoding=encoding) as f:
             data = json.load(f)
         
         return {
@@ -177,7 +178,7 @@ class DataAnalyzerSkill:
                 "error": f"读取 Excel 文件失败: {str(e)}"
             }
     
-    async def _analyze_data(self, data: List[Dict[str, Any]], analysis_type: str, **kwargs) -> dict:
+    async def _analyze_data(self, data: list[dict[str, Any]], analysis_type: str, **kwargs) -> dict:
         """
         分析数据
         
@@ -209,7 +210,7 @@ class DataAnalyzerSkill:
                 "error": f"分析数据失败: {str(e)}"
             }
     
-    def _basic_analysis(self, data: List[Dict[str, Any]], **kwargs) -> dict:
+    def _basic_analysis(self, data: list[dict[str, Any]], **kwargs) -> dict:
         """
         基本统计分析
         
@@ -249,7 +250,7 @@ class DataAnalyzerSkill:
             "message": "基本统计分析完成"
         }
     
-    def _correlation_analysis(self, data: List[Dict[str, Any]], **kwargs) -> dict:
+    def _correlation_analysis(self, data: list[dict[str, Any]], **kwargs) -> dict:
         """
         相关性分析
         
@@ -285,7 +286,7 @@ class DataAnalyzerSkill:
                 "error": f"相关性分析失败: {str(e)}"
             }
     
-    def _trend_analysis(self, data: List[Dict[str, Any]], **kwargs) -> dict:
+    def _trend_analysis(self, data: list[dict[str, Any]], **kwargs) -> dict:
         """
         趋势分析
         
@@ -355,7 +356,7 @@ class DataAnalyzerSkill:
                 "error": f"趋势分析失败: {str(e)}"
             }
     
-    async def _visualize_data(self, data: List[Dict[str, Any]], **kwargs) -> dict:
+    async def _visualize_data(self, data: list[dict[str, Any]], **kwargs) -> dict:
         """
         数据可视化
         
@@ -418,7 +419,7 @@ class DataAnalyzerSkill:
                 "error": f"数据可视化失败: {str(e)}"
             }
     
-    async def _export_data(self, data: List[Dict[str, Any]], export_format: str, **kwargs) -> dict:
+    async def _export_data(self, data: list[dict[str, Any]], export_format: str, **kwargs) -> dict:
         """
         导出数据
         
@@ -452,7 +453,7 @@ class DataAnalyzerSkill:
                 "error": f"导出数据失败: {str(e)}"
             }
     
-    def _export_csv(self, data: List[Dict[str, Any]], output_path: str) -> dict:
+    def _export_csv(self, data: list[dict[str, Any]], output_path: str) -> dict:
         """
         导出为 CSV 文件
         
@@ -480,7 +481,7 @@ class DataAnalyzerSkill:
             "message": f"成功导出为 CSV 文件: {output_path}"
         }
     
-    def _export_json(self, data: List[Dict[str, Any]], output_path: str) -> dict:
+    def _export_json(self, data: list[dict[str, Any]], output_path: str) -> dict:
         """
         导出为 JSON 文件
         
@@ -500,7 +501,7 @@ class DataAnalyzerSkill:
             "message": f"成功导出为 JSON 文件: {output_path}"
         }
     
-    def _export_excel(self, data: List[Dict[str, Any]], output_path: str) -> dict:
+    def _export_excel(self, data: list[dict[str, Any]], output_path: str) -> dict:
         """
         导出为 Excel 文件
         

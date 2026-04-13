@@ -1,5 +1,6 @@
 import os
 import tempfile
+
 import pytest
 
 from src.skills.file_ops import FileOpsTool
@@ -45,7 +46,7 @@ def test_write_file(file_ops_tool, temp_dir):
     assert result["status"] == "success"
     assert "文件写入成功" in result["observation"]["message"]
     # 验证文件内容
-    with open(file_path, "r") as f:
+    with open(file_path) as f:
         assert f.read() == content
 
 
@@ -76,7 +77,7 @@ def test_copy_file(file_ops_tool, temp_file, temp_dir):
     assert "文件复制成功" in result["observation"]["message"]
     # 验证文件已复制
     assert os.path.exists(target_path)
-    with open(target_path, "r") as f:
+    with open(target_path) as f:
         assert f.read() == "Hello, World!"
 
 

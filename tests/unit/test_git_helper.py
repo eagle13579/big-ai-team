@@ -1,9 +1,9 @@
-import unittest
 import os
-import tempfile
 import shutil
-from unittest.mock import patch, MagicMock
-from src.skills.git_helper import GitHelperTool, GitArgsSchema
+import tempfile
+import unittest
+
+from src.skills.git_helper import GitHelperTool
 
 
 class TestGitHelperTool(unittest.IsolatedAsyncioTestCase):

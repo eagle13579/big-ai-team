@@ -1,6 +1,6 @@
-import unittest
 import asyncio
-from unittest.mock import patch, MagicMock
+import unittest
+
 from src.skills.web_search import WebSearchSkill
 
 

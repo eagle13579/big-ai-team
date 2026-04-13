@@ -1,15 +1,15 @@
 import argparse
+import importlib.util
 import json
 import os
 import sys
-import importlib.util
-from typing import Dict, Any, List, Optional
+from typing import Any
 
 # 添加项目根目录到Python路径
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from core.plugin_interface import BasePlugin, PluginManagerInterface
 from core.channel_manager import ChannelManager
+from core.plugin_interface import BasePlugin, PluginManagerInterface
 
 
 class PluginManager(PluginManagerInterface):
@@ -22,9 +22,9 @@ class PluginManager(PluginManagerInterface):
             plugin_dir: 插件目录
         """
         self.plugin_dir = plugin_dir
-        self.plugins: Dict[str, BasePlugin] = {}
-        self.plugin_configs: Dict[str, Dict[str, Any]] = {}
-        self.plugin_status: Dict[str, str] = {}
+        self.plugins: dict[str, BasePlugin] = {}
+        self.plugin_configs: dict[str, dict[str, Any]] = {}
+        self.plugin_status: dict[str, str] = {}
         self.channel_manager = ChannelManager(plugin_dir)
     
     def load_plugin(self, plugin_path: str) -> bool:
@@ -54,7 +54,7 @@ class PluginManager(PluginManagerInterface):
             
             # 查找插件类
             plugin_class = None
-            for name, obj in module.__dict__.items():
+            for _name, obj in module.__dict__.items():
                 if isinstance(obj, type) and issubclass(obj, BasePlugin) and obj != BasePlugin:
                     plugin_class = obj
                     break
@@ -108,7 +108,7 @@ class PluginManager(PluginManagerInterface):
             print(f"卸载插件失败: {str(e)}")
             return False
     
-    def get_plugin(self, plugin_name: str) -> Optional[BasePlugin]:
+    def get_plugin(self, plugin_name: str) -> BasePlugin | None:
         """获取插件
         
         Args:
@@ -119,7 +119,7 @@ class PluginManager(PluginManagerInterface):
         """
         return self.plugins.get(plugin_name)
     
-    def get_all_plugins(self) -> Dict[str, BasePlugin]:
+    def get_all_plugins(self) -> dict[str, BasePlugin]:
         """获取所有插件
         
         Returns:
@@ -127,7 +127,7 @@ class PluginManager(PluginManagerInterface):
         """
         return self.plugins
     
-    def initialize_all(self, config: Dict[str, Any]) -> bool:
+    def initialize_all(self, config: dict[str, Any]) -> bool:
         """初始化所有插件
         
         Args:
@@ -193,7 +193,7 @@ class PluginManager(PluginManagerInterface):
             print(f"关闭所有插件失败: {str(e)}")
             return False
     
-    def get_plugin_status(self, plugin_name: str) -> Dict[str, Any]:
+    def get_plugin_status(self, plugin_name: str) -> dict[str, Any]:
         """获取插件状态
         
         Args:
@@ -224,7 +224,7 @@ class PluginManager(PluginManagerInterface):
         
         return status
     
-    def get_health_status(self) -> Dict[str, Any]:
+    def get_health_status(self) -> dict[str, Any]:
         """获取健康状态
         
         Returns:
@@ -259,7 +259,7 @@ class PluginManager(PluginManagerInterface):
                 plugin_path = os.path.join(self.plugin_dir, filename)
                 self.load_plugin(plugin_path)
     
-    def _sort_plugins_by_dependency(self) -> List[str]:
+    def _sort_plugins_by_dependency(self) -> list[str]:
         """按依赖顺序排序插件
         
         Returns:
