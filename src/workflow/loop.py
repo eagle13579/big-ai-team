@@ -29,8 +29,8 @@ class MemoryManager:
     def __init__(
         self,
         memory_dir: str = "memory",
-        max_short_term_memory: int = 50,  # 减少短期记忆容量
-        memory_limit_mb: int = 80,  # 降低内存限制
+        max_short_term_memory: int = 50,  # 短期记忆容量
+        memory_limit_mb: int = 512,  # 提高内存限制
     ):
         self.memory_dir = Path(memory_dir)
         self.memory_dir.mkdir(exist_ok=True)
@@ -40,7 +40,7 @@ class MemoryManager:
         self.memory_limit_mb = memory_limit_mb
         self._load_long_term_memory()
         self._memory_usage_history = []
-        self._memory_check_interval = 5  # 内存检查间隔（任务数）
+        self._memory_check_interval = 10  # 增加内存检查间隔
         self._task_count = 0
 
     def add_to_short_term_memory(self, item: dict[str, Any]):

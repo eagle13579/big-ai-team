@@ -19,7 +19,7 @@ class TestSettings:
         assert settings.DATABASE_URL == "sqlite:///./test.db"
         assert settings.REDIS_URL == "redis://localhost:6379/0"
         assert settings.SECRET_KEY == "test_secret_key_123456789012345678901234567890"
-        assert settings.CONFIG_VERSION == "2.0.0"
+        assert settings.CONFIG_VERSION == "3.0.0"
 
     def test_settings_validation(self):
         """测试配置验证"""
@@ -52,7 +52,7 @@ class TestConfigManager:
         os.environ["SECRET_KEY"] = "test_secret_key_123456789012345678901234567890"
 
         config_manager = ConfigManager()
-        assert config_manager.get_config_version() == "2.0.0"
+        assert config_manager.get_config_version() == "3.0.0"
 
     def test_config_export_import(self, tmp_path):
         """测试配置导出和导入"""
