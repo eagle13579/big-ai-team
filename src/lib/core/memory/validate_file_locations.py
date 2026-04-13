@@ -52,7 +52,7 @@ def generate_validation_report():
     
     # 保留历史记录（如果存在）
     if os.path.exists(report_file):
-        with open(report_file, "r", encoding="utf-8") as f:
+        with open(report_file, encoding="utf-8") as f:
             existing_content = f.read()
         
         # 提取历史记录（所有在核心模块状态概览之前的内容）
