@@ -4,6 +4,8 @@ on:
   workflow_run:
     workflows: ["Production-Grade AI Core Protection Pipeline"]
     types: [completed]
+  push:
+    branches: [main]
 
 jobs:
   summary:
@@ -26,3 +28,29 @@ jobs:
             echo "### ⚠️ 风险警报" >> $GITHUB_STEP_SUMMARY
             echo "❌ 构建中断。请立即检查主流水线中的 **Step 4 (测试)** 或 **Step 6 (审计)**。" >> $GITHUB_STEP_SUMMARY
           fi
+
+  update-validation-report:
+    name: "🔍 Update Module Validation Report"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "📥 Checkout Repository"
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: "🐍 Set up Python"
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: "🔍 Run Validation Script"
+        run: python src/lib/core/memory/validate_file_locations.py
+
+      - name: "📤 Commit Updated Report"
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add memory/module_validation_report.md
+          git commit -m "Update module validation report" || echo "No changes to commit"
+          git push origin main || echo "Push failed"
