@@ -11,7 +11,8 @@ from unittest.mock import patch
 # 添加项目根目录到 Python 路径
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
-from core.algorithm import MemPalaceCore, run as core_run
+from core.algorithm import MemPalaceCore
+from core.algorithm import run as core_run
 
 
 class TestMemPalaceCore(unittest.TestCase):

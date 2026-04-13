@@ -1,8 +1,8 @@
+import http.server
 import importlib
+import socketserver
 import sys
 import threading
-import http.server
-import socketserver
 from pathlib import Path
 from typing import Any
 

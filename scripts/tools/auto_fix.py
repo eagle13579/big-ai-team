@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 [Nova 智能代码自愈脚本 v3.3]
 强化版：自动修复风格并具备“脏文件”容错能力，确保流水线不因个别文件损坏而中断。
 """
 
+import os
 import subprocess
 import sys
-import os
 from pathlib import Path
+
 
 def run_fix():
     try:

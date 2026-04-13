@@ -1,7 +1,8 @@
+import asyncio
 import sys
 import time
-import asyncio
 from pathlib import Path
+
 import prometheus_client
 import psutil
 from prometheus_client import Counter, Gauge, Histogram, Info
@@ -14,6 +15,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from src.shared.config import settings
 from src.shared.logging import logger
+
 
 # --- OpenTelemetry 模块安全导入区 ---
 def safe_import(module_path, class_name):
@@ -114,7 +116,7 @@ def init_telemetry():
     # 1. 检查核心追踪组件是否完整
     core_deps = [trace, OTLPSpanExporter, TracerProvider, BatchSpanProcessor]
     if not all(core_deps):
-        missing = [name for name, val in zip(["trace", "OTLPSpanExporter", "TracerProvider", "BatchSpanProcessor"], core_deps) if val is None]
+        missing = [name for name, val in zip(["trace", "OTLPSpanExporter", "TracerProvider", "BatchSpanProcessor"], core_deps, strict=False) if val is None]
         logger.warning(f"⚠️ OpenTelemetry 基础依赖缺失 ({', '.join(missing)})，追踪功能已禁用")
         return
 
@@ -272,7 +274,7 @@ class HealthChecker:
 
 def performance_monitor(func):
     def wrapper(*args, **kwargs):
-        start = time.time()
+        time.time()
         try:
             return func(*args, **kwargs)
         finally:

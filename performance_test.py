@@ -4,11 +4,12 @@
 """
 
 import asyncio
-import aiohttp
-import time
 import json
-import threading
 import statistics
+import threading
+import time
+
+import aiohttp
 
 # 测试配置
 BASE_URL = "http://localhost:8000"
@@ -95,7 +96,7 @@ async def run_user(session, user_id):
 
 async def main():
     """主测试函数"""
-    print(f"开始性能测试...")
+    print("开始性能测试...")
     print(f"并发用户数: {CONCURRENT_USERS}")
     print(f"每个用户请求数: {REQUESTS_PER_USER}")
     print(f"总请求数: {TOTAL_REQUESTS}")
