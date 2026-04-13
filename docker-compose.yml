@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: docker/Dockerfile.bridge
     ports:
-      - "8000:8000"
+      - "8003:8000"
     environment:
       - ENV_MODE=production
       - SERVICE_NAME=bridge
@@ -27,7 +27,7 @@ services:
       context: .
       dockerfile: docker/Dockerfile.core
     ports:
-      - "8001:8001"
+      - "8004:8001"
     environment:
       - ENV_MODE=production
       - SERVICE_NAME=core
@@ -73,7 +73,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5435:5432"
 
   redis:
     image: redis:7-alpine

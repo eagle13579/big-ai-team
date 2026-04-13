@@ -81,7 +81,7 @@ class HealthCheckHandler(http.server.SimpleHTTPRequestHandler):
 
 def start_health_check_server():
     """启动健康检查服务器"""
-    port = 8000
+    port = 8001
     with socketserver.TCPServer(("", port), HealthCheckHandler) as httpd:
         print(f"✅ [Bridge] 健康检查服务器启动在端口 {port}")
         httpd.serve_forever()

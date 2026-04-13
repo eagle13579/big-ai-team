@@ -22,3 +22,11 @@ numpy>=1.26.0      # 高性能数值计算
 pandas>=2.2.0     # 数据处理
 requests>=2.31.0   # 健壮的网络请求
 pre-commit==3.5.0  # 代码提交前自动执行检查
+
+opentelemetry-api
+opentelemetry-sdk
+redis>=4.0.0
+opentelemetry-instrumentation-redis
+opentelemetry-instrumentation-redis
+opentelemetry-instrumentation-fastapi
+opentelemetry-instrumentation-aiohttp-client

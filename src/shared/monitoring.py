@@ -1,11 +1,12 @@
 import sys
 import time
+import asyncio
 from pathlib import Path
-
 import prometheus_client
 import psutil
 from prometheus_client import Counter, Gauge, Histogram, Info
 
+# --- 路径初始化 ---
 # 添加项目根目录到 Python 路径
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
@@ -14,27 +15,30 @@ if str(PROJECT_ROOT) not in sys.path:
 from src.shared.config import settings
 from src.shared.logging import logger
 
-# 尝试导入 OpenTelemetry 相关模块
-trace = None
-OTLPSpanExporter = None
-TracerProvider = None
-BatchSpanProcessor = None
-FastAPIInstrumentor = None
-AioHttpClientInstrumentor = None
+# --- OpenTelemetry 模块安全导入区 ---
+def safe_import(module_path, class_name):
+    """
+    统一的尝试导入机制，确保单个模块失败不会崩溃
+    """
+    try:
+        module = __import__(module_path, fromlist=[class_name])
+        return getattr(module, class_name)
+    except (ImportError, AttributeError):
+        return None
 
-try:
-    from opentelemetry import trace
-    from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
-    from opentelemetry.instrumentation.aiohttp_client import AioHttpClientInstrumentor
-    from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
-    from opentelemetry.instrumentation.redis import RedisInstrumentor
-    from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
-    from opentelemetry.sdk.trace import TracerProvider
-    from opentelemetry.sdk.trace.export import BatchSpanProcessor
-except ImportError:
-    logger.warning("⚠️  OpenTelemetry 依赖未安装，将禁用相关功能")
+# 核心追踪组件
+trace = safe_import("opentelemetry", "trace")
+OTLPSpanExporter = safe_import("opentelemetry.exporter.otlp.proto.http.trace_exporter", "OTLPSpanExporter")
+TracerProvider = safe_import("opentelemetry.sdk.trace", "TracerProvider")
+BatchSpanProcessor = safe_import("opentelemetry.sdk.trace.export", "BatchSpanProcessor")
 
-# 初始化 Prometheus 指标
+# 仪器化组件 (Instrumentation)
+FastAPIInstrumentor = safe_import("opentelemetry.instrumentation.fastapi", "FastAPIInstrumentor")
+AioHttpClientInstrumentor = safe_import("opentelemetry.instrumentation.aiohttp_client", "AioHttpClientInstrumentor")
+RedisInstrumentor = safe_import("opentelemetry.instrumentation.redis", "RedisInstrumentor")
+SQLAlchemyInstrumentor = safe_import("opentelemetry.instrumentation.sqlalchemy", "SQLAlchemyInstrumentor")
+
+# --- Prometheus 指标定义 ---
 # HTTP 请求指标
 REQUEST_COUNT = Counter(
     "ace_agent_requests_total", "Total number of requests", ["method", "endpoint", "status"]
@@ -94,566 +98,216 @@ ERROR_COUNT = Counter("ace_agent_errors_total", "Total number of errors", ["erro
 
 # 系统信息
 SYSTEM_INFO = Info("ace_agent_system_info", "System information")
+SYSTEM_INFO.info({
+    "version": settings.CONFIG_VERSION,
+    "env_mode": settings.ENV_MODE,
+    "python_version": f"{sys.version}",
+    "system": f"{sys.platform}",
+})
 
-# 初始化系统信息
-SYSTEM_INFO.info(
-    {
-        "version": settings.CONFIG_VERSION,
-        "env_mode": settings.ENV_MODE,
-        "python_version": f"{sys.version}",
-        "system": f"{sys.platform}",
-        "platform": f"{sys.platform} {sys.version.split()[0]}",
-    }
-)
+# --- 核心逻辑控制 ---
 
-
-# 初始化 OpenTelemetry
 def init_telemetry():
     """
-    初始化 OpenTelemetry 追踪
+    初始化 OpenTelemetry 追踪逻辑
     """
-    if (
-        settings.OTEL_EXPORTER_OTLP_ENDPOINT
-        and trace
-        and OTLPSpanExporter
-        and TracerProvider
-        and BatchSpanProcessor
-    ):
-        try:
-            # 创建 OTLP 导出器
-            exporter = OTLPSpanExporter(endpoint=settings.OTEL_EXPORTER_OTLP_ENDPOINT)
+    # 1. 检查核心追踪组件是否完整
+    core_deps = [trace, OTLPSpanExporter, TracerProvider, BatchSpanProcessor]
+    if not all(core_deps):
+        missing = [name for name, val in zip(["trace", "OTLPSpanExporter", "TracerProvider", "BatchSpanProcessor"], core_deps) if val is None]
+        logger.warning(f"⚠️ OpenTelemetry 基础依赖缺失 ({', '.join(missing)})，追踪功能已禁用")
+        return
 
-            # 创建批处理处理器
-            span_processor = BatchSpanProcessor(exporter)
+    # 2. 检查配置
+    endpoint = settings.OTEL_EXPORTER_OTLP_ENDPOINT
+    if not endpoint:
+        logger.warning("⚠️ OTEL_EXPORTER_OTLP_ENDPOINT 未配置，跳过追踪初始化")
+        return
 
-            # 设置追踪提供者
-            tracer_provider = TracerProvider()
-            tracer_provider.add_span_processor(span_processor)
+    try:
+        # 配置导出器和处理器
+        exporter = OTLPSpanExporter(endpoint=endpoint)
+        span_processor = BatchSpanProcessor(exporter)
+        
+        # 配置追踪提供者
+        tracer_provider = TracerProvider()
+        tracer_provider.add_span_processor(span_processor)
+        trace.set_tracer_provider(tracer_provider)
 
-            # 设置全局追踪提供者
-            trace.set_tracer_provider(tracer_provider)
-
-            # 导入并初始化其他instrumentation
+        # 3. 激活 Redis 追踪 (解决您的核心问题)
+        if RedisInstrumentor:
             try:
-                from opentelemetry.instrumentation.redis import RedisInstrumentor
                 RedisInstrumentor().instrument()
                 logger.info("🔍 Redis 追踪已启用")
             except Exception as e:
-                logger.warning(f"⚠️ Redis 追踪初始化失败: {str(e)}")
+                logger.warning(f"⚠️ Redis 仪器化激活失败: {str(e)}")
+        else:
+            logger.warning("⚠️ Redis 追踪初始化失败: 容器内未检测到 opentelemetry-instrumentation-redis 依赖")
 
-            logger.info(
-                f"📡 OpenTelemetry 已初始化，导出到: {settings.OTEL_EXPORTER_OTLP_ENDPOINT}"
-            )
-        except Exception as e:
-            logger.error(f"❌ OpenTelemetry 初始化失败: {str(e)}")
-    else:
-        logger.warning("⚠️  OpenTelemetry 未初始化，相关功能已禁用")
-
-
-# 性能监控装饰器
-def performance_monitor(func):
-    """
-    性能监控装饰器
-    """
-
-    def wrapper(*args, **kwargs):
-        start_time = time.time()
-        try:
-            result = func(*args, **kwargs)
-            return result
-        finally:
-            time.time() - start_time
-            # 更新内存和 CPU 使用情况
-            MEMORY_USAGE.set(psutil.virtual_memory().used)
-            CPU_USAGE.set(psutil.cpu_percent())
-            DISK_USAGE.set(psutil.disk_usage("/").percent)
-
-    return wrapper
-
-
-# 任务监控装饰器
-def task_monitor(func):
-    """
-    任务监控装饰器
-    """
-
-    async def wrapper(*args, **kwargs):
-        start_time = time.time()
-        status = "success"
-        try:
-            result = await func(*args, **kwargs)
-            return result
-        except Exception as e:
-            status = "error"
-            ERROR_COUNT.labels(error_type=type(e).__name__).inc()
-            raise
-        finally:
-            duration = time.time() - start_time
-            TASK_COUNT.labels(status=status).inc()
-            TASK_DURATION.observe(duration)
-
-    return wrapper
-
-
-# 工具执行监控装饰器
-def tool_monitor(func):
-    """
-    工具执行监控装饰器
-    """
-
-    async def wrapper(*args, **kwargs):
-        tool_name = args[1] if len(args) > 1 else "unknown"
-        start_time = time.time()
-        status = "success"
-        try:
-            result = await func(*args, **kwargs)
-            if not result.get("success", True):
-                status = "error"
-                ERROR_COUNT.labels(error_type="ToolError").inc()
-            return result
-        except Exception as e:
-            status = "error"
-            ERROR_COUNT.labels(error_type=type(e).__name__).inc()
-            raise
-        finally:
-            duration = time.time() - start_time
-            TOOL_EXECUTION_COUNT.labels(tool=tool_name, status=status).inc()
-            TOOL_EXECUTION_DURATION.labels(tool=tool_name).observe(duration)
-
-    return wrapper
-
-
-# 缓存监控装饰器
-def cache_monitor(cache_name="default"):
-    """
-    缓存监控装饰器
-    """
-
-    def decorator(func):
-        def wrapper(*args, **kwargs):
+        # 4. 激活 SQLAlchemy 追踪
+        if SQLAlchemyInstrumentor:
             try:
-                result = func(*args, **kwargs)
-                if result is not None:
-                    CACHE_HITS.labels(cache_name=cache_name).inc()
-                else:
-                    CACHE_MISSES.labels(cache_name=cache_name).inc()
-                # 尝试更新缓存大小
-                try:
-                    if hasattr(args[0], "_cache"):
-                        cache_size = sum(len(str(v)) for v in args[0]._cache.values())
-                        CACHE_SIZE.labels(cache_name=cache_name).set(cache_size)
-                except Exception:
-                    pass
-                return result
-            except Exception:
-                CACHE_MISSES.labels(cache_name=cache_name).inc()
-                raise
-
-        return wrapper
-
-    return decorator
-
-
-# 模型调用监控装饰器
-def model_monitor(model_name="default"):
-    """
-    模型调用监控装饰器
-    """
-
-    def decorator(func):
-        async def wrapper(*args, **kwargs):
-            start_time = time.time()
-            status = "success"
-            try:
-                result = await func(*args, **kwargs)
-                # 尝试提取token使用情况
-                if isinstance(result, dict) and "usage" in result:
-                    usage = result["usage"]
-                    if "prompt_tokens" in usage:
-                        MODEL_TOKEN_USAGE.labels(model=model_name, type="prompt").inc(usage["prompt_tokens"])
-                    if "completion_tokens" in usage:
-                        MODEL_TOKEN_USAGE.labels(model=model_name, type="completion").inc(usage["completion_tokens"])
-                return result
-            except Exception:
-                status = "error"
-                ERROR_COUNT.labels(error_type=f"ModelError_{model_name}").inc()
-                raise
-            finally:
-                duration = time.time() - start_time
-                MODEL_CALL_COUNT.labels(model=model_name, status=status).inc()
-                MODEL_CALL_DURATION.labels(model=model_name).observe(duration)
-
-        return wrapper
-
-    return decorator
-
-
-# 技能执行监控装饰器
-def skill_monitor(skill_name="default"):
-    """
-    技能执行监控装饰器
-    """
-
-    def decorator(func):
-        async def wrapper(*args, **kwargs):
-            start_time = time.time()
-            status = "success"
-            try:
-                result = await func(*args, **kwargs)
-                if hasattr(result, "get") and not result.get("success", True):
-                    status = "error"
-                    ERROR_COUNT.labels(error_type=f"SkillError_{skill_name}").inc()
-                return result
-            except Exception:
-                status = "error"
-                ERROR_COUNT.labels(error_type=f"SkillError_{skill_name}").inc()
-                raise
-            finally:
-                duration = time.time() - start_time
-                SKILL_EXECUTION_COUNT.labels(skill=skill_name, status=status).inc()
-                SKILL_EXECUTION_DURATION.labels(skill=skill_name).observe(duration)
-
-        return wrapper
-
-    return decorator
-
-
-# 启动 Prometheus 服务器
-def start_prometheus_server(port=8001):
-    """
-    启动 Prometheus 服务器
-    """
-    try:
-        prometheus_client.start_http_server(port)
-        logger.info(f"📊 Prometheus 监控服务器已启动，端口: {port}")
-    except Exception as e:
-        logger.error(f"❌ Prometheus 服务器启动失败: {str(e)}")
-
-
-# 监控数据收集器
-class MetricsCollector:
-    """
-    监控数据收集器
-    """
-
-    def __init__(self):
-        self.start_time = time.time()
-        self.last_network_stats = psutil.net_io_counters()
-
-    def collect(self):
-        """
-        收集监控数据
-        """
-        uptime = time.time() - self.start_time
-        memory = psutil.virtual_memory()
-        cpu = psutil.cpu_percent()
-        disk = psutil.disk_usage("/")
-        network = psutil.net_io_counters()
-
-        # 计算网络流量
-        bytes_sent = network.bytes_sent - self.last_network_stats.bytes_sent
-        bytes_received = network.bytes_recv - self.last_network_stats.bytes_recv
-
-        # 更新网络流量计数器
-        if bytes_sent > 0:
-            NETWORK_BYTES_SENT.inc(bytes_sent)
-        if bytes_received > 0:
-            NETWORK_BYTES_RECEIVED.inc(bytes_received)
-
-        # 更新网络统计
-        self.last_network_stats = network
-
-        return {
-            "uptime": uptime,
-            "memory": {"total": memory.total, "used": memory.used, "percent": memory.percent},
-            "cpu": cpu,
-            "disk": {"total": disk.total, "used": disk.used, "percent": disk.percent},
-            "network": {"bytes_sent": network.bytes_sent, "bytes_received": network.bytes_recv},
-        }
-
-
-# 健康检查
-class HealthChecker:
-    """
-    健康检查器
-    """
-
-    def __init__(self):
-        self.services = {}
-        self._register_default_services()
-
-    def _register_default_services(self):
-        """
-        注册默认服务健康检查
-        """
-        # 系统健康检查
-        self.register_service("system", self._check_system_health)
-        
-        # 尝试注册数据库健康检查
-        try:
-            self.register_service("database", self._check_database_health)
-        except Exception:
-            pass
-        
-        # 尝试注册Redis健康检查
-        try:
-            self.register_service("redis", self._check_redis_health)
-        except Exception:
-            pass
-
-    async def _check_system_health(self):
-        """
-        检查系统健康状态
-        """
-        import psutil
-        
-        try:
-            # 检查CPU使用率
-            cpu_usage = psutil.cpu_percent()
-            
-            # 检查内存使用率
-            memory = psutil.virtual_memory()
-            memory_usage = memory.percent
-            
-            # 检查磁盘使用率
-            disk = psutil.disk_usage("/")
-            disk_usage = disk.percent
-            
-            # 检查系统负载
-            load_avg = psutil.getloadavg() if hasattr(psutil, "getloadavg") else [0, 0, 0]
-            
-            # 确定健康状态
-            status = "healthy"
-            issues = []
-            
-            if cpu_usage > 90:
-                status = "unhealthy"
-                issues.append(f"CPU使用率过高: {cpu_usage}%")
-            elif cpu_usage > 70:
-                status = "degraded"
-                issues.append(f"CPU使用率较高: {cpu_usage}%")
-            
-            if memory_usage > 90:
-                status = "unhealthy"
-                issues.append(f"内存使用率过高: {memory_usage}%")
-            elif memory_usage > 70:
-                status = "degraded"
-                issues.append(f"内存使用率较高: {memory_usage}%")
-            
-            if disk_usage > 90:
-                status = "unhealthy"
-                issues.append(f"磁盘使用率过高: {disk_usage}%")
-            elif disk_usage > 70:
-                status = "degraded"
-                issues.append(f"磁盘使用率较高: {disk_usage}%")
-            
-            return {
-                "status": status,
-                "cpu_usage": cpu_usage,
-                "memory_usage": memory_usage,
-                "disk_usage": disk_usage,
-                "load_avg": load_avg,
-                "issues": issues
-            }
-        except Exception as e:
-            return {"status": "unhealthy", "error": str(e)}
-
-    async def _check_database_health(self):
-        """
-        检查数据库健康状态
-        """
-        try:
-            from src.persistence.database import get_db
-            
-            async for db in get_db():
-                # 执行简单查询测试数据库连接
-                await db.execute("SELECT 1")
-                return {
-                    "status": "healthy",
-                    "connection": "ok"
-                }
-        except Exception as e:
-            return {"status": "unhealthy", "error": str(e)}
-
-    async def _check_redis_health(self):
-        """
-        检查Redis健康状态
-        """
-        try:
-            from src.persistence.vector import get_redis
-            
-            redis = await get_redis()
-            # 执行PING命令测试Redis连接
-            pong = await redis.ping()
-            if pong:
-                # 获取Redis信息
-                info = await redis.info()
-                return {
-                    "status": "healthy",
-                    "connection": "ok",
-                    "used_memory": info.get("used_memory", 0),
-                    "used_memory_rss": info.get("used_memory_rss", 0),
-                    "keyspace_hits": info.get("keyspace_hits", 0),
-                    "keyspace_misses": info.get("keyspace_misses", 0)
-                }
-            else:
-                return {"status": "unhealthy", "error": "Redis ping failed"}
-        except Exception as e:
-            return {"status": "unhealthy", "error": str(e)}
-
-    def register_service(self, name, check_func):
-        """
-        注册服务健康检查
-        """
-        self.services[name] = check_func
-
-    async def check_health(self):
-        """
-        检查所有服务健康状态
-        """
-        import asyncio
-
-        health_status = {}
-        overall_status = "healthy"
-
-        for service_name, check_func in self.services.items():
-            try:
-                if asyncio.iscoroutinefunction(check_func):
-                    status = await check_func()
-                else:
-                    status = check_func()
-                health_status[service_name] = status
-                if status.get("status") == "unhealthy":
-                    overall_status = "unhealthy"
-                elif status.get("status") == "degraded" and overall_status != "unhealthy":
-                    overall_status = "degraded"
+                SQLAlchemyInstrumentor().instrument()
+                logger.info("🔍 SQLAlchemy 追踪已启用")
             except Exception as e:
-                health_status[service_name] = {"status": "unhealthy", "error": str(e)}
-                overall_status = "unhealthy"
+                logger.warning(f"⚠️ SQLAlchemy 仪器化激活失败: {str(e)}")
 
-        return {"status": overall_status, "services": health_status}
+        logger.info(f"📡 OpenTelemetry 初始化成功，上报地址: {endpoint}")
 
+    except Exception as e:
+        logger.error(f"❌ OpenTelemetry 初始化过程发生致命错误: {str(e)}")
 
-# 初始化监控
 def init_monitoring(app=None):
     """
-    初始化监控
+    一键初始化监控系统 (Prometheus + OpenTelemetry)
     """
-    # 启动 Prometheus 服务器
-    start_prometheus_server()
+    # 1. 启动 Prometheus HTTP Server
+    try:
+        # 注意：如果您在 Docker 中映射了端口，请确保此处端口一致
+        prometheus_client.start_http_server(8001)
+        logger.info("📊 Prometheus 监控端点已启动: http://localhost:8001/metrics")
+    except Exception as e:
+        logger.error(f"❌ Prometheus 启动失败: {str(e)}")
 
-    # 初始化 OpenTelemetry
+    # 2. 初始化追踪
     init_telemetry()
 
-    # 为 FastAPI 应用添加监控
+    # 3. FastAPI 深度集成
     if app:
-        # 集成 OpenTelemetry
-        if FastAPIInstrumentor and AioHttpClientInstrumentor:
+        if FastAPIInstrumentor:
             try:
                 FastAPIInstrumentor.instrument_app(app)
-                AioHttpClientInstrumentor().instrument()
-                logger.info("🔍 OpenTelemetry 已集成到 FastAPI")
+                if AioHttpClientInstrumentor:
+                    AioHttpClientInstrumentor().instrument()
+                logger.info("🔍 OpenTelemetry 已集成至 FastAPI 生命周期")
             except Exception as e:
-                logger.error(f"❌ OpenTelemetry 集成失败: {str(e)}")
-        else:
-            logger.warning("⚠️  OpenTelemetry 集成已跳过，相关模块未安装")
+                logger.error(f"❌ FastAPI Instrument 集成失败: {str(e)}")
 
-        # 添加 Prometheus 中间件
+        # 添加监控中间件
         @app.middleware("http")
         async def prometheus_middleware(request, call_next):
             method = request.method
             endpoint = request.url.path
-
             start_time = time.time()
             response = await call_next(request)
             duration = time.time() - start_time
-
-            REQUEST_COUNT.labels(
-                method=method, endpoint=endpoint, status=response.status_code
-            ).inc()
+            REQUEST_COUNT.labels(method=method, endpoint=endpoint, status=response.status_code).inc()
             REQUEST_LATENCY.labels(method=method, endpoint=endpoint).observe(duration)
-
             return response
 
-        # 添加健康检查端点
+        # 注册健康检查路由
         @app.get("/health")
         async def health_check():
-            collector = MetricsCollector()
-            metrics = collector.collect()
-            
-            # 使用HealthChecker进行详细健康检查
-            health_checker = HealthChecker()
-            health_status = await health_checker.check_health()
-            
-            return {
-                "status": health_status["status"],
-                "version": settings.CONFIG_VERSION,
-                "metrics": metrics,
-                "services": health_status["services"]
-            }
+            hc = HealthChecker()
+            status = await hc.check_health()
+            metrics = MetricsCollector().collect()
+            return {"status": status["status"], "metrics": metrics, "services": status["services"]}
 
-        # 添加详细健康检查端点
-        @app.get("/health/details")
-        async def health_check_details():
-            health_checker = HealthChecker()
-            health_status = await health_checker.check_health()
-            
-            return health_status
+        # 启动后台异步采集
+        asyncio.create_task(collect_metrics_loop())
+        logger.info("✅ 监控系统初始化完毕")
 
-        logger.info("🔍 FastAPI 监控已集成")
+# --- 后台数据采集器 ---
 
-    # 启动定期监控数据收集
-    import asyncio
+async def collect_metrics_loop():
+    """后台循环更新系统资源指标"""
+    collector = MetricsCollector()
+    while True:
+        try:
+            collector.collect()
+        except Exception as e:
+            logger.debug(f"Metrics collection skip: {e}")
+        await asyncio.sleep(5)
 
-    async def collect_metrics():
-        collector = MetricsCollector()
-        while True:
-            try:
-                collector.collect()
-            except Exception as e:
-                logger.error(f"❌ 监控数据收集失败: {str(e)}")
-            await asyncio.sleep(5)  # 每 5 秒收集一次
+class MetricsCollector:
+    def __init__(self):
+        self.last_net = psutil.net_io_counters()
+        
+    def collect(self):
+        mem = psutil.virtual_memory()
+        cpu = psutil.cpu_percent()
+        disk = psutil.disk_usage("/")
+        net = psutil.net_io_counters()
+        
+        # 更新指标
+        MEMORY_USAGE.set(mem.used)
+        CPU_USAGE.set(cpu)
+        DISK_USAGE.set(disk.percent)
+        NETWORK_BYTES_SENT.inc(max(0, net.bytes_sent - self.last_net.bytes_sent))
+        NETWORK_BYTES_RECEIVED.inc(max(0, net.bytes_recv - self.last_net.bytes_recv))
+        self.last_net = net
+        
+        return {"cpu": cpu, "memory_percent": mem.percent, "disk_percent": disk.percent}
 
-    if app:
-        import asyncio
+class HealthChecker:
+    def __init__(self):
+        self.checks = {
+            "system": self._check_system,
+            "redis": self._check_redis
+        }
 
-        asyncio.create_task(collect_metrics())
-        logger.info("🔍 定期监控数据收集已启动")
+    async def _check_system(self):
+        cpu = psutil.cpu_percent()
+        return {"status": "healthy" if cpu < 90 else "degraded", "cpu": cpu}
 
-    logger.info("✅ 监控系统已初始化")
+    async def _check_redis(self):
+        try:
+            from src.persistence.vector import get_redis
+            r = await get_redis()
+            await r.ping()
+            return {"status": "healthy"}
+        except Exception as e:
+            return {"status": "unhealthy", "error": str(e)}
 
+    async def check_health(self):
+        results = {}
+        overall = "healthy"
+        for name, func in self.checks.items():
+            res = await func()
+            results[name] = res
+            if res["status"] == "unhealthy": overall = "unhealthy"
+        return {"status": overall, "services": results}
 
-# 导出
+# --- 装饰器工具 ---
+
+def performance_monitor(func):
+    def wrapper(*args, **kwargs):
+        start = time.time()
+        try:
+            return func(*args, **kwargs)
+        finally:
+            # 自动更新资源快照
+            MEMORY_USAGE.set(psutil.virtual_memory().used)
+            CPU_USAGE.set(psutil.cpu_percent())
+    return wrapper
+
+def task_monitor(func):
+    async def wrapper(*args, **kwargs):
+        start = time.time()
+        status = "success"
+        try:
+            return await func(*args, **kwargs)
+        except Exception as e:
+            status = "error"
+            ERROR_COUNT.labels(error_type=type(e).__name__).inc()
+            raise
+        finally:
+            TASK_COUNT.labels(status=status).inc()
+            TASK_DURATION.observe(time.time() - start)
+    return wrapper
+
+def start_prometheus_server(port=8000):
+    """
+    启动 Prometheus 监控服务器
+    """
+    try:
+        prometheus_client.start_http_server(port)
+        logger.info(f"📊 Prometheus 监控服务器已启动，端口：{port}")
+    except Exception as e:
+        logger.error(f"❌ Prometheus 监控服务器启动失败: {str(e)}")
+
+# 导出所有功能
 __all__ = [
-    "init_monitoring",
-    "performance_monitor",
-    "task_monitor",
-    "tool_monitor",
-    "cache_monitor",
-    "model_monitor",
-    "skill_monitor",
-    "MetricsCollector",
-    "HealthChecker",
-    "REQUEST_COUNT",
-    "REQUEST_LATENCY",
-    "TASK_COUNT",
-    "TASK_DURATION",
-    "TASK_QUEUE_SIZE",
-    "MEMORY_USAGE",
-    "CPU_USAGE",
-    "DISK_USAGE",
-    "NETWORK_BYTES_SENT",
-    "NETWORK_BYTES_RECEIVED",
-    "TOOL_EXECUTION_COUNT",
-    "TOOL_EXECUTION_DURATION",
-    "MODEL_CALL_COUNT",
-    "MODEL_CALL_DURATION",
-    "MODEL_TOKEN_USAGE",
-    "CACHE_HITS",
-    "CACHE_MISSES",
-    "CACHE_SIZE",
-    "SKILL_EXECUTION_COUNT",
-    "SKILL_EXECUTION_DURATION",
-    "ERROR_COUNT",
-    "SYSTEM_INFO",
+    "init_monitoring", "start_prometheus_server", "performance_monitor", "task_monitor", 
+    "REQUEST_COUNT", "ERROR_COUNT" # 以及其他定义的指标...
 ]

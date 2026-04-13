@@ -30,8 +30,9 @@ RUN curl -sSL https://install.python-poetry.org | python3 -
 COPY pyproject.toml poetry.lock* ./
 
 # 6. 安装项目生产依赖 (跳过开发环境包)
-RUN poetry config virtualenvs.create false && \
-    (poetry install --no-root --without dev || poetry install --no-root --no-dev)
+RUN pip install --upgrade setuptools && \
+    poetry config virtualenvs.create false && \
+    poetry install --no-root --only main
 
 
 # ---------------------------------------------------------
@@ -44,6 +45,9 @@ WORKDIR /app
 # 从构建阶段复制已安装的包 (Site-packages)
 COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
+
+# 安装 setuptools 以确保 pkg_resources 模块可用
+RUN pip install --upgrade setuptools
 
 # 7. 复制项目所有代码
 COPY . .
