@@ -5,55 +5,108 @@
 
 import os
 import sys
+import unittest
+from unittest.mock import patch
 
 # 添加项目根目录到 Python 路径
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
-from bridge.caller import MemPalaceIntegration
+from core.algorithm import MemPalaceCore, run as core_run
 
 
-def test_core_module():
-    """测试核心模块"""
-    print("🚀 测试 MemPalace 核心模块")
-    print("=" * 50)
+class TestMemPalaceCore(unittest.TestCase):
+    """测试 MemPalace 核心模块"""
 
-    try:
-        # 初始化核心模块
-        mempalace = MemPalaceIntegration()
-        print("✓ 核心模块初始化成功")
+    def setUp(self):
+        """设置测试环境"""
+        self.mempalace = MemPalaceCore(palace_path="./test_mempalace")
 
-        # 测试添加记忆
-        print("\n测试添加记忆...")
-        result = mempalace.add_memory(
-            "测试记忆内容",
+    def tearDown(self):
+        """清理测试环境"""
+        import shutil
+        if os.path.exists("./test_mempalace"):
+            shutil.rmtree("./test_mempalace")
+
+    def test_initialization(self):
+        """测试初始化功能"""
+        self.assertTrue(os.path.exists("./test_mempalace"))
+        self.assertEqual(self.mempalace.palace_path, os.path.abspath("./test_mempalace"))
+
+    def test_add_memory(self):
+        """测试添加记忆功能"""
+        # 测试基本添加
+        result = self.mempalace.add_memory("测试记忆内容")
+        self.assertTrue(result)
+
+        # 测试带上下文和标签的添加
+        result = self.mempalace.add_memory(
+            "测试记忆内容2",
             context={"importance": "high", "project": "test"},
-            tags=["test", "example"],
+            tags=["test", "example"]
         )
-        print(f"✓ 添加记忆结果: {result}")
+        self.assertTrue(result)
 
-        # 测试搜索
-        print("\n测试搜索记忆...")
-        search_results = mempalace.search("测试")
-        print(f"✓ 搜索结果: {search_results}")
+    def test_search(self):
+        """测试搜索功能"""
+        # 测试基本搜索
+        results = self.mempalace.search("测试")
+        self.assertIsInstance(results, list)
 
-        # 测试获取统计信息
-        print("\n测试获取统计信息...")
-        stats = mempalace.get_memory_stats()
-        print(f"✓ 记忆统计: {stats}")
+        # 测试带限制和上下文的搜索
+        results = self.mempalace.search(
+            "测试",
+            limit=10,
+            context={"project": "test"}
+        )
+        self.assertIsInstance(results, list)
 
-        # 测试清理重复记忆
-        print("\n测试清理重复记忆...")
-        cleanup_result = mempalace.cleanup_duplicates()
-        print(f"✓ 清理结果: {cleanup_result}")
+    def test_run_add_action(self):
+        """测试 run 方法的 add 操作"""
+        params = {
+            "action": "add",
+            "content": "测试内容",
+            "context": {"importance": "high"},
+            "tags": ["test"]
+        }
+        result = self.mempalace.run(params)
+        self.assertTrue(result)
 
-        print("\n" + "=" * 50)
-        print("🎉 所有测试通过！核心模块工作正常")
-        return True
+    def test_run_search_action(self):
+        """测试 run 方法的 search 操作"""
+        params = {
+            "action": "search",
+            "query": "测试",
+            "limit": 5
+        }
+        result = self.mempalace.run(params)
+        self.assertIsInstance(result, list)
 
-    except Exception as e:
-        print(f"✗ 测试失败: {e}")
-        return False
+    def test_run_status_action(self):
+        """测试 run 方法的默认状态操作"""
+        params = {}
+        result = self.mempalace.run(params)
+        self.assertIsInstance(result, dict)
+        self.assertIn("status", result)
+        self.assertIn("path", result)
+        self.assertIn("version", result)
+
+    def test_functional_run(self):
+        """测试函数式调用入口"""
+        params = {
+            "action": "status"
+        }
+        result = core_run(params)
+        self.assertIsInstance(result, dict)
+
+    @patch('os.makedirs')
+    def test_initialization_error(self, mock_makedirs):
+        """测试初始化失败的情况"""
+        # 模拟 os.makedirs 抛出异常
+        mock_makedirs.side_effect = Exception("权限错误")
+        # 初始化应该不会抛出异常，只会记录错误
+        mempalace = MemPalaceCore(palace_path="./test_mempalace")
+        self.assertIsInstance(mempalace, MemPalaceCore)
 
 
 if __name__ == "__main__":
-    test_core_module()
+    unittest.main()

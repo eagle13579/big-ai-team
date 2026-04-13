@@ -68,12 +68,11 @@ class LoggingConfig:
         logger.add(
             str(self.log_dir / f"agent_{datetime.datetime.now().strftime('%Y%m%d')}.json"),
             level=self.log_level,
-            format='{"timestamp": "{time}", "level": "{level}", "logger": "{name}", "function": "{function}", "line": {line}, "message": "{message}", "request_id": "{extra[request_id]}", "session_id": "{extra[session_id]}", "user_id": "{extra[user_id]}", "task_id": "{extra[task_id]}", "environment": "{extra[environment]}", "service": "{extra[service]}"}',
+            format="{time:YYYY-MM-DD HH:mm:ss.SSS}|{level: <8}|{name}:{function}:{line}|{message}",
             rotation=self.max_log_size,
             retention=self.log_retention,
             compression="zip",
             encoding="utf-8",
-            serialize=True,
         )
 
 

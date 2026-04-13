@@ -30,8 +30,9 @@ RUN curl -sSL https://install.python-poetry.org | python3 -
 COPY pyproject.toml poetry.lock* ./
 
 # 6. 安装项目生产依赖 (跳过开发环境包)
-RUN poetry config virtualenvs.create false && \
-    (poetry install --no-root --without dev || poetry install --no-root --no-dev)
+RUN pip install --upgrade setuptools && \
+    poetry config virtualenvs.create false && \
+    poetry install --no-root --only main
 
 
 # ---------------------------------------------------------
@@ -44,6 +45,9 @@ WORKDIR /app
 # 从构建阶段复制已安装的包 (Site-packages)
 COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
+
+# 安装 setuptools 以确保 pkg_resources 模块可用
+RUN pip install --upgrade setuptools
 
 # 7. 复制项目所有代码
 COPY . .
@@ -63,8 +67,31 @@ RUN python scripts/tools/deploy_check.py
 # 10. 暴露服务端口 (根据 bridge.caller 的实际需求调整)
 EXPOSE 8000
 
+# 11. 添加健康检查脚本
+RUN mkdir -p /app && echo '#!/usr/bin/env python3' > /app/health_check.py && \
+    echo 'import http.server' >> /app/health_check.py && \
+    echo 'import socketserver' >> /app/health_check.py && \
+    echo 'import os' >> /app/health_check.py && \
+    echo '' >> /app/health_check.py && \
+    echo 'class HealthCheckHandler(http.server.SimpleHTTPRequestHandler):' >> /app/health_check.py && \
+    echo '    def do_GET(self):' >> /app/health_check.py && \
+    echo '        if self.path == "/health":' >> /app/health_check.py && \
+    echo '            self.send_response(200)' >> /app/health_check.py && \
+    echo '            self.send_header("Content-type", "text/plain")' >> /app/health_check.py && \
+    echo '            self.end_headers()' >> /app/health_check.py && \
+    echo '            self.wfile.write(b"OK")' >> /app/health_check.py && \
+    echo '        else:' >> /app/health_check.py && \
+    echo '            self.send_response(404)' >> /app/health_check.py && \
+    echo '            self.end_headers()' >> /app/health_check.py && \
+    echo '' >> /app/health_check.py && \
+    echo 'if __name__ == "__main__":' >> /app/health_check.py && \
+    echo '    port = int(os.getenv("HEALTH_CHECK_PORT", "8000"))' >> /app/health_check.py && \
+    echo '    with socketserver.TCPServer(("", port), HealthCheckHandler) as httpd:' >> /app/health_check.py && \
+    echo '        httpd.serve_forever()' >> /app/health_check.py && \
+    chmod +x /app/health_check.py
+
 # ---------------------------------------------------------
-# 11. [启动命令修复] 使用 -m 参数确保模块寻址正确
+# 12. [启动命令修复] 使用 -m 参数确保模块寻址正确
 # ---------------------------------------------------------
 # 使用 ENTRYPOINT 配合 -m，能彻底解决 "No module named 'bridge'" 报错
 ENTRYPOINT ["python", "-m", "bridge.caller"]

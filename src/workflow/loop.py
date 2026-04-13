@@ -1,14 +1,20 @@
 import asyncio
 import json
 import os
+import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+# 添加项目根目录到 Python 路径
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
 # 导入配置，用于控制最大步数等参数
-from shared.config import settings
-from shared.logging import logger
-from shared.monitoring import task_monitor
+from src.shared.config import settings
+from src.shared.logging import logger
+from src.shared.monitoring import task_monitor
 
 logger = logger.bind(name="AceAgent.Workflow")
 
@@ -17,14 +23,14 @@ import psutil
 
 class MemoryManager:
     """
-    记忆管理器，负责管理 Agent 的短期和长期记忆
+    优化的记忆管理器，负责管理 Agent 的短期和长期记忆
     """
 
     def __init__(
         self,
         memory_dir: str = "memory",
-        max_short_term_memory: int = 100,
-        memory_limit_mb: int = 100,
+        max_short_term_memory: int = 50,  # 减少短期记忆容量
+        memory_limit_mb: int = 80,  # 降低内存限制
     ):
         self.memory_dir = Path(memory_dir)
         self.memory_dir.mkdir(exist_ok=True)
@@ -34,6 +40,8 @@ class MemoryManager:
         self.memory_limit_mb = memory_limit_mb
         self._load_long_term_memory()
         self._memory_usage_history = []
+        self._memory_check_interval = 5  # 内存检查间隔（任务数）
+        self._task_count = 0
 
     def add_to_short_term_memory(self, item: dict[str, Any]):
         """添加到短期记忆"""
@@ -42,16 +50,20 @@ class MemoryManager:
         item["priority"] = item.get("priority", 1)  # 默认为低优先级
 
         self.short_term_memory.append(item)
-        # 检查内存使用情况
-        if self._check_memory_usage():
-            # 内存使用过高，清理部分记忆
-            self._cleanup_memory()
-        else:
-            # 限制短期记忆大小
-            if len(self.short_term_memory) > self.max_short_term_memory:
-                # 按优先级排序，保留高优先级记忆
-                self.short_term_memory.sort(key=lambda x: x.get("priority", 1), reverse=True)
-                self.short_term_memory = self.short_term_memory[: self.max_short_term_memory]
+        self._task_count += 1
+        
+        # 定期检查内存使用情况
+        if self._task_count % self._memory_check_interval == 0:
+            # 检查内存使用情况
+            if self._check_memory_usage():
+                # 内存使用过高，清理部分记忆
+                self._cleanup_memory()
+            else:
+                # 限制短期记忆大小
+                if len(self.short_term_memory) > self.max_short_term_memory:
+                    # 按优先级排序，保留高优先级记忆
+                    self.short_term_memory.sort(key=lambda x: x.get("priority", 1), reverse=True)
+                    self.short_term_memory = self.short_term_memory[: self.max_short_term_memory]
 
     def add_to_long_term_memory(self, key: str, value: Any):
         """添加到长期记忆"""
@@ -147,7 +159,7 @@ class LLMClient:
 
         # 导入模型选择器
         try:
-            from shared.model_selector import select_model_for_task
+            from src.shared.model_selector import select_model_for_task
 
             self.model_name = select_model_for_task(task) if task else settings.DEFAULT_MODEL_NAME
         except ImportError:

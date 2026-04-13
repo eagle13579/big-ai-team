@@ -3,7 +3,7 @@
 # ==========================================
 
 # 1. 全局配置 (必须放在最顶部，不能放在 [lint] 下)
-target-version = "py39"
+target-version = "py312"
 line-length = 100
 
 # 关键修复：解决 Binary error

@@ -7,7 +7,8 @@
     "build:core": "python build_protect.py",
     "test": "python core/test_core.py",
     "clean": "rm -rf core/*.pyd core/*.so core/__pycache__",
-    "dev": "tsx index.ts"
+    "dev": "tsx index.ts",
+    "validate": "echo \"Validation passed\""
   },
   "dependencies": {
     "winston": "^3.19.0"
@@ -15,8 +16,5 @@
   "devDependencies": {
     "tsx": "^4.21.0",
     "typescript": "^6.0.2"
-  },
-  "scripts": {
-    "validate": "echo \"Validation passed\""
   }
 }

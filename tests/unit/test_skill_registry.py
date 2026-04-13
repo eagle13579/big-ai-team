@@ -17,7 +17,10 @@ for skill_name in skill_registry.get_skill_names():
         print(f"技能: {skill_name}")
         print(f"  类名: {skill_class.__name__}")
         print(f"  描述: {skill_class.description}")
-        print(f"  参数架构: {skill_class.args_schema.__name__}")
+        if hasattr(skill_class, 'args_schema') and skill_class.args_schema:
+            print(f"  参数架构: {skill_class.args_schema.__name__}")
+        else:
+            print(f"  参数架构: None")
     else:
         print(f"技能 {skill_name} 未找到")
 
