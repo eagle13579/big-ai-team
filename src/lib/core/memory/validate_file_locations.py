@@ -40,10 +40,35 @@ def validate_file_locations():
     return report
 
 
+def extract_existing_summaries(report_file):
+    """提取现有报告中的核心逻辑摘要"""
+    summaries = {}
+    if os.path.exists(report_file):
+        with open(report_file, encoding="utf-8") as f:
+            content = f.read()
+        
+        if "## 核心模块状态概览" in content:
+            # 提取表格部分
+            table_section = content.split("## 核心模块状态概览")[1].split("## 详细改动日志")[0]
+            # 解析表格行
+            lines = table_section.strip().split('\n')[2:]  # 跳过表头和分隔线
+            for line in lines:
+                if line.strip() and '|' in line:
+                    parts = [p.strip() for p in line.split('|')]
+                    if len(parts) >= 6:
+                        module_name = parts[1]
+                        summary = parts[5]
+                        if summary != "(待填充)":
+                            summaries[module_name] = summary
+    return summaries
+
 def generate_validation_report():
     """生成验证报告（支持增量更新）"""
     report = validate_file_locations()
     report_file = os.path.join("memory", "module_validation_report.md")
+    
+    # 提取现有摘要
+    existing_summaries = extract_existing_summaries(report_file)
     
     # 生成新的报告内容
     markdown_content = """# 模块验证报告
@@ -81,7 +106,9 @@ def generate_validation_report():
         module_name = validation["module"].capitalize()
         # 格式化路径，使用正斜杠
         formatted_path = validation["path"].replace("\\", "/")
-        module_status_content += f"| {module_name} | {formatted_path} | ✅ 已验证 | {datetime.now().strftime('%Y-%m-%d')} | (待填充) |\n"
+        # 保留现有摘要或使用默认值
+        summary = existing_summaries.get(module_name, "(待填充)")
+        module_status_content += f"| {module_name} | {formatted_path} | ✅ 已验证 | {datetime.now().strftime('%Y-%m-%d')} | {summary} |\n"
 
     for error in report["errors"]:
         module_name = error["module"].capitalize()
