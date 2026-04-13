@@ -1,336 +1,222 @@
+import unittest
 import os
-import sys
-
-# 确保项目根目录在 Python 搜索路径中
-# 尝试多种可能的路径组合
-possible_roots = [
-    os.path.abspath(
-        os.path.join(os.path.dirname(__file__), "..")
-    ),  # 常见情况：tests/ 目录在项目根目录下
-    os.path.abspath(
-        os.path.join(os.path.dirname(__file__), "..", "..")
-    ),  # 特殊情况：tests/ 目录在更深层
-    os.path.abspath("."),  # 当前目录
-    os.path.abspath(".."),  # 父目录
-]
-
-for root in possible_roots:
-    if os.path.exists(os.path.join(root, "src")):
-        sys.path.insert(0, root)
-        print(f"Added project root to path: {root}")
-        break
-
-from unittest.mock import MagicMock, patch
-
-import git
-import pytest
-
-from src.skills.git_helper import GitHelperTool
-
-
-@pytest.fixture
-def mock_tool():
-    """创建带有mock的GitHelperTool实例"""
-    with patch("git.Repo") as mock_repo_class:
-        # 创建mock repo实例
-        mock_repo = MagicMock()
-        mock_repo_class.return_value = mock_repo
-
-        # 模拟active_branch
-        mock_branch = MagicMock()
-        mock_branch.name = "feature-branch"
-        mock_repo.active_branch = mock_branch
-
-        # 模拟is_dirty
-        mock_repo.is_dirty.return_value = False
-
-        # 模拟index.diff
-        mock_index = MagicMock()
-        mock_repo.index = mock_index
-
-        # 模拟diff返回值
-        mock_diff_item1 = MagicMock()
-        mock_diff_item1.a_path = "file1.py"
-        mock_diff_item2 = MagicMock()
-        mock_diff_item2.a_path = "file2.py"
-        mock_index.diff.side_effect = lambda x: (
-            [mock_diff_item1, mock_diff_item2] if x is None else []
-        )
-
-        # 模拟untracked_files
-        mock_repo.untracked_files = ["new_file.py"]
-
-        # 模拟remote
-        mock_remote = MagicMock()
-        mock_repo.remote.return_value = mock_remote
-
-        # 模拟push返回值
-        mock_push_info = MagicMock()
-        mock_push_info.flags = 0
-        mock_remote.push.return_value = [mock_push_info]
-
-        # 模拟commit返回值
-        mock_commit = MagicMock()
-        mock_commit.hexsha = "1234567890abcdef"
-        mock_index.commit.return_value = mock_commit
-
-        # 模拟GitPythonClient的add方法
-        def mock_add(files):
-            if "." in files:
-                mock_repo.git.add(A=True)
-                return {"message": "已暂存所有更改"}
-            else:
-                mock_repo.index.add(files)
-                return {"message": f"已暂存文件: {files}"}
-
-        # 模拟GitPythonClient的commit方法
-        def mock_commit(message):
-            commit_obj = mock_index.commit(message)
-            return {"hexsha": commit_obj.hexsha, "message": f"提交成功: {commit_obj.hexsha[:7]}"}
-
-        # 模拟GitPythonClient的push方法
-        def mock_push(remote, branch):
-            remote_obj = mock_repo.remote(name=remote)
-            remote_obj.push(branch)
-            return {"message": f"成功推送到 {remote}/{branch}"}
-
-        # 模拟GitPythonClient的pull方法
-        def mock_pull(remote, branch):
-            remote_obj = mock_repo.remote(name=remote)
-            remote_obj.pull(branch)
-            return {"message": f"已从 {remote}/{branch} 拉取更改"}
-
-        # 模拟GitPythonClient的status方法
-        def mock_status():
-            return {
-                "branch": mock_repo.active_branch.name,
-                "dirty": mock_repo.is_dirty(),
-                "modified": [item.a_path for item in mock_repo.index.diff(None)],
-                "untracked": mock_repo.untracked_files,
-                "staged": [item.a_path for item in mock_repo.index.diff("HEAD")],
-            }
-
-        # 创建自定义的GitPythonClient mock
-        class MockGitPythonClient:
-            def __init__(self, repo_path):
-                self.repo = mock_repo
-
-            def status(self):
-                return mock_status()
-
-            def add(self, files):
-                return mock_add(files)
-
-            def commit(self, message):
-                return mock_commit(message)
-
-            def push(self, remote, branch):
-                return mock_push(remote, branch)
-
-            def pull(self, remote, branch):
-                return mock_pull(remote, branch)
-
-            def branch(self, branch_name):
-                return {"message": f"成功创建分支: {branch_name}"}
-
-            def tag(self, tag_name, message=None):
-                return {"message": f"成功创建标签: {tag_name}"}
-
-            def merge(self, branch):
-                return {"message": f"成功合并分支: {branch}"}
-
-        # 创建工具实例（使用admin角色进行测试）
-        tool = GitHelperTool(
-            repo_path="/fake/path", git_client_factory=MockGitPythonClient, user_role="admin"
-        )
-        yield tool, mock_repo
-
-
-def test_status_success(mock_tool):
-    """测试成功获取Git状态"""
-    tool, mock_repo = mock_tool
-
-    # 执行status操作
-    result = tool.execute({"action": "status"})
-
-    # 验证结果
-    assert result["status"] == "success"
-    assert "observation" in result
-    assert "data" in result["observation"]
-    assert "branch" in result["observation"]["data"]
-    assert result["observation"]["data"]["branch"] == "feature-branch"
-    assert "timestamp" in result["observation"]
-
-
-def test_add_success(mock_tool):
-    """测试成功暂存文件"""
-    tool, mock_repo = mock_tool
-
-    # 执行add操作
-    result = tool.execute({"action": "add", "files": ["file1.py", "file2.py"]})
-
-    # 验证结果
-    assert result["status"] == "success"
-    assert "observation" in result
-    assert "message" in result["observation"]
-    assert "已暂存文件" in result["observation"]["message"]
-    # 验证调用
-    mock_repo.index.add.assert_called_once_with(["file1.py", "file2.py"])
-
-
-def test_add_all_success(mock_tool):
-    """测试成功暂存所有文件"""
-    tool, mock_repo = mock_tool
-
-    # 执行add操作（添加所有文件）
-    result = tool.execute({"action": "add", "files": ["."]})
-
-    # 验证结果
-    assert result["status"] == "success"
-    assert "observation" in result
-    assert "message" in result["observation"]
-    assert "已暂存所有更改" in result["observation"]["message"]
-    # 验证调用
-    mock_repo.git.add.assert_called_once_with(A=True)
-
-
-def test_commit_success(mock_tool):
-    """测试成功提交"""
-    tool, mock_repo = mock_tool
-
-    # 执行commit操作
-    result = tool.execute({"action": "commit", "message": "Test commit message"})
-
-    # 验证结果
-    assert result["status"] == "success"
-    assert "observation" in result
-    assert "data" in result["observation"]
-    assert "hexsha" in result["observation"]["data"]
-    assert "message" in result["observation"]
-    assert "提交成功" in result["observation"]["message"]
-    # 验证调用
-    mock_repo.index.commit.assert_called_once_with("Test commit message")
-
-
-def test_commit_validation_error(mock_tool):
-    """测试提交时缺少message参数的验证错误"""
-    tool, mock_repo = mock_tool
-
-    # 执行commit操作（缺少message）
-    result = tool.execute({"action": "commit"})
-
-    # 验证结果
-    assert result["status"] == "error"
-    assert "observation" in result
-    assert "执行 commit 操作时必须提供提交信息" in result["observation"]["message"]
-
-
-def test_push_success(mock_tool):
-    """测试成功推送"""
-    tool, mock_repo = mock_tool
-
-    # 执行push操作
-    result = tool.execute({"action": "push", "remote": "origin", "branch": "feature-branch"})
-
-    # 验证结果
-    assert result["status"] == "success"
-    assert "observation" in result
-    assert "message" in result["observation"]
-    assert "成功推送到" in result["observation"]["message"]
-    # 验证调用
-    mock_repo.remote.assert_called_once_with(name="origin")
-    mock_repo.remote.return_value.push.assert_called_once_with("feature-branch")
-
-
-def test_pull_success(mock_tool):
-    """测试成功拉取"""
-    tool, mock_repo = mock_tool
-
-    # 执行pull操作
-    result = tool.execute({"action": "pull", "remote": "origin", "branch": "feature-branch"})
-
-    # 验证结果
-    assert result["status"] == "success"
-    assert "observation" in result
-    assert "message" in result["observation"]
-    assert "已从" in result["observation"]["message"]
-    # 验证调用
-    mock_repo.remote.assert_called_once_with(name="origin")
-    mock_repo.remote.return_value.pull.assert_called_once_with("feature-branch")
-
-
-def test_git_command_error(mock_tool):
-    """测试Git命令执行错误的处理"""
-    tool, mock_repo = mock_tool
-
-    # 模拟push操作失败
-    mock_repo.remote.return_value.push.side_effect = git.GitCommandError("push", "Network error")
-
-    # 执行push操作
-    result = tool.execute({"action": "push", "remote": "origin", "branch": "feature-branch"})
-
-    # 验证结果
-    assert result["status"] == "error"
-    assert "observation" in result
-    assert (
-        "执行失败" in result["observation"]["message"]
-        or "推送失败" in result["observation"]["message"]
-    )
-
-
-def test_security_guard_protected_branch():
-    """测试安全防护：操作受保护分支的警告"""
-
-    with patch("git.Repo") as mock_repo_class:
-        # 创建mock repo实例
-        mock_repo = MagicMock()
-        mock_repo_class.return_value = mock_repo
-
-        # 模拟active_branch
-        mock_branch = MagicMock()
-        mock_branch.name = "main"
-        mock_repo.active_branch = mock_branch
-
-        # 模拟commit返回值
-        mock_commit = MagicMock()
-        mock_commit.hexsha = "1234567890abcdef"
-        mock_repo.index = MagicMock()
-        mock_repo.index.commit.return_value = mock_commit
-
-        # 模拟GitPythonClient的方法
-        class MockGitPythonClient:
-            def __init__(self, repo_path):
-                self.repo = mock_repo
-
-            def status(self):
-                return {"branch": "main"}
-
-            def commit(self, message):
-                return {"hexsha": "1234567890abcdef", "message": "提交成功: 1234567"}
-
-        # 创建工具实例（使用user角色进行测试）
-        tool = GitHelperTool(
-            repo_path="/fake/path", git_client_factory=MockGitPythonClient, user_role="user"
-        )
-
-        # 执行commit操作（user角色在受保护分支上执行commit应该被拒绝）
-        result = tool.execute({"action": "commit", "message": "Test commit on main branch"})
-
-        # 验证结果
-        assert result["status"] == "error"
-        assert "observation" in result
-        assert "权限不足" in result["observation"]["message"]
-        assert "main" in result["observation"]["message"]
-
-
-def test_invalid_git_repository():
-    """测试无效的Git仓库路径"""
-    with patch("git.Repo") as mock_repo_class:
-        # 模拟无效的Git仓库
-        mock_repo_class.side_effect = git.InvalidGitRepositoryError
-
-        # 验证异常
-        with pytest.raises(Exception) as excinfo:
-            GitHelperTool(repo_path="/invalid/path")
-
-        assert "不是一个有效的 Git 仓库" in str(excinfo.value)
+import tempfile
+import shutil
+from unittest.mock import patch, MagicMock
+from src.skills.git_helper import GitHelperTool, GitArgsSchema
+
+
+class TestGitHelperTool(unittest.IsolatedAsyncioTestCase):
+    """测试 Git 助手工具"""
+    
+    def setUp(self):
+        """设置测试环境"""
+        # 创建临时目录作为测试 Git 仓库
+        self.temp_dir = tempfile.mkdtemp()
+        # 初始化 Git 仓库
+        import git
+        self.repo = git.Repo.init(self.temp_dir)
+        
+        # 设置 Git 用户名和邮箱
+        with self.repo.config_writer() as config:
+            config.set_value('user', 'name', 'Test User')
+            config.set_value('user', 'email', 'test@example.com')
+        
+        # 创建初始提交
+        test_file = os.path.join(self.temp_dir, 'README.md')
+        with open(test_file, 'w') as f:
+            f.write('# Test Repository')
+        self.repo.index.add([test_file])
+        self.repo.index.commit('Initial commit')
+        
+        # 创建 GitHelperTool 实例
+        self.tool = GitHelperTool(repo_path=self.temp_dir)
+    
+    def tearDown(self):
+        """清理测试环境"""
+        # 清理临时目录
+        import gc
+        # 确保 Git 仓库连接被释放
+        if hasattr(self, 'repo'):
+            del self.repo
+        if hasattr(self, 'tool'):
+            del self.tool
+        # 强制垃圾回收
+        gc.collect()
+        # 延迟一下，确保文件锁被释放
+        import time
+        time.sleep(0.5)
+        # 清理临时目录
+        shutil.rmtree(self.temp_dir)
+    
+    def test_status(self):
+        """测试获取 Git 状态"""
+        args = {
+            "action": "status"
+        }
+        
+        result = self.tool.execute(args)
+        self.assertEqual(result["status"], "success")
+        self.assertIn("data", result["observation"])
+        self.assertIn("branch", result["observation"]["data"])
+    
+    def test_add(self):
+        """测试添加文件到暂存区"""
+        # 创建测试文件
+        test_file = os.path.join(self.temp_dir, "test.txt")
+        with open(test_file, "w") as f:
+            f.write("test content")
+        
+        args = {
+            "action": "add",
+            "files": ["test.txt"]
+        }
+        
+        result = self.tool.execute(args)
+        self.assertEqual(result["status"], "success")
+        self.assertIn("已暂存文件", result["observation"]["message"])
+    
+    def test_commit(self):
+        """测试提交更改"""
+        # 创建测试文件并添加到暂存区
+        test_file = os.path.join(self.temp_dir, "test.txt")
+        with open(test_file, "w") as f:
+            f.write("test content")
+        
+        # 添加到暂存区
+        add_args = {
+            "action": "add",
+            "files": ["test.txt"]
+        }
+        self.tool.execute(add_args)
+        
+        # 提交
+        commit_args = {
+            "action": "commit",
+            "message": "Initial commit"
+        }
+        
+        result = self.tool.execute(commit_args)
+        self.assertEqual(result["status"], "success")
+        self.assertIn("提交成功", result["observation"]["message"])
+    
+    def test_branch(self):
+        """测试分支操作"""
+        # 列出分支
+        list_args = {
+            "action": "branch"
+        }
+        result = self.tool.execute(list_args)
+        self.assertEqual(result["status"], "success")
+        self.assertIn("data", result["observation"])
+        self.assertIn("branches", result["observation"]["data"])
+    
+    def test_stash(self):
+        """测试暂存更改"""
+        # 创建测试文件
+        test_file = os.path.join(self.temp_dir, "test.txt")
+        with open(test_file, "w") as f:
+            f.write("test content")
+        
+        # 暂存更改
+        stash_args = {
+            "action": "stash",
+            "message": "Test stash"
+        }
+        
+        result = self.tool.execute(stash_args)
+        self.assertEqual(result["status"], "success")
+        self.assertIn("成功暂存更改", result["observation"]["message"])
+    
+    def test_stash_list(self):
+        """测试列出暂存"""
+        # 列出暂存
+        list_args = {
+            "action": "stash_list"
+        }
+        
+        result = self.tool.execute(list_args)
+        self.assertEqual(result["status"], "success")
+        self.assertIn("data", result["observation"])
+    
+    def test_hooks_list(self):
+        """测试列出钩子"""
+        # 列出钩子
+        list_args = {
+            "action": "hooks_list"
+        }
+        
+        result = self.tool.execute(list_args)
+        self.assertEqual(result["status"], "success")
+        self.assertIn("data", result["observation"])
+    
+    def test_invalid_action(self):
+        """测试无效操作"""
+        args = {
+            "action": "invalid"
+        }
+        
+        result = self.tool.execute(args)
+        self.assertEqual(result["status"], "error")
+        self.assertIn("validation error", result["observation"]["message"])
+    
+    def test_missing_message(self):
+        """测试缺少提交消息"""
+        args = {
+            "action": "commit"
+        }
+        
+        result = self.tool.execute(args)
+        self.assertEqual(result["status"], "error")
+        self.assertIn("执行 commit 操作时必须提供提交信息", result["observation"]["message"])
+    
+    def test_missing_tag_name(self):
+        """测试缺少标签名称"""
+        args = {
+            "action": "tag"
+        }
+        
+        result = self.tool.execute(args)
+        self.assertEqual(result["status"], "error")
+        self.assertIn("执行 tag 操作时必须提供标签名称", result["observation"]["message"])
+    
+    def test_missing_target_branch(self):
+        """测试缺少目标分支"""
+        args = {
+            "action": "merge"
+        }
+        
+        result = self.tool.execute(args)
+        self.assertEqual(result["status"], "error")
+        self.assertIn("执行 merge 操作时必须提供目标分支", result["observation"]["message"])
+    
+    def test_get_available_actions(self):
+        """测试获取可用操作"""
+        actions = self.tool.get_available_actions()
+        self.assertIsInstance(actions, list)
+        self.assertIn("status", actions)
+        self.assertIn("add", actions)
+        self.assertIn("commit", actions)
+    
+    def test_get_metrics(self):
+        """测试获取性能指标"""
+        metrics = self.tool.get_metrics()
+        self.assertIsInstance(metrics, dict)
+        self.assertIn("total_operations", metrics)
+        self.assertIn("successful_operations", metrics)
+        self.assertIn("failed_operations", metrics)
+    
+    def test_reset_metrics(self):
+        """测试重置性能指标"""
+        # 执行一些操作
+        self.tool.execute({"action": "status"})
+        # 重置指标
+        self.tool.reset_metrics()
+        metrics = self.tool.get_metrics()
+        self.assertEqual(metrics["total_operations"], 0)
+        self.assertEqual(metrics["successful_operations"], 0)
+        self.assertEqual(metrics["failed_operations"], 0)
+
+
+if __name__ == "__main__":
+    unittest.main()

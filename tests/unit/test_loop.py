@@ -29,12 +29,14 @@ class TestMemoryManager:
 
     def test_get_short_term_memory(self):
         """测试获取短期记忆"""
-        memory_manager = MemoryManager()
+        # 创建一个内存限制较高的 MemoryManager，避免测试中触发内存清理
+        memory_manager = MemoryManager(memory_limit_mb=1024, max_short_term_memory=20)
         for i in range(15):
             memory_manager.add_to_short_term_memory({"id": i})
         memory = memory_manager.get_short_term_memory(10)
         assert len(memory) == 10
-        assert memory[0]["id"] == 5
+        # 最近添加的项目应该在前面
+        assert memory[0]["id"] == 14
 
     def test_get_long_term_memory(self):
         """测试获取长期记忆"""

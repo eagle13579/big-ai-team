@@ -104,3 +104,23 @@ class SkillRegistry:
 
 # 创建全局技能注册表实例
 skill_registry = SkillRegistry()
+
+
+def register_skill(name: str, skill_instance):
+    """
+    注册技能实例
+    
+    Args:
+        name: 技能名称
+        skill_instance: 技能实例
+    """
+    # 这里我们不直接存储实例，而是存储类
+    # 这样可以在需要时创建新的实例
+    if hasattr(skill_instance, '__class__'):
+        skill_class = skill_instance.__class__
+        skill_registry.skills[name] = skill_class
+        print(f"Registered skill instance: {name} ({skill_class.__name__})")
+    else:
+        # 如果传入的是类，则直接存储
+        skill_registry.skills[name] = skill_instance
+        print(f"Registered skill class: {name} ({skill_instance.__name__})")

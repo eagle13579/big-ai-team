@@ -298,6 +298,62 @@ def task_monitor(func):
             TASK_DURATION.observe(time.time() - start)
     return wrapper
 
+def tool_monitor(func):
+    async def wrapper(*args, **kwargs):
+        # 尝试从参数中获取工具名称
+        tool_name = "unknown"
+        if args:
+            if isinstance(args[0], str):
+                tool_name = args[0]
+            elif hasattr(args[0], "__class__"):
+                tool_name = args[0].__class__.__name__
+        
+        start = time.time()
+        status = "success"
+        try:
+            return await func(*args, **kwargs)
+        except Exception as e:
+            status = "error"
+            ERROR_COUNT.labels(error_type=type(e).__name__).inc()
+            raise
+        finally:
+            TOOL_EXECUTION_COUNT.labels(tool=tool_name, status=status).inc()
+            TOOL_EXECUTION_DURATION.labels(tool=tool_name).observe(time.time() - start)
+    return wrapper
+
+def cache_monitor(func):
+    def wrapper(*args, **kwargs):
+        # 尝试从参数中获取缓存名称
+        cache_name = "unknown"
+        if args:
+            if isinstance(args[0], str):
+                cache_name = args[0]
+            elif hasattr(args[0], "__class__"):
+                cache_name = args[0].__class__.__name__
+        
+        try:
+            result = func(*args, **kwargs)
+            if result is not None:
+                CACHE_HITS.labels(cache_name=cache_name).inc()
+            else:
+                CACHE_MISSES.labels(cache_name=cache_name).inc()
+            return result
+        except Exception as e:
+            ERROR_COUNT.labels(error_type=type(e).__name__).inc()
+            raise
+    return wrapper
+
+def core_performance_monitor(func):
+    def wrapper(*args, **kwargs):
+        start = time.time()
+        try:
+            return func(*args, **kwargs)
+        finally:
+            duration = time.time() - start
+            # 记录核心性能指标
+            logger.debug(f"Core function {func.__name__} took {duration:.4f} seconds")
+    return wrapper
+
 def start_prometheus_server(port=8000):
     """
     启动 Prometheus 监控服务器
@@ -311,5 +367,6 @@ def start_prometheus_server(port=8000):
 # 导出所有功能
 __all__ = [
     "init_monitoring", "start_prometheus_server", "performance_monitor", "task_monitor", 
+    "tool_monitor", "cache_monitor", "core_performance_monitor",
     "REQUEST_COUNT", "ERROR_COUNT" # 以及其他定义的指标...
 ]

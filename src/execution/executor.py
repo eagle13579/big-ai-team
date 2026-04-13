@@ -149,8 +149,115 @@ class ToolExecutor:
         # 故障恢复管理器
         self._fault_recovery_manager = FaultRecoveryManager()
         
+        # 超时管理
+        self._timeout_settings = {
+            "web_search": 30,  # 网络搜索超时时间（秒）
+            "code_interpreter": 60,  # 代码解释器超时时间（秒）
+            "git_helper": 45,  # Git 操作超时时间（秒）
+            "file_manager": 20,  # 文件操作超时时间（秒）
+            "data_analyzer": 60,  # 数据分析超时时间（秒）
+            "default": 30,  # 默认超时时间（秒）
+        }
+        
+        # 超时统计
+        self._timeout_stats = {
+            "total_executions": 0,
+            "timeout_count": 0,
+            "tool_timeouts": {},  # 按工具统计超时次数
+            "average_execution_time": 0,
+            "max_execution_time": 0,
+        }
+        
+        # 超时预警阈值
+        self._timeout_warning_threshold = 0.8  # 超时预警阈值（占总超时时间的比例）
+        
         # 注册恢复策略
         self._register_recovery_strategies()
+        
+        # 启动超时监控任务
+        self._start_timeout_monitor()
+
+    def _start_timeout_monitor(self):
+        """
+        启动超时监控任务
+        """
+        async def monitor_timeout():
+            while True:
+                await asyncio.sleep(60)  # 每分钟检查一次
+                self._check_timeout_stats()
+        
+        try:
+            asyncio.create_task(monitor_timeout())
+            logger.info("🔔 超时监控任务已启动")
+        except RuntimeError:
+            # 在没有运行的事件循环时，跳过启动监控任务
+            logger.info("🔔 跳过启动超时监控任务（无事件循环）")
+
+    def _check_timeout_stats(self):
+        """
+        检查超时统计信息并发出预警
+        """
+        if self._timeout_stats["total_executions"] > 0:
+            timeout_rate = self._timeout_stats["timeout_count"] / self._timeout_stats["total_executions"] * 100
+            if timeout_rate > 5:  # 超时率超过5%发出预警
+                logger.warning(f"⚠️  超时率过高: {timeout_rate:.2f}%")
+            
+            for tool_name, timeout_count in self._timeout_stats["tool_timeouts"].items():
+                if timeout_count > 3:  # 某个工具超时超过3次发出预警
+                    logger.warning(f"⚠️  工具 {tool_name} 超时次数过多: {timeout_count} 次")
+
+    def _get_tool_timeout(self, tool_name: str) -> int:
+        """
+        获取工具的超时时间
+        
+        Args:
+            tool_name: 工具名称
+            
+        Returns:
+            int: 超时时间（秒）
+        """
+        return self._timeout_settings.get(tool_name, self._timeout_settings["default"])
+
+    def _update_timeout_stats(self, tool_name: str, execution_time: float, timed_out: bool):
+        """
+        更新超时统计信息
+        
+        Args:
+            tool_name: 工具名称
+            execution_time: 执行时间（秒）
+            timed_out: 是否超时
+        """
+        self._timeout_stats["total_executions"] += 1
+        
+        # 更新平均执行时间
+        current_avg = self._timeout_stats["average_execution_time"]
+        total = self._timeout_stats["total_executions"]
+        self._timeout_stats["average_execution_time"] = ((current_avg * (total - 1)) + execution_time) / total
+        
+        # 更新最大执行时间
+        if execution_time > self._timeout_stats["max_execution_time"]:
+            self._timeout_stats["max_execution_time"] = execution_time
+        
+        # 更新超时统计
+        if timed_out:
+            self._timeout_stats["timeout_count"] += 1
+            if tool_name not in self._timeout_stats["tool_timeouts"]:
+                self._timeout_stats["tool_timeouts"][tool_name] = 0
+            self._timeout_stats["tool_timeouts"][tool_name] += 1
+        
+        # 检查是否接近超时
+        tool_timeout = self._get_tool_timeout(tool_name)
+        if execution_time > tool_timeout * self._timeout_warning_threshold:
+            logger.warning(f"⚠️  工具 {tool_name} 执行时间接近超时: {execution_time:.2f}s / {tool_timeout}s")
+
+    def get_timeout_stats(self) -> dict[str, Any]:
+        """
+        获取超时统计信息
+        
+        Returns:
+            dict: 超时统计信息
+        """
+        return self._timeout_stats
 
     def _load_skills(self):
         """加载技能"""
@@ -434,11 +541,15 @@ class ToolExecutor:
                 }
 
     async def _execute_builtin_tool(
-        self, tool_name: str, args: dict[str, Any], role: str = "user", timeout: int = 30, priority: int = 5
+        self, tool_name: str, args: dict[str, Any], role: str = "user", timeout: int = None, priority: int = 5
     ) -> dict[str, Any]:
         """
         执行内置工具
         """
+        # 自动获取超时时间
+        if timeout is None:
+            timeout = self._get_tool_timeout(tool_name)
+
         # 检查权限
         if not self._check_permission(tool_name, role):
             logger.warning(f"🚫 权限不足: {role} 无法调用 {tool_name}")
@@ -470,8 +581,11 @@ class ToolExecutor:
 
         # 定义任务函数
         async def task():
+            start_time = time.time()
+            timed_out = False
+            
             try:
-                logger.info(f"🛠️  正在执行内置工具: {tool_name} | 参数: {args} | 优先级: {priority}")
+                logger.info(f"🛠️  正在执行内置工具: {tool_name} | 参数: {args} | 优先级: {priority} | 超时: {timeout}s")
 
                 # 应用速率限制
                 rate_limiter = self._rate_limiters.get(tool_name, self._rate_limiters["default"])
@@ -507,6 +621,7 @@ class ToolExecutor:
                 self._fault_recovery_manager.record_fault(tool_name, TimeoutError(error_msg))
                 # 尝试恢复
                 await self._fault_recovery_manager.recover(tool_name)
+                timed_out = True
                 return {"success": False, "error": error_msg, "timestamp": datetime.now().isoformat()}
             except TypeError as te:
                 error_msg = f"参数不匹配: {str(te)}"
@@ -520,6 +635,10 @@ class ToolExecutor:
                 # 尝试恢复
                 await self._fault_recovery_manager.recover(tool_name)
                 return {"success": False, "error": error_msg, "timestamp": datetime.now().isoformat()}
+            finally:
+                # 更新超时统计
+                execution_time = time.time() - start_time
+                self._update_timeout_stats(tool_name, execution_time, timed_out)
 
         # 如果队列不为空，将任务添加到队列
         if self._task_queue:
@@ -598,11 +717,15 @@ class ToolExecutor:
         return True, ""
 
     async def _execute_skill_tool(
-        self, skill_class, args: dict[str, Any], role: str = "user", timeout: int = 30, priority: int = 5
+        self, skill_class, args: dict[str, Any], role: str = "user", timeout: int = None, priority: int = 5
     ) -> dict[str, Any]:
         """
         执行技能工具
         """
+        # 自动获取超时时间
+        if timeout is None:
+            timeout = self._get_tool_timeout(skill_class.name)
+
         # 检查服务是否降级
         if self._service_degrader.is_degraded(skill_class.name):
             logger.warning(f"⚠️  服务 {skill_class.name} 已降级")
@@ -617,8 +740,11 @@ class ToolExecutor:
 
         # 定义任务函数
         async def task():
+            start_time = time.time()
+            timed_out = False
+            
             try:
-                logger.info(f"🛠️  正在执行技能工具: {skill_class.name} | 参数: {args} | 优先级: {priority}")
+                logger.info(f"🛠️  正在执行技能工具: {skill_class.name} | 参数: {args} | 优先级: {priority} | 超时: {timeout}s")
 
                 # 检查依赖
                 is_ready, error_msg = self._check_dependencies(skill_class.name)
@@ -659,6 +785,7 @@ class ToolExecutor:
                 self._fault_recovery_manager.record_fault(skill_class.name, TimeoutError(error_msg))
                 # 尝试恢复
                 await self._fault_recovery_manager.recover(skill_class.name)
+                timed_out = True
                 return {
                     "status": "error",
                     "observation": {
@@ -682,6 +809,10 @@ class ToolExecutor:
                         "timestamp": datetime.now().isoformat(),
                     },
                 }
+            finally:
+                # 更新超时统计
+                execution_time = time.time() - start_time
+                self._update_timeout_stats(skill_class.name, execution_time, timed_out)
 
         # 如果队列不为空，将任务添加到队列
         if self._task_queue:

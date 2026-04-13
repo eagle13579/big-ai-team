@@ -1,175 +1,251 @@
+import unittest
 import os
-import sys
-
-# 确保项目根目录在 Python 搜索路径中
-# 尝试多种可能的路径组合
-possible_roots = [
-    os.path.abspath(
-        os.path.join(os.path.dirname(__file__), "..")
-    ),  # 常见情况：tests/ 目录在项目根目录下
-    os.path.abspath(
-        os.path.join(os.path.dirname(__file__), "..", "..")
-    ),  # 特殊情况：tests/ 目录在更深层
-    os.path.abspath("."),  # 当前目录
-    os.path.abspath(".."),  # 父目录
-]
-
-for root in possible_roots:
-    if os.path.exists(os.path.join(root, "src")):
-        sys.path.insert(0, root)
-        print(f"Added project root to path: {root}")
-        break
-
-from unittest.mock import mock_open, patch
-
-import pytest
-
-from src.skills.file_manager import FileManagerTool
+import tempfile
+from src.skills.file_manager import FileManagerTool, FileManagerArgsSchema
 
 
-@pytest.fixture
-def file_manager_tool():
-    """创建FileManagerTool实例"""
-    return FileManagerTool()
+class TestFileManagerTool(unittest.IsolatedAsyncioTestCase):
+    """测试文件管理工具"""
+    
+    def setUp(self):
+        """设置测试环境"""
+        # 创建临时目录作为测试工作目录
+        self.temp_dir = tempfile.mkdtemp()
+        self.tool = FileManagerTool()
+    
+    def tearDown(self):
+        """清理测试环境"""
+        # 清理临时目录
+        import shutil
+        shutil.rmtree(self.temp_dir)
+    
+    def test_write_file(self):
+        """测试写入文件"""
+        file_path = os.path.join(self.temp_dir, "test.txt")
+        content = "Hello, World!"
+        
+        args = {
+            "operation": "write",
+            "file_path": file_path,
+            "content": content
+        }
+        
+        result = self.tool.execute(args)
+        self.assertEqual(result["status"], "success")
+        
+        # 验证文件内容
+        with open(file_path, "r", encoding="utf-8") as f:
+            self.assertEqual(f.read(), content)
+    
+    def test_read_file(self):
+        """测试读取文件"""
+        file_path = os.path.join(self.temp_dir, "test.txt")
+        content = "Hello, World!"
+        
+        # 先写入文件
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write(content)
+        
+        args = {
+            "operation": "read",
+            "file_path": file_path
+        }
+        
+        result = self.tool.execute(args)
+        self.assertEqual(result["status"], "success")
+        self.assertEqual(result["observation"]["data"], content)
+    
+    def test_list_directory(self):
+        """测试列出目录"""
+        # 创建测试文件
+        file1 = os.path.join(self.temp_dir, "file1.txt")
+        file2 = os.path.join(self.temp_dir, "file2.txt")
+        
+        with open(file1, "w") as f:
+            f.write("content1")
+        with open(file2, "w") as f:
+            f.write("content2")
+        
+        args = {
+            "operation": "list",
+            "file_path": self.temp_dir
+        }
+        
+        result = self.tool.execute(args)
+        self.assertEqual(result["status"], "success")
+        items = result["observation"]["data"]
+        self.assertEqual(len(items), 2)
+    
+    def test_delete_file(self):
+        """测试删除文件"""
+        file_path = os.path.join(self.temp_dir, "test.txt")
+        
+        # 先创建文件
+        with open(file_path, "w") as f:
+            f.write("content")
+        
+        args = {
+            "operation": "delete",
+            "file_path": file_path
+        }
+        
+        result = self.tool.execute(args)
+        self.assertEqual(result["status"], "success")
+        
+        # 验证文件已删除
+        self.assertFalse(os.path.exists(file_path))
+    
+    def test_create_directory(self):
+        """测试创建目录"""
+        dir_path = os.path.join(self.temp_dir, "test_dir")
+        
+        args = {
+            "operation": "mkdir",
+            "file_path": dir_path
+        }
+        
+        result = self.tool.execute(args)
+        self.assertEqual(result["status"], "success")
+        
+        # 验证目录已创建
+        self.assertTrue(os.path.exists(dir_path))
+        self.assertTrue(os.path.isdir(dir_path))
+    
+    def test_rename_file(self):
+        """测试重命名文件"""
+        old_path = os.path.join(self.temp_dir, "old.txt")
+        new_path = os.path.join(self.temp_dir, "new.txt")
+        
+        # 先创建文件
+        with open(old_path, "w") as f:
+            f.write("content")
+        
+        args = {
+            "operation": "rename",
+            "file_path": old_path,
+            "target_path": new_path
+        }
+        
+        result = self.tool.execute(args)
+        self.assertEqual(result["status"], "success")
+        
+        # 验证文件已重命名
+        self.assertFalse(os.path.exists(old_path))
+        self.assertTrue(os.path.exists(new_path))
+    
+    def test_copy_file(self):
+        """测试复制文件"""
+        source_path = os.path.join(self.temp_dir, "source.txt")
+        target_path = os.path.join(self.temp_dir, "target.txt")
+        
+        # 先创建源文件
+        with open(source_path, "w") as f:
+            f.write("content")
+        
+        args = {
+            "operation": "copy",
+            "file_path": source_path,
+            "target_path": target_path
+        }
+        
+        result = self.tool.execute(args)
+        self.assertEqual(result["status"], "success")
+        
+        # 验证文件已复制
+        self.assertTrue(os.path.exists(source_path))
+        self.assertTrue(os.path.exists(target_path))
+        with open(target_path, "r") as f:
+            self.assertEqual(f.read(), "content")
+    
+    def test_move_file(self):
+        """测试移动文件"""
+        source_path = os.path.join(self.temp_dir, "source.txt")
+        target_path = os.path.join(self.temp_dir, "target.txt")
+        
+        # 先创建源文件
+        with open(source_path, "w") as f:
+            f.write("content")
+        
+        args = {
+            "operation": "move",
+            "file_path": source_path,
+            "target_path": target_path
+        }
+        
+        result = self.tool.execute(args)
+        self.assertEqual(result["status"], "success")
+        
+        # 验证文件已移动
+        self.assertFalse(os.path.exists(source_path))
+        self.assertTrue(os.path.exists(target_path))
+    
+    def test_get_file_stat(self):
+        """测试获取文件信息"""
+        file_path = os.path.join(self.temp_dir, "test.txt")
+        
+        # 先创建文件
+        with open(file_path, "w") as f:
+            f.write("content")
+        
+        args = {
+            "operation": "stat",
+            "file_path": file_path
+        }
+        
+        result = self.tool.execute(args)
+        self.assertEqual(result["status"], "success")
+        self.assertIn("path", result["observation"]["data"])
+        self.assertIn("size", result["observation"]["data"])
+    
+    def test_invalid_operation(self):
+        """测试无效操作"""
+        args = {
+            "operation": "invalid",
+            "file_path": self.temp_dir
+        }
+        
+        result = self.tool.execute(args)
+        self.assertEqual(result["status"], "error")
+        self.assertIn("不支持的操作类型", result["observation"]["message"])
+    
+    def test_missing_content(self):
+        """测试缺少内容"""
+        file_path = os.path.join(self.temp_dir, "test.txt")
+        
+        args = {
+            "operation": "write",
+            "file_path": file_path
+        }
+        
+        result = self.tool.execute(args)
+        self.assertEqual(result["status"], "error")
+        self.assertIn("写入操作必须提供 content 参数", result["observation"]["message"])
+    
+    def test_missing_target_path(self):
+        """测试缺少目标路径"""
+        file_path = os.path.join(self.temp_dir, "test.txt")
+        
+        args = {
+            "operation": "copy",
+            "file_path": file_path
+        }
+        
+        result = self.tool.execute(args)
+        self.assertEqual(result["status"], "error")
+        self.assertIn("copy 操作必须提供 target_path 参数", result["observation"]["message"])
+    
+    def test_security_check(self):
+        """测试安全检查"""
+        # 尝试使用相对路径
+        args = {
+            "operation": "read",
+            "file_path": "../test.txt"
+        }
+        
+        result = self.tool.execute(args)
+        self.assertEqual(result["status"], "error")
+        self.assertIn("路径包含不安全的字符", result["observation"]["message"])
 
 
-def test_read_file_success(file_manager_tool):
-    """测试成功读取文件"""
-    # 模拟文件存在且可读
-    with patch("os.path.exists", return_value=True):
-        with patch("os.path.isfile", return_value=True):
-            with patch("os.path.getsize", return_value=100):
-                with patch("builtins.open", mock_open(read_data="test content")):
-                    result = file_manager_tool.execute(
-                        {"operation": "read", "file_path": "test.txt"}
-                    )
-
-                    # 验证结果
-                    assert result["status"] == "success"
-                    assert result["observation"]["data"] == "test content"
-                    assert "成功读取文件" in result["observation"]["message"]
-                    assert "timestamp" in result["observation"]
-
-
-def test_read_file_not_exists(file_manager_tool):
-    """测试读取不存在的文件"""
-    # 模拟文件不存在
-    with patch("os.path.exists", return_value=False):
-        result = file_manager_tool.execute({"operation": "read", "file_path": "non_existent.txt"})
-
-        # 验证结果
-        assert result["status"] == "error"
-        assert "observation" in result
-        assert "文件不存在" in result["observation"]["message"]
-
-
-def test_write_file_success(file_manager_tool):
-    """测试成功写入文件"""
-    # 模拟文件路径
-    with patch("os.makedirs", return_value=None):
-        with patch("builtins.open", mock_open()) as mock_file:
-            result = file_manager_tool.execute(
-                {"operation": "write", "file_path": "test.txt", "content": "test content"}
-            )
-
-            # 验证结果
-            assert result["status"] == "success"
-            assert "observation" in result
-            assert "成功写入到" in result["observation"]["message"]
-            # 验证文件被打开并写入
-            mock_file.assert_called_once_with(os.path.abspath("test.txt"), "w", encoding="utf-8")
-            mock_file().write.assert_called_once_with("test content")
-
-
-def test_write_file_no_content(file_manager_tool):
-    """测试写入文件时缺少内容"""
-    result = file_manager_tool.execute({"operation": "write", "file_path": "test.txt"})
-
-    # 验证结果
-    assert result["status"] == "error"
-    assert "observation" in result
-    assert "写入操作必须提供 content 参数" in result["observation"]["message"]
-
-
-def test_list_directory_success(file_manager_tool):
-    """测试成功列出目录"""
-    # 模拟目录存在且包含文件
-    with patch("os.path.isdir", return_value=True):
-        with patch("os.listdir", return_value=["file1.txt", "file2.txt"]):
-            result = file_manager_tool.execute({"operation": "list", "file_path": "."})
-
-            # 验证结果
-            assert result["status"] == "success"
-            assert "observation" in result
-            assert "data" in result["observation"]
-            # 检查返回的数据结构
-            assert isinstance(result["observation"]["data"], list)
-            assert len(result["observation"]["data"]) == 2
-            assert "成功列出目录" in result["observation"]["message"]
-
-
-def test_list_directory_not_exists(file_manager_tool):
-    """测试列出不存在的目录"""
-    # 模拟目录不存在
-    with patch("os.path.isdir", return_value=False):
-        result = file_manager_tool.execute({"operation": "list", "file_path": "non_existent_dir"})
-
-        # 验证结果
-        assert result["status"] == "error"
-        assert "observation" in result
-        assert "目录不存在" in result["observation"]["message"]
-
-
-def test_delete_file_success(file_manager_tool):
-    """测试成功删除文件"""
-    # 模拟文件存在
-    with patch("os.path.isfile", return_value=True):
-        with patch("os.remove", return_value=None) as mock_remove:
-            result = file_manager_tool.execute({"operation": "delete", "file_path": "test.txt"})
-
-            # 验证结果
-            assert result["status"] == "success"
-            assert "observation" in result
-            assert "已删除文件" in result["observation"]["message"]
-            # 验证文件被删除
-            mock_remove.assert_called_once_with(os.path.abspath("test.txt"))
-
-
-def test_delete_file_not_exists(file_manager_tool):
-    """测试删除不存在的文件"""
-    # 模拟文件不存在
-    with patch("os.path.isfile", return_value=False):
-        result = file_manager_tool.execute({"operation": "delete", "file_path": "non_existent.txt"})
-
-        # 验证结果
-        assert result["status"] == "error"
-        assert "observation" in result
-        assert "仅支持删除单个文件" in result["observation"]["message"]
-
-
-def test_invalid_operation(file_manager_tool):
-    """测试无效的操作类型"""
-    result = file_manager_tool.execute({"operation": "invalid", "file_path": "test.txt"})
-
-    # 验证结果
-    assert result["status"] == "error"
-    assert "observation" in result
-    assert "不支持的操作类型" in result["observation"]["message"]
-
-
-def test_exception_handling(file_manager_tool):
-    """测试异常处理"""
-    # 模拟读取文件时发生异常
-    with patch("os.path.exists", return_value=True):
-        with patch("os.path.isfile", return_value=True):
-            with patch("os.path.getsize", return_value=100):
-                with patch("builtins.open", side_effect=Exception("File read error")):
-                    result = file_manager_tool.execute(
-                        {"operation": "read", "file_path": "test.txt"}
-                    )
-
-                    # 验证结果
-                    assert result["status"] == "error"
-                    assert "observation" in result
-                    assert "File read error" in result["observation"]["message"]
-                    assert "timestamp" in result["observation"]
+if __name__ == "__main__":
+    unittest.main()

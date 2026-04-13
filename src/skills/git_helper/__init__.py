@@ -417,8 +417,8 @@ class SecurityManager:
         self.protected_branches = protected_branches or ["main", "master", "develop"]
         # 使用默认值或自定义值
         self.permission_matrix = permission_matrix or {
-            "admin": ["status", "add", "commit", "push", "pull", "branch", "tag", "merge"],
-            "user": ["status", "add", "commit", "branch", "tag"],
+            "admin": ["status", "add", "commit", "push", "pull", "branch", "tag", "merge", "stash", "stash_list", "stash_apply", "stash_pop", "stash_drop", "hooks_list", "hooks_read", "hooks_write", "hooks_delete"],
+            "user": ["status", "add", "commit", "branch", "tag", "stash", "stash_list"],
             "guest": ["status"],
         }
         logger.info(
@@ -547,7 +547,7 @@ class GitHelperTool(BaseSkill):
             files = validated_args.files
             message = validated_args.message
             remote = validated_args.remote
-            branch = validated_args.branch or self.git_client.repo.active_branch.name
+            branch = validated_args.branch
             # 优先使用初始化时设置的user_role
             user_role = self.user_role
             tag_name = validated_args.tag_name
@@ -555,6 +555,9 @@ class GitHelperTool(BaseSkill):
 
             # 检查权限
             try:
+                # 当 branch 为 None 时，获取当前分支名称
+                if branch is None:
+                    branch = self.git_client.repo.active_branch.name
                 self.security_manager.check_permission(action, user_role, branch)
             except GitPermissionError as e:
                 logger.warning(f"权限检查失败: {str(e)}")
@@ -590,7 +593,7 @@ class GitHelperTool(BaseSkill):
                 GitAction.COMMIT: lambda: self._commit(message),
                 GitAction.PUSH: lambda: self._push(remote, branch),
                 GitAction.PULL: lambda: self._pull(remote, branch),
-                GitAction.BRANCH: lambda: self._branch(branch),
+                GitAction.BRANCH: lambda: self._branch(validated_args.branch),
                 GitAction.TAG: lambda: self._tag(tag_name, message),
                 GitAction.MERGE: lambda: self._merge(target_branch),
                 GitAction.STASH: lambda: self._stash(message),
@@ -897,7 +900,7 @@ class GitHelperTool(BaseSkill):
             logger.error(f"拉取更改失败: {str(e)}")
             return {"data": None, "message": f"拉取失败: {str(e)}"}
 
-    def _branch(self, branch_name: str) -> dict[str, Any]:
+    def _branch(self, branch_name: str | None) -> dict[str, Any]:
         """管理分支"""
         logger.info(f"分支操作: {branch_name}")
         try:
@@ -933,6 +936,19 @@ class GitHelperTool(BaseSkill):
         except Exception as e:
             logger.error(f"合并分支失败: {str(e)}")
             return {"data": None, "message": f"合并操作失败: {str(e)}", "status": "error"}
+
+    def _stash(self, message: str | None) -> dict[str, Any]:
+        """暂存更改"""
+        logger.info(f"暂存更改: {message}")
+        try:
+            result = self.git_client.stash(message)
+            # 清除状态缓存
+            self._clear_status_cache()
+            logger.info(f"成功暂存更改: {result['message']}")
+            return result
+        except Exception as e:
+            logger.error(f"暂存更改失败: {str(e)}")
+            return {"data": None, "message": f"暂存失败: {str(e)}"}
 
     def _stash_list(self) -> dict[str, Any]:
         """列出所有暂存"""
@@ -1088,3 +1104,12 @@ def create_git_helper(
         permission_matrix=permission_matrix,
         cache_ttl=cache_ttl,
     )
+
+
+# 注册技能
+try:
+    from src.skills.registry import register_skill
+    register_skill("git_helper", create_git_helper())
+except ImportError:
+    # 如果注册失败，记录日志
+    logger.warning("无法注册 git_helper 技能，registry 模块未找到")
