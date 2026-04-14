@@ -86,61 +86,149 @@ class AnalystRole(Role):
 
 
 class ExecutorRole(Role):
-    """执行专家角色"""
+    """执行专家角色 - 对接 ToolExecutor 执行真实任务"""
 
-    def __init__(self):
+    def __init__(self, executor=None):
         super().__init__(
             role_type="executor", name="执行专家", description="负责执行具体任务，使用工具完成操作"
         )
+        self._executor = executor
+
+    def set_executor(self, executor):
+        """设置工具执行器"""
+        self._executor = executor
 
     def process_task(self, task: dict[str, Any]) -> dict[str, Any]:
-        """处理执行任务"""
+        """处理执行任务 - 对接真实 ToolExecutor"""
         try:
-            # 执行任务
             task_description = task.get("description", "")
-            input_params = task.get("input_params", {})
+            tool_name = task.get("tool")
+            tool_args = task.get("args", {})
 
-            # 生成执行结果
+            if not tool_name:
+                return {
+                    "status": "error",
+                    "message": "缺少 tool 参数，无法执行",
+                    "suggestion": "请指定要调用的工具名称",
+                }
+
+            if self._executor is None:
+                return {
+                    "status": "error",
+                    "message": "执行器未初始化",
+                    "task_description": task_description,
+                }
+
+            import asyncio
+
+            try:
+                loop = asyncio.get_event_loop()
+                if loop.is_running():
+                    import concurrent.futures
+                    with concurrent.futures.ThreadPoolExecutor() as pool:
+                        future = pool.submit(
+                            asyncio.run,
+                            self._executor.execute(tool_name, tool_args)
+                        )
+                        result = future.result(timeout=60)
+                else:
+                    result = loop.run_until_complete(
+                        self._executor.execute(tool_name, tool_args)
+                    )
+            except RuntimeError:
+                result = asyncio.run(
+                    self._executor.execute(tool_name, tool_args)
+                )
+
             execution_result = {
                 "task_description": task_description,
-                "input_params": input_params,
-                "execution_status": "in_progress",
-                "estimated_completion": "正在执行中",
+                "tool": tool_name,
+                "tool_args": tool_args,
+                "execution_status": "success" if result.get("success") else "failed",
+                "result": result.get("result") if result.get("success") else None,
+                "error": result.get("error") if not result.get("success") else None,
             }
 
-            return {"status": "success", "data": execution_result}
+            return {"status": "success" if result.get("success") else "error", "data": execution_result}
+
         except Exception as e:
             logger.error(f"执行专家处理任务失败: {str(e)}")
             return {"status": "error", "message": f"处理任务失败: {str(e)}"}
 
 
 class ReviewerRole(Role):
-    """审查专家角色"""
+    """审查专家角色 - 对接 ExecutionLoop 审查步骤"""
 
-    def __init__(self):
+    def __init__(self, llm_client=None):
         super().__init__(
             role_type="reviewer", name="审查专家", description="负责审查任务执行结果，确保质量"
         )
+        self._llm_client = llm_client
+
+    def set_llm_client(self, llm_client):
+        """设置 LLM 客户端"""
+        self._llm_client = llm_client
 
     def process_task(self, task: dict[str, Any]) -> dict[str, Any]:
-        """处理审查任务"""
+        """处理审查任务 - 使用 LLM 进行智能审查"""
         try:
-            # 审查任务结果
             task_description = task.get("description", "")
             execution_result = task.get("execution_result", {})
 
-            # 生成审查结果
+            review_checks = self._perform_automated_checks(execution_result)
+
+            llm_review = None
+            if self._llm_client is not None:
+                try:
+                    import asyncio
+                    review_prompt = (
+                        f"请审查以下任务执行结果的质量：\n"
+                        f"任务描述: {task_description}\n"
+                        f"执行结果: {execution_result}\n"
+                        f"自动检查结果: {review_checks}\n"
+                        f"请给出审查意见和改进建议。"
+                    )
+                    llm_review = asyncio.run(
+                        self._llm_client.generate(review_prompt, temperature=0.3)
+                    )
+                except Exception as e:
+                    logger.warning(f"LLM 审查失败，使用自动审查: {e}")
+
+            passed = all(review_checks.values())
             review_result = {
                 "task_description": task_description,
                 "execution_result": execution_result,
-                "review_status": "pending",
-                "review_comments": "正在审查中",
+                "review_status": "passed" if passed else "needs_improvement",
+                "automated_checks": review_checks,
+                "llm_review": llm_review,
+                "review_comments": "审查通过" if passed else "需要改进",
             }
 
             return {"status": "success", "data": review_result}
+
         except Exception as e:
             logger.error(f"审查专家处理任务失败: {str(e)}")
             return {"status": "error", "message": f"处理任务失败: {str(e)}"}
+
+    def _perform_automated_checks(self, execution_result: dict[str, Any]) -> dict[str, bool]:
+        """执行自动化质量检查"""
+        checks = {
+            "has_result": bool(execution_result.get("result")),
+            "no_error": not execution_result.get("error"),
+            "result_not_empty": bool(execution_result.get("result")),
+        }
+
+        result = execution_result.get("result")
+        if isinstance(result, str):
+            checks["result_meaningful"] = len(result.strip()) > 10
+        elif isinstance(result, dict):
+            checks["result_meaningful"] = len(result) > 0
+        elif isinstance(result, list):
+            checks["result_meaningful"] = len(result) > 0
+        else:
+            checks["result_meaningful"] = result is not None
+
+        return checks
 
 
 class RoleFactory:

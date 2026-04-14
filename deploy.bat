@@ -1,4 +1,5 @@
 @echo off
+echo 开始执行 deploy.bat...
 chcp 65001 >nul
 setlocal enabledelayedexpansion
 
@@ -7,16 +8,20 @@ echo 🚀 Nova 部署助手 (2026 工业级标准版)
 echo ======================================================
 
 :: 1. 检查 Docker 是否运行
-docker version >nul 2>&1
+echo [检查] 正在检查 Docker 服务状态...
+docker version
 if %ERRORLEVEL% NEQ 0 (
     echo [!] 错误：Docker 引擎未启动！
     echo [i] 请先打开 Docker Desktop 软件，确保左下角显示为绿色。
+    pause
     exit /b 1
 )
 
 :: 2. 检查 Dockerfile
+echo [检查] 正在检查 Dockerfile 是否存在...
 if not exist "Dockerfile" (
     echo [!] 错误：未在 %cd% 找到 Dockerfile
+    pause
     exit /b 1
 )
 
@@ -26,6 +31,7 @@ docker build -t big-ai-app:latest .
 
 if %ERRORLEVEL% NEQ 0 (
     echo [!] 镜像构建失败，请检查 Dockerfile 内容。
+    pause
     exit /b 1
 )
 
@@ -36,4 +42,5 @@ docker run --rm big-ai-app:latest
 
 echo ------------------------------------------------------
 echo ✅ 执行完毕！
+pause
 exit /b 0
