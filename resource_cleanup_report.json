@@ -1,0 +1,170 @@
+{
+  "test_summary": {
+    "total_requests": 20,
+    "success_count": 20,
+    "error_count": 0,
+    "timeout_count": 0,
+    "success_rate": 100.0,
+    "error_rate": 0.0,
+    "timeout_rate": 0.0,
+    "total_time_seconds": 61.8966543674469,
+    "requests_per_second": 0.3231192413287936,
+    "test_cases": 20
+  },
+  "test_cases": [
+    {
+      "test_case": "请计算 12345 乘以 67890",
+      "duration": 0,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165771.1209526
+    },
+    {
+      "test_case": "请计算 987654321 除以 12345",
+      "duration": 0,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165774.9920862
+    },
+    {
+      "test_case": "请计算 100 的平方根",
+      "duration": 0,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165778.3179877
+    },
+    {
+      "test_case": "请计算 2 的 10 次方",
+      "duration": 0,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165781.142109
+    },
+    {
+      "test_case": "请计算 1+2+3+...+100 的和",
+      "duration": 0,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165784.0745778
+    },
+    {
+      "test_case": "请告诉我首都北京的人口是多少",
+      "duration": 0,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165786.4874961
+    },
+    {
+      "test_case": "请告诉我太阳系八大行星的名称",
+      "duration": 0,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165788.9584703
+    },
+    {
+      "test_case": "请告诉我 Python 3.12 的新特性",
+      "duration": 0,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165791.4705527
+    },
+    {
+      "test_case": "请告诉我世界上最高的山峰是什么",
+      "duration": 0,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165794.1447496
+    },
+    {
+      "test_case": "请告诉我 2026 年世界杯的举办地点",
+      "duration": 0,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165796.781688
+    },
+    {
+      "test_case": "如果今天是星期一，那么三天后是星期几",
+      "duration": 0,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165799.1321843
+    },
+    {
+      "test_case": "如果 a > b 且 b > c，那么 a 和 c 的关系是什么",
+      "duration": 0,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165801.9715502
+    },
+    {
+      "test_case": "请解释什么是机器学习",
+      "duration": 0,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165805.3353963
+    },
+    {
+      "test_case": "请解释什么是区块链技术",
+      "duration": 0,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165807.8416896
+    },
+    {
+      "test_case": "请解释什么是云计算",
+      "duration": 0,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165810.2778804
+    },
+    {
+      "test_case": "请将 'Hello World' 转换为大写",
+      "duration": 0,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165812.8025992
+    },
+    {
+      "test_case": "请将 'Python is awesome' 反转",
+      "duration": 0,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165815.1165743
+    },
+    {
+      "test_case": "请统计 'Hello World' 中字母 'l' 的出现次数",
+      "duration": 0,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165817.9206355
+    },
+    {
+      "test_case": "请将 '12345' 转换为整数",
+      "duration": 0,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165820.19092
+    },
+    {
+      "test_case": "请生成一个 10 位的随机字符串",
+      "duration": 0,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165823.0693097
+    }
+  ],
+  "system_metrics": [],
+  "config": {
+    "concurrent_tasks": 10,
+    "sequential_tasks": 50,
+    "task_timeout": 120,
+    "memory_threshold_mb": 1000,
+    "cpu_threshold_percent": 80,
+    "response_time_threshold_ms": 30000,
+    "success_rate_threshold": 80,
+    "test_duration_minutes": 5,
+    "ramp_up_seconds": 30,
+    "cool_down_seconds": 30
+  },
+  "test_time": "2026-04-14 19:23:48"
+}

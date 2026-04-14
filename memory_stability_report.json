@@ -1,0 +1,494 @@
+{
+  "test_summary": {
+    "total_requests": 50,
+    "success_count": 50,
+    "error_count": 0,
+    "timeout_count": 0,
+    "success_rate": 100.0,
+    "error_rate": 0.0,
+    "timeout_rate": 0.0,
+    "total_time_seconds": 161.68950390815735,
+    "requests_per_second": 0.3092346676281531,
+    "test_cases": 50,
+    "response_time": {
+      "min_ms": 2153.611183166504,
+      "max_ms": 7098.673582077026,
+      "avg_ms": 3174.3051767349243,
+      "median_ms": 2701.8260955810547,
+      "p95_ms": 6022.089242935181,
+      "p99_ms": 7098.673582077026,
+      "std_dev_ms": 1182.686218062927
+    },
+    "memory_usage": {
+      "min_mb": 182.23828125,
+      "max_mb": 216.828125,
+      "avg_mb": 198.825390625,
+      "current_mb": 216.828125,
+      "std_dev_mb": 12.211383883717808
+    },
+    "cpu_usage": {
+      "min_percent": 0.0,
+      "max_percent": 15.6,
+      "avg_percent": 1.56,
+      "current_percent": 0.0,
+      "std_dev_percent": 4.9331531498626715
+    }
+  },
+  "test_cases": [
+    {
+      "test_case": "请计算 12345 乘以 67890",
+      "duration": 2.595379590988159,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165607.0930386
+    },
+    {
+      "test_case": "请计算 987654321 除以 12345",
+      "duration": 2.2072198390960693,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165609.510185
+    },
+    {
+      "test_case": "请计算 100 的平方根",
+      "duration": 2.3263731002807617,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165611.8366144
+    },
+    {
+      "test_case": "请计算 2 的 10 次方",
+      "duration": 2.4035613536834717,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165614.240181
+    },
+    {
+      "test_case": "请计算 1+2+3+...+100 的和",
+      "duration": 2.169262170791626,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165616.4094472
+    },
+    {
+      "test_case": "请告诉我首都北京的人口是多少",
+      "duration": 2.2958080768585205,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165618.70526
+    },
+    {
+      "test_case": "请告诉我太阳系八大行星的名称",
+      "duration": 2.2138559818267822,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165621.1339278
+    },
+    {
+      "test_case": "请告诉我 Python 3.12 的新特性",
+      "duration": 2.290771007537842,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165623.4247022
+    },
+    {
+      "test_case": "请告诉我世界上最高的山峰是什么",
+      "duration": 2.153611183166504,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165625.5783174
+    },
+    {
+      "test_case": "请告诉我 2026 年世界杯的举办地点",
+      "duration": 2.2372472286224365,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165627.8155682
+    },
+    {
+      "test_case": "如果今天是星期一，那么三天后是星期几",
+      "duration": 2.2871720790863037,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165630.1027436
+    },
+    {
+      "test_case": "如果 a > b 且 b > c，那么 a 和 c 的关系是什么",
+      "duration": 3.420591115951538,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165633.7411609
+    },
+    {
+      "test_case": "请解释什么是机器学习",
+      "duration": 3.1279876232147217,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165636.8691533
+    },
+    {
+      "test_case": "请解释什么是区块链技术",
+      "duration": 3.0290095806121826,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165639.898167
+    },
+    {
+      "test_case": "请解释什么是云计算",
+      "duration": 2.6950342655181885,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165642.5932047
+    },
+    {
+      "test_case": "请将 'Hello World' 转换为大写",
+      "duration": 2.6327359676361084,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165645.2259443
+    },
+    {
+      "test_case": "请将 'Python is awesome' 反转",
+      "duration": 2.225163459777832,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165647.6621954
+    },
+    {
+      "test_case": "请统计 'Hello World' 中字母 'l' 的出现次数",
+      "duration": 2.341689348220825,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165650.0038888
+    },
+    {
+      "test_case": "请将 '12345' 转换为整数",
+      "duration": 3.218667507171631,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165653.2225602
+    },
+    {
+      "test_case": "请生成一个 10 位的随机字符串",
+      "duration": 4.431770324707031,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165657.654335
+    },
+    {
+      "test_case": "请计算 12345 乘以 67890",
+      "duration": 7.098673582077026,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165664.753013
+    },
+    {
+      "test_case": "请计算 987654321 除以 12345",
+      "duration": 3.7655882835388184,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165668.97355
+    },
+    {
+      "test_case": "请计算 100 的平方根",
+      "duration": 3.1285598278045654,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165672.1021147
+    },
+    {
+      "test_case": "请计算 2 的 10 次方",
+      "duration": 2.7533843517303467,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165674.8555036
+    },
+    {
+      "test_case": "请计算 1+2+3+...+100 的和",
+      "duration": 2.7962512969970703,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165677.6517599
+    },
+    {
+      "test_case": "请告诉我首都北京的人口是多少",
+      "duration": 2.7889645099639893,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165680.4407287
+    },
+    {
+      "test_case": "请告诉我太阳系八大行星的名称",
+      "duration": 2.762965440750122,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165683.4279823
+    },
+    {
+      "test_case": "请告诉我 Python 3.12 的新特性",
+      "duration": 2.312096118927002,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165685.740083
+    },
+    {
+      "test_case": "请告诉我世界上最高的山峰是什么",
+      "duration": 2.21999192237854,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165687.9600785
+    },
+    {
+      "test_case": "请告诉我 2026 年世界杯的举办地点",
+      "duration": 2.756718873977661,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165690.7168007
+    },
+    {
+      "test_case": "如果今天是星期一，那么三天后是星期几",
+      "duration": 2.620291233062744,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165693.3370953
+    },
+    {
+      "test_case": "如果 a > b 且 b > c，那么 a 和 c 的关系是什么",
+      "duration": 2.688361406326294,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165696.2425551
+    },
+    {
+      "test_case": "请解释什么是机器学习",
+      "duration": 2.5880608558654785,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165698.8306198
+    },
+    {
+      "test_case": "请解释什么是区块链技术",
+      "duration": 2.708617925643921,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165701.5392416
+    },
+    {
+      "test_case": "请解释什么是云计算",
+      "duration": 2.430492401123047,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165703.9697375
+    },
+    {
+      "test_case": "请将 'Hello World' 转换为大写",
+      "duration": 2.2994754314422607,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165706.2692165
+    },
+    {
+      "test_case": "请将 'Python is awesome' 反转",
+      "duration": 2.303090810775757,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165708.7861438
+    },
+    {
+      "test_case": "请统计 'Hello World' 中字母 'l' 的出现次数",
+      "duration": 2.3746893405914307,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165711.1608367
+    },
+    {
+      "test_case": "请将 '12345' 转换为整数",
+      "duration": 2.683474063873291,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165713.8443146
+    },
+    {
+      "test_case": "请生成一个 10 位的随机字符串",
+      "duration": 3.4441308975219727,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165717.2884498
+    },
+    {
+      "test_case": "请计算 12345 乘以 67890",
+      "duration": 3.794315814971924,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165721.08277
+    },
+    {
+      "test_case": "请计算 987654321 除以 12345",
+      "duration": 4.788558721542358,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165726.2389393
+    },
+    {
+      "test_case": "请计算 100 的平方根",
+      "duration": 4.02983832359314,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165730.2687821
+    },
+    {
+      "test_case": "请计算 2 的 10 次方",
+      "duration": 4.12271523475647,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165734.3915007
+    },
+    {
+      "test_case": "请计算 1+2+3+...+100 的和",
+      "duration": 3.711294174194336,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165738.1027997
+    },
+    {
+      "test_case": "请告诉我首都北京的人口是多少",
+      "duration": 6.022089242935181,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165744.1248932
+    },
+    {
+      "test_case": "请告诉我太阳系八大行星的名称",
+      "duration": 6.302263498306274,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165751.061971
+    },
+    {
+      "test_case": "请告诉我 Python 3.12 的新特性",
+      "duration": 4.52966046333313,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165755.5916357
+    },
+    {
+      "test_case": "请告诉我世界上最高的山峰是什么",
+      "duration": 5.292013645172119,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165760.8836534
+    },
+    {
+      "test_case": "请告诉我 2026 年世界杯的举办地点",
+      "duration": 5.295720338821411,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165766.1793766
+    }
+  ],
+  "system_metrics": [
+    {
+      "timestamp": 1776165607.1936975,
+      "memory_mb": 182.23828125,
+      "cpu_percent": 0.0,
+      "num_threads": 19,
+      "num_fds": 0,
+      "system_cpu": 100.0,
+      "system_memory": 26958.01953125
+    },
+    {
+      "timestamp": 1776165618.8058918,
+      "memory_mb": 183.76953125,
+      "cpu_percent": 0.0,
+      "num_threads": 19,
+      "num_fds": 0,
+      "system_cpu": 100.0,
+      "system_memory": 26870.41796875
+    },
+    {
+      "timestamp": 1776165630.2035148,
+      "memory_mb": 188.16796875,
+      "cpu_percent": 0.0,
+      "num_threads": 19,
+      "num_fds": 0,
+      "system_cpu": 100.0,
+      "system_memory": 26842.26953125
+    },
+    {
+      "timestamp": 1776165645.3267624,
+      "memory_mb": 192.1953125,
+      "cpu_percent": 0.0,
+      "num_threads": 19,
+      "num_fds": 0,
+      "system_cpu": 100.0,
+      "system_memory": 27036.4140625
+    },
+    {
+      "timestamp": 1776165664.8602881,
+      "memory_mb": 196.8515625,
+      "cpu_percent": 0.0,
+      "num_threads": 16,
+      "num_fds": 0,
+      "system_cpu": 100.0,
+      "system_memory": 27260.66796875
+    },
+    {
+      "timestamp": 1776165680.541045,
+      "memory_mb": 200.58203125,
+      "cpu_percent": 15.6,
+      "num_threads": 16,
+      "num_fds": 0,
+      "system_cpu": 100.0,
+      "system_memory": 27108.078125
+    },
+    {
+      "timestamp": 1776165693.4374976,
+      "memory_mb": 205.31640625,
+      "cpu_percent": 0.0,
+      "num_threads": 16,
+      "num_fds": 0,
+      "system_cpu": 100.0,
+      "system_memory": 27146.5390625
+    },
+    {
+      "timestamp": 1776165706.369697,
+      "memory_mb": 209.48046875,
+      "cpu_percent": 0.0,
+      "num_threads": 16,
+      "num_fds": 0,
+      "system_cpu": 100.0,
+      "system_memory": 27071.6171875
+    },
+    {
+      "timestamp": 1776165721.2078645,
+      "memory_mb": 212.82421875,
+      "cpu_percent": 0.0,
+      "num_threads": 15,
+      "num_fds": 0,
+      "system_cpu": 100.0,
+      "system_memory": 27612.5703125
+    },
+    {
+      "timestamp": 1776165744.2511892,
+      "memory_mb": 216.828125,
+      "cpu_percent": 0.0,
+      "num_threads": 13,
+      "num_fds": 0,
+      "system_cpu": 100.0,
+      "system_memory": 29114.5859375
+    }
+  ],
+  "config": {
+    "concurrent_tasks": 10,
+    "sequential_tasks": 50,
+    "task_timeout": 120,
+    "memory_threshold_mb": 1000,
+    "cpu_threshold_percent": 80,
+    "response_time_threshold_ms": 30000,
+    "success_rate_threshold": 80,
+    "test_duration_minutes": 5,
+    "ramp_up_seconds": 30,
+    "cool_down_seconds": 30
+  },
+  "test_time": "2026-04-14 19:22:46"
+}
