@@ -23,9 +23,18 @@ def safe_import(module_path, class_name):
     统一的尝试导入机制，确保单个模块失败不会崩溃
     """
     try:
+        # 首先尝试导入pkg_resources，这是opentelemetry-instrumentation的依赖
+        import pkg_resources
+    except ImportError:
+        # 如果缺少pkg_resources，我们可以尝试使用importlib.metadata作为替代
+        import importlib.metadata
+        # 然后继续导入其他模块
+    
+    try:
         module = __import__(module_path, fromlist=[class_name])
         return getattr(module, class_name)
-    except (ImportError, AttributeError):
+    except (ImportError, AttributeError) as e:
+        logger.warning(f"⚠️ 导入 {module_path}.{class_name} 失败: {str(e)}")
         return None
 
 # 核心追踪组件
@@ -139,12 +148,23 @@ def init_telemetry():
         # 3. 激活 Redis 追踪 (解决您的核心问题)
         if RedisInstrumentor:
             try:
+                logger.info(f"🔍 RedisInstrumentor 已成功导入: {RedisInstrumentor}")
                 RedisInstrumentor().instrument()
                 logger.info("🔍 Redis 追踪已启用")
             except Exception as e:
                 logger.warning(f"⚠️ Redis 仪器化激活失败: {str(e)}")
+                import traceback
+                logger.warning(f"⚠️ 详细错误信息: {traceback.format_exc()}")
         else:
             logger.warning("⚠️ Redis 追踪初始化失败: 容器内未检测到 opentelemetry-instrumentation-redis 依赖")
+            # 尝试直接导入以获取更详细的错误信息
+            try:
+                from opentelemetry.instrumentation.redis import RedisInstrumentor as DirectRedisInstrumentor
+                logger.info(f"🔍 直接导入成功: {DirectRedisInstrumentor}")
+            except Exception as e:
+                logger.warning(f"⚠️ 直接导入失败: {str(e)}")
+                import traceback
+                logger.warning(f"⚠️ 详细错误信息: {traceback.format_exc()}")
 
         # 4. 激活 SQLAlchemy 追踪
         if SQLAlchemyInstrumentor:
