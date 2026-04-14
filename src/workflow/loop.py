@@ -152,33 +152,146 @@ class MemoryManager:
 class LLMClient:
     """
     LLM 客户端，负责与各种 LLM API 交互
+    集成 LLMFactory + ModelSelector，支持真实 API 调用 + Mock 回退
     """
 
     def __init__(self, task: str = ""):
-        self.api_key = os.environ.get("OPENAI_API_KEY") or os.environ.get("DEEPSEEK_API_KEY")
+        from src.access.llm_protocol import LLMFactory, LLMRequest, LLMResponse, MockLLMProtocol
+        from src.shared.model_selector import model_selector, ModelInfo
 
-        # 导入模型选择器
-        try:
-            from src.shared.model_selector import select_model_for_task
+        self._llm_factory = LLMFactory
+        self._model_selector = model_selector
+        self._use_mock = False
+        self._token_usage_total: dict[str, int] = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
 
-            self.model_name = select_model_for_task(task) if task else settings.DEFAULT_MODEL_NAME
-        except ImportError:
+        selected_model: ModelInfo | None = None
+        if task:
+            try:
+                selected_model = model_selector.select_model(task)
+                self.model_name = selected_model.name
+            except Exception:
+                self.model_name = settings.DEFAULT_MODEL_NAME
+        else:
             self.model_name = settings.DEFAULT_MODEL_NAME
 
-        logger.info(f"🤖 为任务选择的模型: {self.model_name}")
+        self._provider = selected_model.provider if selected_model else "mock"
+
+        provider_map = {
+            "openai": "openai",
+            "anthropic": "claude",
+            "deepseek": "openai",
+            "ollama": "openai",
+            "google": "openai",
+            "zhipu": "openai",
+            "moonshot": "openai",
+        }
+        self._protocol_type = provider_map.get(self._provider, "mock")
+
+        try:
+            self._protocol = self._llm_factory.create_protocol(self._protocol_type)
+            self._use_mock = isinstance(self._protocol, MockLLMProtocol)
+        except Exception as e:
+            logger.warning(f"LLM 协议创建失败，回退到 Mock: {e}")
+            self._protocol = MockLLMProtocol()
+            self._use_mock = True
+
+        mode_label = "Mock" if self._use_mock else f"真实API({self._provider})"
+        logger.info(f"🤖 为任务选择的模型: {self.model_name} [{mode_label}]")
 
     async def generate(self, prompt: str, temperature: float = 0.7) -> str:
         """
-        生成文本
+        生成文本 - 优先使用真实 LLM API，失败回退到 Mock
         """
-        # 这里使用模拟实现，实际使用时应该调用真实的 LLM API
-        # 例如 OpenAI、DeepSeek、Claude 等
+        from src.access.llm_protocol import LLMRequest
+
         logger.info(f"📡 调用 LLM 生成文本，模型: {self.model_name}")
 
-        # 模拟 API 调用延迟
-        await asyncio.sleep(1.5)
+        if self._use_mock:
+            return await self._generate_mock(prompt)
 
-        # 模拟不同场景的回复
+        try:
+            request = LLMRequest(
+                prompt=prompt,
+                model=self.model_name,
+                temperature=temperature,
+                max_tokens=2000,
+            )
+            loop = asyncio.get_event_loop()
+            response = await loop.run_in_executor(None, self._protocol.generate, request)
+
+            self._accumulate_token_usage(response.token_usage)
+
+            logger.info(
+                f"📊 Token 使用: prompt={response.token_usage.get('prompt_tokens', 0)}, "
+                f"completion={response.token_usage.get('completion_tokens', 0)}"
+            )
+            return response.content
+
+        except Exception as e:
+            logger.error(f"❌ LLM API 调用失败: {e}，回退到 Mock")
+            return await self._generate_mock(prompt)
+
+    async def generate_decision(self, goal: str, context: str) -> dict[str, Any]:
+        """
+        生成决策 - 使用 LLM 生成结构化 JSON 决策
+        """
+        if self._use_mock:
+            return await self._generate_decision_mock(goal, context)
+
+        decision_prompt = self._build_decision_prompt(goal, context)
+
+        try:
+            raw_response = await self.generate(decision_prompt, temperature=0.3)
+            return self._parse_decision_response(raw_response)
+        except Exception as e:
+            logger.error(f"❌ LLM 决策生成失败: {e}，回退到 Mock")
+            return await self._generate_decision_mock(goal, context)
+
+    def _build_decision_prompt(self, goal: str, context: str) -> str:
+        """构建决策生成的 Prompt"""
+        return f"""你是一个智能任务执行助手。根据当前目标和工作上下文，生成下一步决策。
+
+当前目标: {goal}
+
+工作上下文:
+{context}
+
+请严格按照以下 JSON 格式输出你的决策（不要输出任何其他内容）:
+{{
+    "action": "CALL_TOOL" 或 "FINISH",
+    "thought": "你的思考过程",
+    "tool": "要调用的工具名称（仅当 action=CALL_TOOL 时）",
+    "args": {{}} （工具参数，仅当 action=CALL_TOOL 时）,
+    "final_answer": "最终答案（仅当 action=FINISH 时）"
+}}
+
+可用工具: web_search, write_file, read_file, code_interpreter, calculator, git_helper, data_analyzer, file_manager, file_ops
+
+决策:"""
+
+    def _parse_decision_response(self, raw_response: str) -> dict[str, Any]:
+        """解析 LLM 返回的决策 JSON"""
+        import re
+
+        json_match = re.search(r'\{[^{}]*\}', raw_response, re.DOTALL)
+        if json_match:
+            try:
+                decision = json.loads(json_match.group())
+                if "action" in decision:
+                    return decision
+            except json.JSONDecodeError:
+                pass
+
+        logger.warning("⚠️ LLM 返回非结构化响应，使用默认决策")
+        return {
+            "action": "FINISH",
+            "thought": raw_response[:200],
+            "final_answer": raw_response,
+        }
+
+    async def _generate_mock(self, prompt: str) -> str:
+        """Mock 生成（回退方案）"""
+        await asyncio.sleep(0.5)
         if "除以 0" in prompt:
             return "我尝试计算 10 除以 0，但这会导致数学错误。根据数学规则，除数不能为零。我将改为计算 10 除以 2，结果是 5。"
         elif "搜索" in prompt:
@@ -186,15 +299,9 @@ class LLMClient:
         else:
             return f"基于您的请求，我生成了以下内容：{prompt}"
 
-    async def generate_decision(self, goal: str, context: str) -> dict[str, Any]:
-        """
-        生成决策
-        """
-
-        # 模拟决策生成
-        await asyncio.sleep(1.0)
-
-        # 基于上下文生成决策
+    async def _generate_decision_mock(self, goal: str, context: str) -> dict[str, Any]:
+        """Mock 决策生成（回退方案）"""
+        await asyncio.sleep(0.5)
         if "web_search" not in context:
             return {
                 "action": "CALL_TOOL",
@@ -218,6 +325,15 @@ class LLMClient:
                 "thought": "调研报告已生成并安全保存，所有子任务已完成。",
                 "final_answer": "您的调研报告已保存至 research_report.md，任务顺利结束。",
             }
+
+    def _accumulate_token_usage(self, usage: dict[str, int]):
+        """累积 token 使用统计"""
+        for key in self._token_usage_total:
+            self._token_usage_total[key] += usage.get(key, 0)
+
+    def get_token_usage(self) -> dict[str, int]:
+        """获取累计 token 使用统计"""
+        return dict(self._token_usage_total)
 
 
 class ExecutionLoop:

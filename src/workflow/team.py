@@ -1,6 +1,6 @@
 from typing import Any
 
-from ..core.factory import RoleFactory
+from src.lib.core.factory import RoleFactory
 
 
 class TeamMode:
