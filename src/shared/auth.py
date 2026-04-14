@@ -6,7 +6,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
-from shared.config import settings
+from src.shared.config import settings
 
 # 密码加密上下文
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -115,7 +115,7 @@ def check_permissions(required_roles: list[str], user_role: str) -> bool:
     return user_role in required_roles
 
 
-async def require_permissions(required_roles: list[str]):
+def require_permissions(required_roles: list[str]):
     """权限依赖"""
     async def permission_checker(current_user: User = Depends(get_current_active_user)):
         if not check_permissions(required_roles, current_user.role):

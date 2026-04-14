@@ -226,8 +226,10 @@ def init_monitoring(app=None):
             return {"status": status["status"], "metrics": metrics, "services": status["services"]}
 
         # 启动后台异步采集
-        asyncio.create_task(collect_metrics_loop())
-        logger.info("✅ 监控系统初始化完毕")
+        @app.on_event("startup")
+        async def startup_event():
+            asyncio.create_task(collect_metrics_loop())
+            logger.info("✅ 监控系统初始化完毕")
 
 # --- 后台数据采集器 ---
 
