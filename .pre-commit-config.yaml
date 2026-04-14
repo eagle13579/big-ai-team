@@ -5,7 +5,7 @@ repos:
     -   id: core-asset-protection
         name: 核心资产隔离预处理与自动检测
         # 触发你的核心脚本，进行资产隔离处理
-        entry: cmd /c deploy.bat
+        entry: python scripts/tools/build_protect.py
         language: system
         always_run: true
         pass_filenames: false

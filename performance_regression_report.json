@@ -1,0 +1,389 @@
+{
+  "test_summary": {
+    "total_requests": 50,
+    "success_count": 50,
+    "error_count": 0,
+    "timeout_count": 0,
+    "success_rate": 100.0,
+    "error_rate": 0.0,
+    "timeout_rate": 0.0,
+    "total_time_seconds": 182.22584676742554,
+    "requests_per_second": 0.2743847861703993,
+    "test_cases": 50,
+    "response_time": {
+      "min_ms": 2299.915552139282,
+      "max_ms": 13271.697282791138,
+      "avg_ms": 3643.861656188965,
+      "median_ms": 3064.1930103302,
+      "p95_ms": 7063.560962677002,
+      "p99_ms": 13271.697282791138,
+      "std_dev_ms": 1806.4955722604122
+    }
+  },
+  "test_cases": [
+    {
+      "test_case": "请计算 12345 乘以 67890",
+      "duration": 4.382751703262329,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165919.69384
+    },
+    {
+      "test_case": "请计算 987654321 除以 12345",
+      "duration": 4.573880195617676,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165924.2677302
+    },
+    {
+      "test_case": "请计算 100 的平方根",
+      "duration": 3.794646978378296,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165928.0623813
+    },
+    {
+      "test_case": "请计算 2 的 10 次方",
+      "duration": 3.4966866970062256,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165931.5590718
+    },
+    {
+      "test_case": "请计算 1+2+3+...+100 的和",
+      "duration": 4.1537275314331055,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165935.7128036
+    },
+    {
+      "test_case": "请告诉我首都北京的人口是多少",
+      "duration": 3.0918829441070557,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165938.8046904
+    },
+    {
+      "test_case": "请告诉我太阳系八大行星的名称",
+      "duration": 3.271456480026245,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165942.0761514
+    },
+    {
+      "test_case": "请告诉我 Python 3.12 的新特性",
+      "duration": 3.722062826156616,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165945.798218
+    },
+    {
+      "test_case": "请告诉我世界上最高的山峰是什么",
+      "duration": 3.198197603225708,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165948.9964206
+    },
+    {
+      "test_case": "请告诉我 2026 年世界杯的举办地点",
+      "duration": 2.644834041595459,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165951.641259
+    },
+    {
+      "test_case": "请计算 12345 乘以 67890",
+      "duration": 3.5878028869628906,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165955.2291968
+    },
+    {
+      "test_case": "请计算 987654321 除以 12345",
+      "duration": 2.9568095207214355,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165958.1860113
+    },
+    {
+      "test_case": "请计算 100 的平方根",
+      "duration": 2.6307311058044434,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165960.8167474
+    },
+    {
+      "test_case": "请计算 2 的 10 次方",
+      "duration": 2.837444543838501,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165963.6541963
+    },
+    {
+      "test_case": "请计算 1+2+3+...+100 的和",
+      "duration": 3.0441441535949707,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165966.6983445
+    },
+    {
+      "test_case": "请告诉我首都北京的人口是多少",
+      "duration": 3.1321492195129395,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165969.8304977
+    },
+    {
+      "test_case": "请告诉我太阳系八大行星的名称",
+      "duration": 2.497236967086792,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165972.3277395
+    },
+    {
+      "test_case": "请告诉我 Python 3.12 的新特性",
+      "duration": 2.62699818611145,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165974.9547417
+    },
+    {
+      "test_case": "请告诉我世界上最高的山峰是什么",
+      "duration": 2.482623338699341,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165977.43737
+    },
+    {
+      "test_case": "请告诉我 2026 年世界杯的举办地点",
+      "duration": 2.3191773891448975,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165979.7565525
+    },
+    {
+      "test_case": "请计算 12345 乘以 67890",
+      "duration": 3.9366791248321533,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165983.6953995
+    },
+    {
+      "test_case": "请计算 987654321 除以 12345",
+      "duration": 2.85186767578125,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165986.5472717
+    },
+    {
+      "test_case": "请计算 100 的平方根",
+      "duration": 2.7459652423858643,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165989.2932415
+    },
+    {
+      "test_case": "请计算 2 的 10 次方",
+      "duration": 2.6162779331207275,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165991.9095244
+    },
+    {
+      "test_case": "请计算 1+2+3+...+100 的和",
+      "duration": 2.6828765869140625,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165994.5924058
+    },
+    {
+      "test_case": "请告诉我首都北京的人口是多少",
+      "duration": 2.539534091949463,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165997.1319444
+    },
+    {
+      "test_case": "请告诉我太阳系八大行星的名称",
+      "duration": 2.720071792602539,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165999.8520215
+    },
+    {
+      "test_case": "请告诉我 Python 3.12 的新特性",
+      "duration": 2.2999155521392822,
+      "success": true,
+      "error": null,
+      "timestamp": 1776166002.1519413
+    },
+    {
+      "test_case": "请告诉我世界上最高的山峰是什么",
+      "duration": 2.580298662185669,
+      "success": true,
+      "error": null,
+      "timestamp": 1776166004.7322447
+    },
+    {
+      "test_case": "请告诉我 2026 年世界杯的举办地点",
+      "duration": 2.558804750442505,
+      "success": true,
+      "error": null,
+      "timestamp": 1776166007.291054
+    },
+    {
+      "test_case": "请计算 12345 乘以 67890",
+      "duration": 7.063560962677002,
+      "success": true,
+      "error": null,
+      "timestamp": 1776166014.354756
+    },
+    {
+      "test_case": "请计算 987654321 除以 12345",
+      "duration": 3.0842418670654297,
+      "success": true,
+      "error": null,
+      "timestamp": 1776166017.4390025
+    },
+    {
+      "test_case": "请计算 100 的平方根",
+      "duration": 4.086643218994141,
+      "success": true,
+      "error": null,
+      "timestamp": 1776166021.52565
+    },
+    {
+      "test_case": "请计算 2 的 10 次方",
+      "duration": 2.640125036239624,
+      "success": true,
+      "error": null,
+      "timestamp": 1776166024.1657784
+    },
+    {
+      "test_case": "请计算 1+2+3+...+100 的和",
+      "duration": 2.6530227661132812,
+      "success": true,
+      "error": null,
+      "timestamp": 1776166026.8188052
+    },
+    {
+      "test_case": "请告诉我首都北京的人口是多少",
+      "duration": 2.7081689834594727,
+      "success": true,
+      "error": null,
+      "timestamp": 1776166029.526979
+    },
+    {
+      "test_case": "请告诉我太阳系八大行星的名称",
+      "duration": 2.928736686706543,
+      "success": true,
+      "error": null,
+      "timestamp": 1776166032.4557202
+    },
+    {
+      "test_case": "请告诉我 Python 3.12 的新特性",
+      "duration": 2.6184728145599365,
+      "success": true,
+      "error": null,
+      "timestamp": 1776166035.074198
+    },
+    {
+      "test_case": "请告诉我世界上最高的山峰是什么",
+      "duration": 2.5156872272491455,
+      "success": true,
+      "error": null,
+      "timestamp": 1776166037.5898898
+    },
+    {
+      "test_case": "请告诉我 2026 年世界杯的举办地点",
+      "duration": 2.9314937591552734,
+      "success": true,
+      "error": null,
+      "timestamp": 1776166040.5213885
+    },
+    {
+      "test_case": "请计算 12345 乘以 67890",
+      "duration": 13.271697282791138,
+      "success": true,
+      "error": null,
+      "timestamp": 1776166053.7940302
+    },
+    {
+      "test_case": "请计算 987654321 除以 12345",
+      "duration": 4.897135972976685,
+      "success": true,
+      "error": null,
+      "timestamp": 1776166058.6911705
+    },
+    {
+      "test_case": "请计算 100 的平方根",
+      "duration": 7.6299684047698975,
+      "success": true,
+      "error": null,
+      "timestamp": 1776166066.3211439
+    },
+    {
+      "test_case": "请计算 2 的 10 次方",
+      "duration": 3.535689353942871,
+      "success": true,
+      "error": null,
+      "timestamp": 1776166069.8568377
+    },
+    {
+      "test_case": "请计算 1+2+3+...+100 的和",
+      "duration": 5.208336591720581,
+      "success": true,
+      "error": null,
+      "timestamp": 1776166075.0651786
+    },
+    {
+      "test_case": "请告诉我首都北京的人口是多少",
+      "duration": 5.978826999664307,
+      "success": true,
+      "error": null,
+      "timestamp": 1776166081.0440104
+    },
+    {
+      "test_case": "请告诉我太阳系八大行星的名称",
+      "duration": 3.7126784324645996,
+      "success": true,
+      "error": null,
+      "timestamp": 1776166084.7566943
+    },
+    {
+      "test_case": "请告诉我 Python 3.12 的新特性",
+      "duration": 3.4219839572906494,
+      "success": true,
+      "error": null,
+      "timestamp": 1776166088.1786828
+    },
+    {
+      "test_case": "请告诉我世界上最高的山峰是什么",
+      "duration": 4.5657899379730225,
+      "success": true,
+      "error": null,
+      "timestamp": 1776166092.7444787
+    },
+    {
+      "test_case": "请告诉我 2026 年世界杯的举办地点",
+      "duration": 4.763286828994751,
+      "success": true,
+      "error": null,
+      "timestamp": 1776166097.5077708
+    }
+  ],
+  "system_metrics": [],
+  "config": {
+    "concurrent_tasks": 10,
+    "sequential_tasks": 50,
+    "task_timeout": 120,
+    "memory_threshold_mb": 1000,
+    "cpu_threshold_percent": 80,
+    "response_time_threshold_ms": 30000,
+    "success_rate_threshold": 80,
+    "test_duration_minutes": 5,
+    "ramp_up_seconds": 30,
+    "cool_down_seconds": 30
+  },
+  "test_time": "2026-04-14 19:28:17"
+}

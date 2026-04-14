@@ -1,0 +1,114 @@
+{
+  "test_summary": {
+    "total_requests": 12,
+    "success_count": 12,
+    "error_count": 0,
+    "timeout_count": 0,
+    "success_rate": 100.0,
+    "error_rate": 0.0,
+    "timeout_rate": 0.0,
+    "total_time_seconds": 59.213932514190674,
+    "requests_per_second": 0.20265500855097218,
+    "test_cases": 12
+  },
+  "test_cases": [
+    {
+      "test_case": "请计算 10 加上 20",
+      "duration": 0,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165831.9703815
+    },
+    {
+      "test_case": "请计算 12345 乘以 67890",
+      "duration": 0,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165836.1387436
+    },
+    {
+      "test_case": "请计算 1 除以 0",
+      "duration": 0,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165839.4441924
+    },
+    {
+      "test_case": "请计算 100 的平方根",
+      "duration": 0,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165842.5150573
+    },
+    {
+      "test_case": "请计算 3 除以 0",
+      "duration": 0,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165845.851209
+    },
+    {
+      "test_case": "请计算 1+2+3+...+100 的和",
+      "duration": 0,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165849.296021
+    },
+    {
+      "test_case": "请计算 5 除以 0",
+      "duration": 0,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165851.9851706
+    },
+    {
+      "test_case": "请告诉我太阳系八大行星的名称",
+      "duration": 0,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165854.600936
+    },
+    {
+      "test_case": "请计算 7 除以 0",
+      "duration": 0,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165864.6022038
+    },
+    {
+      "test_case": "请告诉我世界上最高的山峰是什么",
+      "duration": 0,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165877.7626555
+    },
+    {
+      "test_case": "请计算 9 除以 0",
+      "duration": 0,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165881.767489
+    },
+    {
+      "test_case": "请计算 100 加上 200",
+      "duration": 0,
+      "success": true,
+      "error": null,
+      "timestamp": 1776165887.2674403
+    }
+  ],
+  "system_metrics": [],
+  "config": {
+    "concurrent_tasks": 10,
+    "sequential_tasks": 50,
+    "task_timeout": 120,
+    "memory_threshold_mb": 1000,
+    "cpu_threshold_percent": 80,
+    "response_time_threshold_ms": 30000,
+    "success_rate_threshold": 80,
+    "test_duration_minutes": 5,
+    "ramp_up_seconds": 30,
+    "cool_down_seconds": 30
+  },
+  "test_time": "2026-04-14 19:24:47"
+}

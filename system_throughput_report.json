@@ -1,0 +1,29 @@
+{
+  "test_summary": {
+    "total_requests": 0,
+    "success_count": 0,
+    "error_count": 0,
+    "timeout_count": 0,
+    "success_rate": 0,
+    "error_rate": 0,
+    "timeout_rate": 0,
+    "total_time_seconds": 27.842496395111084,
+    "requests_per_second": 0.0,
+    "test_cases": 0
+  },
+  "test_cases": [],
+  "system_metrics": [],
+  "config": {
+    "concurrent_tasks": 10,
+    "sequential_tasks": 50,
+    "task_timeout": 120,
+    "memory_threshold_mb": 1000,
+    "cpu_threshold_percent": 80,
+    "response_time_threshold_ms": 30000,
+    "success_rate_threshold": 80,
+    "test_duration_minutes": 5,
+    "ramp_up_seconds": 30,
+    "cool_down_seconds": 30
+  },
+  "test_time": "2026-04-14 19:25:15"
+}
