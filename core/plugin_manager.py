@@ -3,29 +3,29 @@ import importlib.util
 import json
 import os
 import sys
-from typing import Any
+from typing import Any, Optional
 
 # 添加项目根目录到Python路径
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from core.channel_manager import ChannelManager
 from core.plugin_interface import BasePlugin, PluginManagerInterface
 
 
 class PluginManager(PluginManagerInterface):
     """插件管理器"""
     
-    def __init__(self, plugin_dir: str = "channel_plugins"):
+    def __init__(self, plugin_dir: str = "channel_plugins", channel_manager=None):
         """初始化插件管理器
         
         Args:
             plugin_dir: 插件目录
+            channel_manager: 通道管理器实例（可选）
         """
         self.plugin_dir = plugin_dir
         self.plugins: dict[str, BasePlugin] = {}
         self.plugin_configs: dict[str, dict[str, Any]] = {}
         self.plugin_status: dict[str, str] = {}
-        self.channel_manager = ChannelManager(plugin_dir)
+        self.channel_manager = channel_manager
     
     def load_plugin(self, plugin_path: str) -> bool:
         """加载插件

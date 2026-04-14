@@ -108,6 +108,72 @@ class TestMemPalaceCore(unittest.TestCase):
         mempalace = MemPalaceCore(palace_path="./test_mempalace")
         self.assertIsInstance(mempalace, MemPalaceCore)
 
+    def test_add_memory_empty_content(self):
+        """测试添加空内容的记忆"""
+        # 测试添加空字符串
+        result = self.mempalace.add_memory("")
+        self.assertTrue(result)
+
+        # 测试添加 None
+        result = self.mempalace.add_memory(None)
+        self.assertTrue(result)
+
+    def test_search_empty_query(self):
+        """测试空查询的搜索"""
+        results = self.mempalace.search("")
+        self.assertIsInstance(results, list)
+
+    def test_search_large_limit(self):
+        """测试大限制值的搜索"""
+        results = self.mempalace.search("测试", limit=1000)
+        self.assertIsInstance(results, list)
+
+    def test_run_invalid_action(self):
+        """测试无效的操作"""
+        params = {
+            "action": "invalid_action",
+            "content": "测试内容"
+        }
+        result = self.mempalace.run(params)
+        self.assertIsInstance(result, dict)
+        self.assertIn("error", result)
+
+    def test_run_missing_required_params(self):
+        """测试缺少必要参数的情况"""
+        # 测试缺少 content 参数的 add 操作
+        params = {
+            "action": "add"
+        }
+        result = self.mempalace.run(params)
+        self.assertIsInstance(result, dict)
+
+        # 测试缺少 query 参数的 search 操作
+        params = {
+            "action": "search"
+        }
+        result = self.mempalace.run(params)
+        self.assertIsInstance(result, list)
+
+    def test_add_memory_large_content(self):
+        """测试添加大内容的记忆"""
+        large_content = "a" * 10000  # 10000 个字符
+        result = self.mempalace.add_memory(large_content)
+        self.assertTrue(result)
+
+    def test_add_memory_complex_context(self):
+        """测试添加复杂上下文的记忆"""
+        complex_context = {
+            "importance": "high",
+            "project": "test",
+            "tags": ["test", "example"],
+            "metadata": {
+                "created_at": "2026-04-14",
+                "updated_at": "2026-04-14"
+            }
+        }
+        result = self.mempalace.add_memory("测试内容", context=complex_context)
+        self.assertTrue(result)
+
 
 if __name__ == "__main__":
     unittest.main()
