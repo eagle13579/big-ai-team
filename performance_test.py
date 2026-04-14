@@ -13,39 +13,39 @@ import aiohttp
 
 # 测试配置
 BASE_URL = "http://localhost:8000"
-ENDPOINT = "/api/v1/agent-reach/execute"
-CONCURRENT_USERS = 1000  # 并发用户数
+ENDPOINT = "/api/v1/tasks"
+CONCURRENT_USERS = 100  # 并发用户数
 REQUESTS_PER_USER = 10  # 每个用户的请求数
 TOTAL_REQUESTS = CONCURRENT_USERS * REQUESTS_PER_USER
 
 # 测试场景
 test_scenarios = [
     {
-        "name": "read_webpage",
+        "name": "test_calculation",
         "payload": {
-            "action": "read_webpage",
-            "params": {"url": "https://example.com"}
+            "query": "计算 1+1",
+            "max_steps": 5
         }
     },
     {
-        "name": "search_twitter",
+        "name": "test_web_search",
         "payload": {
-            "action": "search_twitter",
-            "params": {"query": "AI Agent", "limit": 5}
+            "query": "搜索 Python 编程",
+            "max_steps": 5
         }
     },
     {
-        "name": "get_youtube_transcript",
+        "name": "test_code_execution",
         "payload": {
-            "action": "get_youtube_transcript",
-            "params": {"url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"}
+            "query": "执行 Python 代码 print(1+1)",
+            "max_steps": 5
         }
     },
     {
-        "name": "search_github_repos",
+        "name": "test_data_analysis",
         "payload": {
-            "action": "search_github_repos",
-            "params": {"query": "AI Agent", "language": "python"}
+            "query": "分析数据文件",
+            "max_steps": 5
         }
     }
 ]
@@ -55,12 +55,36 @@ results = []
 error_count = 0
 lock = threading.Lock()
 
-async def make_request(session, scenario):
+async def get_auth_token(session):
+    """获取认证令牌"""
+    auth_data = {
+        "username": "admin",
+        "password": "admin123",
+        "grant_type": "password"
+    }
+    try:
+        async with session.post(f"{BASE_URL}/api/v1/auth/token", data=auth_data) as response:
+            if response.status == 200:
+                data = await response.json()
+                return data.get("access_token")
+            else:
+                print(f"获取认证令牌失败: {response.status}")
+                print(f"响应内容: {await response.text()}")
+                return None
+    except Exception as e:
+        print(f"获取认证令牌异常: {str(e)}")
+        return None
+
+async def make_request(session, scenario, token):
     """发送单个请求并记录结果"""
     global error_count
     start_time = time.time()
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json"
+    }
     try:
-        async with session.post(f"{BASE_URL}{ENDPOINT}", json=scenario["payload"]) as response:
+        async with session.post(f"{BASE_URL}{ENDPOINT}", json=scenario["payload"], headers=headers) as response:
             end_time = time.time()
             response_time = end_time - start_time
             status_code = response.status
@@ -85,12 +109,12 @@ async def make_request(session, scenario):
             })
             error_count += 1
 
-async def run_user(session, user_id):
+async def run_user(session, user_id, token):
     """模拟单个用户的请求"""
     for _ in range(REQUESTS_PER_USER):
         # 随机选择一个测试场景
         scenario = test_scenarios[user_id % len(test_scenarios)]
-        await make_request(session, scenario)
+        await make_request(session, scenario, token)
         # 随机等待时间
         await asyncio.sleep(0.1)
 
@@ -106,9 +130,15 @@ async def main():
     start_time = time.time()
     
     async with aiohttp.ClientSession() as session:
+        # 获取认证令牌
+        token = await get_auth_token(session)
+        if not token:
+            print("无法获取认证令牌，测试终止")
+            return
+        
         tasks = []
         for i in range(CONCURRENT_USERS):
-            task = asyncio.create_task(run_user(session, i))
+            task = asyncio.create_task(run_user(session, i, token))
             tasks.append(task)
         
         # 等待所有任务完成

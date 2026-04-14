@@ -9,7 +9,7 @@ import sys
 # 添加src目录到Python路径
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "src"))
 
-from persistence.mempalace_integration import MemoryTier, MemPalaceIntegration
+from src.persistence.mempalace_integration import MemoryTier, MemPalaceIntegration
 
 
 def check_project_z_memory():

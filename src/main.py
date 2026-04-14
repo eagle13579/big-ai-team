@@ -23,7 +23,10 @@ from src.shared.auth import (
 from src.shared.config import config_manager, settings
 from src.shared.logging import logger
 from src.shared.security_audit import security_audit_logger
+from src.persistence.database import get_db
+from src.persistence.models import Feedback
 from src.workflow.loop import ExecutionLoop
+from sqlalchemy import func
 
 logger = logger.bind(name="AceAgent.Main")
 
@@ -327,6 +330,129 @@ async def get_audit_logs(
     return {"logs": logs}
 
 
+# --- 反馈相关 API ---
+@app.post("/api/v1/feedback")
+async def create_feedback(
+    feedback: dict,
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    """
+    创建用户反馈
+    """
+    security_audit_logger.log_access(
+        user=current_user.username,
+        resource="feedback",
+        action="create",
+        status="success"
+    )
+    
+    new_feedback = Feedback(
+        user_id=current_user.username,
+        task_id=feedback.get("task_id"),
+        skill_name=feedback.get("skill_name"),
+        rating=feedback.get("rating"),
+        comment=feedback.get("comment"),
+        feedback_type=feedback.get("feedback_type")
+    )
+    
+    db.add(new_feedback)
+    db.commit()
+    db.refresh(new_feedback)
+    
+    return {"id": new_feedback.id, "message": "Feedback created successfully"}
+
+
+@app.get("/api/v1/feedback")
+async def get_feedback(
+    limit: int = 100,
+    feedback_type: str = None,
+    skill_name: str = None,
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    """
+    获取反馈列表
+    """
+    security_audit_logger.log_access(
+        user=current_user.username,
+        resource="feedback",
+        action="read",
+        status="success"
+    )
+    
+    query = db.query(Feedback)
+    
+    if feedback_type:
+        query = query.filter(Feedback.feedback_type == feedback_type)
+    
+    if skill_name:
+        query = query.filter(Feedback.skill_name == skill_name)
+    
+    feedbacks = query.order_by(Feedback.created_at.desc()).limit(limit).all()
+    
+    return {
+        "feedbacks": [
+            {
+                "id": f.id,
+                "user_id": f.user_id,
+                "task_id": f.task_id,
+                "skill_name": f.skill_name,
+                "rating": f.rating,
+                "comment": f.comment,
+                "feedback_type": f.feedback_type,
+                "created_at": f.created_at
+            }
+            for f in feedbacks
+        ]
+    }
+
+
+@app.get("/api/v1/feedback/stats")
+async def get_feedback_stats(
+    current_user: User = Depends(require_permissions(["admin"])),
+    db: Session = Depends(get_db)
+):
+    """
+    获取反馈统计信息（仅管理员）
+    """
+    security_audit_logger.log_access(
+        user=current_user.username,
+        resource="feedback/stats",
+        action="read",
+        status="success"
+    )
+    
+    # 计算平均评分
+    avg_rating = db.query(func.avg(Feedback.rating)).scalar() or 0
+    
+    # 按类型统计反馈数量
+    type_stats = db.query(
+        Feedback.feedback_type,
+        func.count(Feedback.id)
+    ).group_by(Feedback.feedback_type).all()
+    
+    # 按技能统计反馈数量和平均评分
+    skill_stats = db.query(
+        Feedback.skill_name,
+        func.count(Feedback.id),
+        func.avg(Feedback.rating)
+    ).group_by(Feedback.skill_name).all()
+    
+    return {
+        "average_rating": float(avg_rating),
+        "type_stats": {t[0]: t[1] for t in type_stats},
+        "skill_stats": [
+            {
+                "skill_name": s[0],
+                "count": s[1],
+                "average_rating": float(s[2]) if s[2] else 0
+            }
+            for s in skill_stats
+        ]
+    }
+
+
 # --- 7. 异常处理 ---
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
@@ -374,4 +500,4 @@ if __name__ == "__main__":
 # --- 9. 启动服务器 ---
 if __name__ == "__main__" and "__uvicorn_main__" not in sys.modules:
     # 启动 FastAPI 服务器
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("src.main:app", host="0.0.0.0", port=8000, reload=True)
