@@ -28,7 +28,9 @@ const resources = {
         success: 'Success',
         error: 'Error',
         warning: 'Warning',
-        info: 'Information'
+        info: 'Information',
+        language: 'Language',
+        welcome: 'Welcome'
       },
       // 登录
       login: {
@@ -156,7 +158,9 @@ const resources = {
         success: '成功',
         error: '错误',
         warning: '警告',
-        info: '信息'
+        info: '信息',
+        language: '语言',
+        welcome: '欢迎'
       },
       // 登录
       login: {

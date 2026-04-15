@@ -7,7 +7,28 @@ echo ======================================================
 echo 🚀 Nova 部署助手 (2026 工业级标准版)
 echo ======================================================
 
-:: 1. 检查 Docker 是否运行
+:: 1. 检查 Python 是否安装
+echo [检查] 正在检查 Python 环境...
+python --version
+if %ERRORLEVEL% NEQ 0 (
+    echo [!] 错误：Python 未安装或未添加到环境变量！
+    echo [i] 请先安装 Python 3.12 或更高版本。
+    pause
+    exit /b 1
+)
+
+:: 2. 运行部署前自动化测试
+echo [检查] 正在运行部署前自动化测试...
+echo ------------------------------------------------------
+python scripts/tools/pre_deploy_test.py
+if %ERRORLEVEL% NEQ 0 (
+    echo [!] 部署前测试失败，请检查测试报告并修复问题。
+    pause
+    exit /b 1
+)
+echo ------------------------------------------------------
+
+:: 3. 检查 Docker 是否运行
 echo [检查] 正在检查 Docker 服务状态...
 docker version
 if %ERRORLEVEL% NEQ 0 (
@@ -17,7 +38,7 @@ if %ERRORLEVEL% NEQ 0 (
     exit /b 1
 )
 
-:: 2. 检查 Dockerfile
+:: 4. 检查 Dockerfile
 echo [检查] 正在检查 Dockerfile 是否存在...
 if not exist "Dockerfile" (
     echo [!] 错误：未在 %cd% 找到 Dockerfile
@@ -25,7 +46,7 @@ if not exist "Dockerfile" (
     exit /b 1
 )
 
-:: 3. 开始构建
+:: 5. 开始构建
 echo [1/2] 🛠️ 正在构建镜像 [big-ai-app:latest]...
 docker build -t big-ai-app:latest .
 
@@ -35,7 +56,7 @@ if %ERRORLEVEL% NEQ 0 (
     exit /b 1
 )
 
-:: 4. 运行容器
+:: 6. 运行容器
 echo [2/2] 🚀 镜像构建成功，正在启动容器...
 echo ------------------------------------------------------
 docker run --rm big-ai-app:latest

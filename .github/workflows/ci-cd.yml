@@ -14,13 +14,16 @@ permissions:
   packages: write
 
 jobs:
-  validate-and-protect:
-    name: "🚀 Build & Protect (Python 3.10 / Ubuntu)"
+  # 并行执行测试和构建准备
+  test-and-prepare:
+    name: "🧪 Tests & Preparation"
     runs-on: ubuntu-latest
-    timeout-minutes: 30 
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        python-version: [ '3.12' ]  # 使用最新的 Python 版本
     
     steps:
-      # --- 1. 基础环境准备 (Foundation) ---
       - name: "Step 1: Checkout Repository"
         uses: actions/checkout@v4
         with:
@@ -30,7 +33,7 @@ jobs:
       - name: "Step 2: Setup Python & Cache"
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: ${{ matrix.python-version }}
           cache: 'pip'
 
       - name: "Step 3: High-Performance Environment Setup"
@@ -41,23 +44,20 @@ jobs:
           if [ -f "requirements.txt" ]; then pip install -r requirements.txt; fi
           sudo apt-get update && sudo apt-get install -y build-essential ccache
 
-      # --- 2. 源码自动化修复 (Nova Auto-Fix) ---
       - name: "Step 4: Nova Intelligent Auto-Fix (Ruff)"
         run: |
-          # 运行我为您提供的 v3.2 修复脚本
-          # 如果脚本不存在，则直接运行 ruff 强制指令
+          # 运行自动化修复脚本
           if [ -f "scripts/auto_fix.py" ]; then
             python scripts/auto_fix.py
           else
-            ruff check . --fix --unsafe-fixes --show-fixes --target-version=py310
+            ruff check . --fix --unsafe-fixes --show-fixes --target-version=py312
             ruff format .
           fi
 
-      # --- 3. 源码阶段：质量卡点 (Pre-Build) ---
-      - name: "Step 5: Logic Validation & Tests"
+      - name: "Step 5: Run Tests in Parallel"
         run: |
-          # 在编译前确保原始逻辑 100% 正确
-          pytest --cov=core --cov-report=term-missing tests/
+          # 并行运行测试以减少时间
+          pytest --cov=core --cov-report=term-missing tests/ -n auto
           
           # 生成自动化校验报告
           echo "### 📊 Module Validation Report" > module_validation_report.md
@@ -65,8 +65,35 @@ jobs:
           echo "- **Status:** Source Code Validated ✅" >> module_validation_report.md
           echo "STATUS=SUCCESS" >> $GITHUB_ENV
 
-      # --- 4. 构建阶段：核心代码脱敏 (Build) ---
-      - name: "Step 6: Execute Nuitka Hardening"
+      - name: "Step 6: Commit Changes & Report"
+        if: always()
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action Bot"
+          
+          # 提交自动修复后的代码和验证报告
+          git add .
+          git commit -m "chore: auto-fix & update validation report [skip ci]" || exit 0
+          git push
+
+  # 构建核心代码
+  build-core:
+    name: "🔧 Build Core"
+    runs-on: ubuntu-latest
+    needs: test-and-prepare
+    timeout-minutes: 15
+    
+    steps:
+      - name: "Step 1: Checkout Repository"
+        uses: actions/checkout@v4
+
+      - name: "Step 2: Setup Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: "Step 3: Execute Nuitka Hardening"
         run: |
           # 执行模块化加密编译，将 core 目录转为二进制
           if [ -f "build_protect.py" ]; then
@@ -80,20 +107,17 @@ jobs:
           CCACHE_DIR: ~/.ccache
           FORCE_UNSAFE_CONFIGURE: 1
 
-      # --- 5. 二进制阶段：冒烟测试 (Post-Build Smoke Test) ---
-      - name: "Step 7: Binary Integrity Check (Nova Smoke Test)"
+      - name: "Step 4: Binary Integrity Check (Nova Smoke Test)"
         run: |
           echo "🔍 正在验证脱敏后的二进制文件加载..."
-          # 运行我为您提供的 v2.0 冒烟测试脚本
-          # 它会检测模块是“源码态”还是“二进制态”
+          # 运行冒烟测试脚本
           if [ -f "tests/test_protected_core.py" ]; then
             python tests/test_protected_core.py
           else
             python -c "import core; print('✅ Core Package Loaded Successfully')"
           fi
 
-      # --- 6. 安全审计与交付 (Audit & Delivery) ---
-      - name: "Step 8: Cleanup & Security Audit"
+      - name: "Step 5: Cleanup & Security Audit"
         run: |
           # [安全铁律] 检查 core 目录下是否还残留非 __init__.py 的源码
           RESIDUAL_PY=$(find core -name "*.py" | grep -v "__init__.py" | wc -l)
@@ -103,21 +127,11 @@ jobs:
           fi
           echo "✅ Security Check Passed: Source code stripped, only binaries remain."
 
-      - name: "Step 9: Commit Changes & Report"
-        if: always()
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action Bot"
-          
-          # 提交自动修复后的代码和验证报告
-          git add .
-          git commit -m "chore: auto-fix & update validation report [skip ci]" || exit 0
-          git push
-
+  # 构建并推送 Docker 镜像
   docker-build-and-push:
     name: "🐳 Docker Build & Push"
     runs-on: ubuntu-latest
-    needs: validate-and-protect
+    needs: build-core
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
     
     steps:
@@ -144,7 +158,13 @@ jobs:
             ghcr.io/${{ github.repository }}/big-ai-team:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          # 优化构建速度
+          build-args: |
+            PYTHON_VERSION=3.12
+          # 使用多阶段构建
+          dockerfile: Dockerfile
 
+  # 部署到 Kubernetes
   deploy-to-kubernetes:
     name: "🚢 Deploy to Kubernetes"
     runs-on: ubuntu-latest
@@ -178,5 +198,38 @@ jobs:
           
           # 等待部署完成
           kubectl rollout status deployment/big-ai-team -n big-ai-team --timeout=120s
+
+  # 前端构建和测试（如果需要）
+  frontend-build:
+    name: "🖥️ Frontend Build"
+    runs-on: ubuntu-latest
+    needs: test-and-prepare
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    
+    steps:
+      - name: "Step 1: Checkout Repository"
+        uses: actions/checkout@v4
+
+      - name: "Step 2: Setup Node.js"
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: "Step 3: Install Frontend Dependencies"
+        run: |
+          cd frontend
+          npm ci
+
+      - name: "Step 4: Run Frontend Tests"
+        run: |
+          cd frontend
+          npm test -- --watchAll=false
+
+      - name: "Step 5: Build Frontend"
+        run: |
+          cd frontend
+          npm run build
 
  

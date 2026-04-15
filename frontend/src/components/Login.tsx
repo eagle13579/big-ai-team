@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Button, Container, TextField, Typography, Paper } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import { validateUsername, validatePassword, sanitizeInput } from '../utils/security';
 
 interface LoginProps {
   onLogin: (username: string) => void;
@@ -15,13 +16,25 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // 简单的模拟登录验证
-    if (username && password) {
-      // 实际项目中应该调用 API 进行验证
-      onLogin(username);
-    } else {
-      setError('Please enter both username and password');
+    // 验证用户名
+    const usernameValidation = validateUsername(username);
+    if (!usernameValidation.isValid) {
+      setError(usernameValidation.message || 'Invalid username');
+      return;
     }
+    
+    // 验证密码
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.isValid) {
+      setError(passwordValidation.message || 'Invalid password');
+      return;
+    }
+    
+    // 清理输入
+    const sanitizedUsername = sanitizeInput(username);
+    
+    // 实际项目中应该调用 API 进行验证
+    onLogin(sanitizedUsername);
   };
 
   return (

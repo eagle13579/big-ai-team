@@ -7,8 +7,9 @@ import time
 from collections.abc import Awaitable, Callable
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
+from functools import lru_cache
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict, Optional
 
 import httpx
 import psutil
@@ -114,6 +115,11 @@ class ToolExecutor:
         self._cache_misses = 0  # 缓存未命中次数
         self._cache_cleanup_interval = 300  # 缓存清理间隔（秒）
         self._last_cache_cleanup = time.time()
+        
+        # 本地缓存（LRU缓存）
+        self._local_cache: Dict[str, tuple[Any, float]] = {}  # 格式: {cache_key: (value, expiry_time)}
+        self._local_cache_max_size = 1000  # 本地缓存最大容量
+        self._local_cache_lock = asyncio.Lock()
 
         # 权限管理
         self._permissions = {
@@ -171,11 +177,52 @@ class ToolExecutor:
         # 超时预警阈值
         self._timeout_warning_threshold = 0.8  # 超时预警阈值（占总超时时间的比例）
         
+        # 性能统计
+        self._performance_stats = {
+            "thread_pool": {
+                "current_size": 0,
+                "max_size": 0,
+                "min_size": 0,
+                "adjustments": 0,
+                "average_size": 0,
+            },
+            "execution": {
+                "total_tasks": 0,
+                "completed_tasks": 0,
+                "failed_tasks": 0,
+                "average_execution_time": 0,
+                "total_execution_time": 0,
+            },
+            "cache": {
+                "hits": 0,
+                "misses": 0,
+                "hit_rate": 0,
+                "local_cache_hits": 0,
+                "redis_cache_hits": 0,
+            },
+            "system": {
+                "cpu_usage": 0,
+                "memory_usage": 0,
+                "disk_usage": 0,
+            },
+            "concurrency": {
+                "max_concurrent_tasks": 0,
+                "current_concurrent_tasks": 0,
+            }
+        }
+        
+        # 并发任务计数
+        self._concurrent_tasks = 0
+        self._concurrent_tasks_lock = asyncio.Lock()
+        
         # 注册恢复策略
         self._register_recovery_strategies()
         
         # 启动超时监控任务
         self._start_timeout_monitor()
+        
+        # 启动线程池监控任务
+        self._start_thread_pool_monitor()
 
     def _start_timeout_monitor(self):
         """
@@ -192,6 +239,22 @@ class ToolExecutor:
         except RuntimeError:
             # 在没有运行的事件循环时，跳过启动监控任务
             logger.info("🔔 跳过启动超时监控任务（无事件循环）")
+    
+    def _start_thread_pool_monitor(self):
+        """
+        启动线程池监控任务，定期调整线程池大小
+        """
+        async def monitor_thread_pool():
+            while True:
+                await asyncio.sleep(30)  # 每30秒检查一次
+                await self._adjust_thread_pool_size()
+        
+        try:
+            asyncio.create_task(monitor_thread_pool())
+            logger.info("🔧 线程池监控任务已启动")
+        except RuntimeError:
+            # 在没有运行的事件循环时，跳过启动监控任务
+            logger.info("🔧 跳过启动线程池监控任务（无事件循环）")
 
     def _check_timeout_stats(self):
         """
@@ -370,6 +433,13 @@ class ToolExecutor:
         optimal_thread_count = self._get_optimal_thread_count()
         current_thread_count = self._thread_pool._max_workers
         
+        # 更新线程池性能统计
+        self._performance_stats["thread_pool"]["current_size"] = current_thread_count
+        if current_thread_count > self._performance_stats["thread_pool"]["max_size"]:
+            self._performance_stats["thread_pool"]["max_size"] = current_thread_count
+        if current_thread_count < self._performance_stats["thread_pool"]["min_size"] or self._performance_stats["thread_pool"]["min_size"] == 0:
+            self._performance_stats["thread_pool"]["min_size"] = current_thread_count
+        
         if optimal_thread_count != current_thread_count:
             logger.info(f"🔧 调整线程池大小: {current_thread_count} -> {optimal_thread_count}")
             
@@ -382,6 +452,9 @@ class ToolExecutor:
                 max_workers=optimal_thread_count, 
                 thread_name_prefix="AceAgent-Executor-"
             )
+            
+            # 更新调整次数
+            self._performance_stats["thread_pool"]["adjustments"] += 1
             
             logger.info(f"🔧 线程池大小已调整为: {optimal_thread_count}")
     
@@ -405,20 +478,33 @@ class ToolExecutor:
         处理优先级队列中的任务
         """
         task_counter = 0
+        batch_size = 5  # 批处理大小
+        batch_tasks = []
+        
         while self._task_queue:
-            # 每处理5个任务后检查并调整线程池大小
-            if task_counter % 5 == 0:
+            # 每处理一批任务后检查并调整线程池大小
+            if task_counter % batch_size == 0:
                 await self._adjust_thread_pool_size()
             
-            # 取出优先级最高的任务
-            priority, _, task = heapq.heappop(self._task_queue)
-            logger.info(f"⚡ 执行任务，优先级: {priority}, 剩余队列大小: {len(self._task_queue)}")
-            try:
-                # 执行任务
-                await task()
-                task_counter += 1
-            except Exception as e:
-                logger.error(f"执行任务时出错: {str(e)}")
+            # 批量取出任务
+            batch_tasks.clear()
+            for _ in range(min(batch_size, len(self._task_queue))):
+                priority, _, task = heapq.heappop(self._task_queue)
+                batch_tasks.append((priority, task))
+            
+            # 并发执行批量任务
+            logger.info(f"⚡ 并发执行 {len(batch_tasks)} 个任务，剩余队列大小: {len(self._task_queue)}")
+            tasks = []
+            for priority, task in batch_tasks:
+                tasks.append(task())
+            
+            # 等待所有任务完成
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+            
+            # 处理异常
+            for i, result in enumerate(results):
+                if isinstance(result, Exception):
+                    logger.error(f"执行任务时出错: {str(result)}")
                 task_counter += 1
 
     def _generate_cache_key(self, tool_name: str, args: dict[str, Any]) -> str:
@@ -450,21 +536,71 @@ class ToolExecutor:
         
         return cache_key
 
-    def _check_cache(self, tool_name: str, args: dict[str, Any]) -> Any | None:
+    async def _check_cache(self, tool_name: str, args: dict[str, Any]) -> Any | None:
         """检查缓存"""
         cache_key = self._generate_cache_key(tool_name, args)
+        
+        # 先检查本地缓存
+        async with self._local_cache_lock:
+            if cache_key in self._local_cache:
+                value, expiry_time = self._local_cache[cache_key]
+                if time.time() < expiry_time:
+                    # 本地缓存未过期
+                    logger.info(f"🔄 从本地缓存中获取 {tool_name} 的结果")
+                    self._cache_hits += 1
+                    self._performance_stats["cache"]["hits"] += 1
+                    self._performance_stats["cache"]["local_cache_hits"] += 1
+                    # 移到字典末尾，实现LRU
+                    self._local_cache[cache_key] = (value, expiry_time)
+                    return value
+                else:
+                    # 本地缓存已过期，删除
+                    del self._local_cache[cache_key]
+        
+        # 本地缓存未命中，检查Redis缓存
         result = redis_cache.get(cache_key)
         if result is not None:
             logger.info(f"🔄 从 Redis 缓存中获取 {tool_name} 的结果")
             self._cache_hits += 1
+            self._performance_stats["cache"]["hits"] += 1
+            self._performance_stats["cache"]["redis_cache_hits"] += 1
+            # 更新本地缓存
+            async with self._local_cache_lock:
+                self._update_local_cache(cache_key, result)
             return result
         else:
             self._cache_misses += 1
+            self._performance_stats["cache"]["misses"] += 1
+        
+        # 更新缓存命中率
+        total = self._performance_stats["cache"]["hits"] + self._performance_stats["cache"]["misses"]
+        if total > 0:
+            self._performance_stats["cache"]["hit_rate"] = (self._performance_stats["cache"]["hits"] / total) * 100
+        
         return None
+    
+    def _update_local_cache(self, cache_key: str, value: Any):
+        """更新本地缓存"""
+        expiry_time = time.time() + self._cache_ttl
+        
+        # 检查缓存大小
+        if len(self._local_cache) >= self._local_cache_max_size:
+            # 删除最旧的缓存项
+            oldest_key = next(iter(self._local_cache))
+            del self._local_cache[oldest_key]
+        
+        # 添加新缓存项
+        self._local_cache[cache_key] = (value, expiry_time)
 
-    def _update_cache(self, tool_name: str, args: dict[str, Any], result: Any):
+    async def _update_cache(self, tool_name: str, args: dict[str, Any], result: Any):
         """更新缓存"""
         cache_key = self._generate_cache_key(tool_name, args)
+        
+        # 更新本地缓存
+        async with self._local_cache_lock:
+            self._update_local_cache(cache_key, result)
+        
+        # 更新Redis缓存
         # 为缓存添加标签，便于后续失效管理
         tags = [tool_name, f"env:{settings.ENV_MODE}"]
         success = redis_cache.set_with_tags(cache_key, result, tags, ttl=self._cache_ttl)
@@ -560,7 +696,7 @@ class ToolExecutor:
             }
 
         # 检查缓存
-        cached_result = self._check_cache(tool_name, args)
+        cached_result = await self._check_cache(tool_name, args)
         if cached_result is not None:
             return {
                 "success": True,
@@ -583,9 +719,20 @@ class ToolExecutor:
         async def task():
             start_time = time.time()
             timed_out = False
+            success = False
+            
+            # 增加并发任务计数
+            async with self._concurrent_tasks_lock:
+                self._concurrent_tasks += 1
+                if self._concurrent_tasks > self._performance_stats["concurrency"]["max_concurrent_tasks"]:
+                    self._performance_stats["concurrency"]["max_concurrent_tasks"] = self._concurrent_tasks
+                self._performance_stats["concurrency"]["current_concurrent_tasks"] = self._concurrent_tasks
             
             try:
                 logger.info(f"🛠️  正在执行内置工具: {tool_name} | 参数: {args} | 优先级: {priority} | 超时: {timeout}s")
+                
+                # 更新系统资源使用情况
+                self._update_system_stats()
 
                 # 应用速率限制
                 rate_limiter = self._rate_limiters.get(tool_name, self._rate_limiters["default"])
@@ -604,7 +751,8 @@ class ToolExecutor:
                     )
 
                 # 更新缓存
-                self._update_cache(tool_name, args, result)
+                await self._update_cache(tool_name, args, result)
+                success = True
 
                 return {
                     "success": True,
@@ -636,9 +784,30 @@ class ToolExecutor:
                 await self._fault_recovery_manager.recover(tool_name)
                 return {"success": False, "error": error_msg, "timestamp": datetime.now().isoformat()}
             finally:
+                # 减少并发任务计数
+                async with self._concurrent_tasks_lock:
+                    self._concurrent_tasks = max(0, self._concurrent_tasks - 1)
+                    self._performance_stats["concurrency"]["current_concurrent_tasks"] = self._concurrent_tasks
+                
                 # 更新超时统计
                 execution_time = time.time() - start_time
                 self._update_timeout_stats(tool_name, execution_time, timed_out)
+                
+                # 更新执行性能统计
+                self._performance_stats["execution"]["total_tasks"] += 1
+                self._performance_stats["execution"]["total_execution_time"] += execution_time
+                
+                if success:
+                    self._performance_stats["execution"]["completed_tasks"] += 1
+                else:
+                    self._performance_stats["execution"]["failed_tasks"] += 1
+                
+                # 更新平均执行时间
+                if self._performance_stats["execution"]["total_tasks"] > 0:
+                    self._performance_stats["execution"]["average_execution_time"] = (
+                        self._performance_stats["execution"]["total_execution_time"] / 
+                        self._performance_stats["execution"]["total_tasks"]
+                    )
 
         # 如果队列不为空，将任务添加到队列
         if self._task_queue:
@@ -1002,7 +1171,7 @@ class ToolExecutor:
     def get_reliability_status(self) -> dict[str, Any]:
         """
         获取可靠性状态
-        
+
         Returns:
             可靠性状态信息
         """
@@ -1021,6 +1190,48 @@ class ToolExecutor:
             }
         
         return status
+    
+    def _update_system_stats(self):
+        """
+        更新系统资源使用情况
+        """
+        try:
+            # 获取CPU使用率
+            cpu_usage = psutil.cpu_percent(interval=0.1)
+            
+            # 获取内存使用率
+            memory = psutil.virtual_memory()
+            memory_usage = memory.percent
+            
+            # 获取磁盘使用率
+            disk = psutil.disk_usage('/')
+            disk_usage = disk.percent
+            
+            # 更新系统统计
+            self._performance_stats["system"]["cpu_usage"] = cpu_usage
+            self._performance_stats["system"]["memory_usage"] = memory_usage
+            self._performance_stats["system"]["disk_usage"] = disk_usage
+        except Exception as e:
+            logger.error(f"更新系统统计失败: {str(e)}")
+    
+    def get_performance_stats(self) -> dict[str, Any]:
+        """
+        获取性能统计信息
+
+        Returns:
+            性能统计信息
+        """
+        # 更新系统资源使用情况
+        self._update_system_stats()
+        
+        # 计算线程池平均大小
+        if self._performance_stats["thread_pool"]["adjustments"] > 0:
+            self._performance_stats["thread_pool"]["average_size"] = (
+                self._performance_stats["thread_pool"]["max_size"] + 
+                self._performance_stats["thread_pool"]["min_size"]
+            ) / 2
+        
+        return self._performance_stats
 
     def close(self):
         """关闭执行器，清理资源"""
@@ -1057,35 +1268,42 @@ class ToolExecutor:
         
         logger.info(f"开始批量执行 {total_tasks} 个任务，最大并发数: {max_concurrency}")
         
-        # 分批执行，控制并发数
-        for i in range(0, total_tasks, max_concurrency):
-            batch = tool_calls[i:i + max_concurrency]
-            tasks = []
-            
-            for call in batch:
+        # 使用信号量控制并发数
+        semaphore = asyncio.Semaphore(max_concurrency)
+        
+        async def execute_with_semaphore(call):
+            async with semaphore:
                 tool_name = call.get("tool_name")
                 args = call.get("args", {})
                 priority = call.get("priority", 5)  # 默认优先级为 5
                 if tool_name:
-                    task = self.execute(tool_name, args, role, timeout, priority)
-                    tasks.append(task)
-            
-            if tasks:
-                batch_results = await asyncio.gather(*tasks, return_exceptions=True)
-                # 处理异常结果
-                for result in batch_results:
-                    if isinstance(result, Exception):
-                        results.append(
-                            {
-                                "success": False,
-                                "error": str(result),
-                                "timestamp": datetime.now().isoformat(),
-                            }
-                        )
-                    else:
-                        results.append(result)
-                
-                processed_tasks += len(tasks)
+                    return await self.execute(tool_name, args, role, timeout, priority)
+                return {
+                    "success": False,
+                    "error": "缺少 tool_name",
+                    "timestamp": datetime.now().isoformat(),
+                }
+        
+        # 创建所有任务
+        tasks = [execute_with_semaphore(call) for call in tool_calls]
+        
+        # 并发执行所有任务
+        batch_results = await asyncio.gather(*tasks, return_exceptions=True)
+        
+        # 处理结果
+        for result in batch_results:
+            if isinstance(result, Exception):
+                results.append(
+                    {
+                        "success": False,
+                        "error": str(result),
+                        "timestamp": datetime.now().isoformat(),
+                    }
+                )
+            else:
+                results.append(result)
+            processed_tasks += 1
+            if processed_tasks % 10 == 0 or processed_tasks == total_tasks:
                 logger.info(f"已完成 {processed_tasks}/{total_tasks} 个任务")
         
         logger.info(f"批量执行完成，共处理 {total_tasks} 个任务")
@@ -1113,37 +1331,45 @@ class ToolExecutor:
         
         logger.info(f"开始带回调的批量执行 {total_tasks} 个任务")
         
-        # 分批执行，控制并发数
-        for i in range(0, total_tasks, max_concurrency):
-            batch = tool_calls[i:i + max_concurrency]
-            tasks = []
-            
-            for call in batch:
+        # 使用信号量控制并发数
+        semaphore = asyncio.Semaphore(max_concurrency)
+        
+        async def execute_with_semaphore(call):
+            async with semaphore:
                 tool_name = call.get("tool_name")
                 args = call.get("args", {})
                 priority = call.get("priority", 5)
                 if tool_name:
-                    task = self.execute(tool_name, args, role, timeout, priority)
-                    tasks.append(task)
+                    return await self.execute(tool_name, args, role, timeout, priority)
+                return {
+                    "success": False,
+                    "error": "缺少 tool_name",
+                    "timestamp": datetime.now().isoformat(),
+                }
+        
+        # 创建所有任务
+        tasks = [execute_with_semaphore(call) for call in tool_calls]
+        
+        # 并发执行所有任务
+        batch_results = await asyncio.gather(*tasks, return_exceptions=True)
+        
+        # 处理结果
+        for result in batch_results:
+            if isinstance(result, Exception):
+                task_result = {
+                    "success": False,
+                    "error": str(result),
+                    "timestamp": datetime.now().isoformat(),
+                }
+            else:
+                task_result = result
             
-            if tasks:
-                batch_results = await asyncio.gather(*tasks, return_exceptions=True)
-                # 处理异常结果
-                for result in batch_results:
-                    if isinstance(result, Exception):
-                        task_result = {
-                            "success": False,
-                            "error": str(result),
-                            "timestamp": datetime.now().isoformat(),
-                        }
-                    else:
-                        task_result = result
-                    
-                    results.append(task_result)
-                    processed_tasks += 1
-                    # 调用回调函数
-                    callback(processed_tasks, total_tasks, task_result)
-                    logger.info(f"已完成 {processed_tasks}/{total_tasks} 个任务")
+            results.append(task_result)
+            processed_tasks += 1
+            # 调用回调函数
+            callback(processed_tasks, total_tasks, task_result)
+            if processed_tasks % 10 == 0 or processed_tasks == total_tasks:
+                logger.info(f"已完成 {processed_tasks}/{total_tasks} 个任务")
         
         logger.info(f"带回调的批量执行完成，共处理 {total_tasks} 个任务")
         return results
