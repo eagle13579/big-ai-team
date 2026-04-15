@@ -7,6 +7,7 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 
 from src.shared.config import settings
+from src.shared.security_utils import validate_username, validate_password, sanitize_input, prevent_sql_injection
 
 # 密码加密上下文
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -56,14 +57,29 @@ def get_password_hash(password: str) -> str:
 
 def get_user(username: str) -> User | None:
     """获取用户"""
-    if username in fake_users_db:
-        user_dict = fake_users_db[username]
+    # 验证和清理用户名
+    if not validate_username(username):
+        return None
+    sanitized_username = sanitize_input(username)
+    # 防止SQL注入
+    safe_username = prevent_sql_injection(sanitized_username)
+    
+    if safe_username in fake_users_db:
+        user_dict = fake_users_db[safe_username]
         return User(**user_dict)
     return None
 
 
 def authenticate_user(username: str, password: str) -> User | None:
     """认证用户"""
+    # 验证和清理用户名
+    if not validate_username(username):
+        return None
+    
+    # 验证密码格式
+    if not validate_password(password):
+        return None
+    
     user = get_user(username)
     if not user:
         return None

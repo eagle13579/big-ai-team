@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Paper, Typography, List, ListItem, ListItemText, ListItemIcon, CircularProgress, Alert } from '@mui/material';
-import { Wrench, Search, FileWrite, FileRead, Folder, Delete, Info } from '@mui/icons-material';
+import { Build, Search, Create, Description, Folder, Delete, Info } from '@mui/icons-material';
 
 interface Tool {
   name: string;
@@ -117,15 +117,15 @@ const ToolsList: React.FC = () => {
       case 'web_search':
         return <Search color="primary" />;
       case 'write_file':
-        return <FileWrite color="primary" />;
+        return <Create color="primary" />;
       case 'read_file':
-        return <FileRead color="primary" />;
+        return <Description color="primary" />;
       case 'list_files':
         return <Folder color="primary" />;
       case 'delete_file':
         return <Delete color="primary" />;
       default:
-        return <Wrench color="primary" />;
+        return <Build color="primary" />;
     }
   };
 

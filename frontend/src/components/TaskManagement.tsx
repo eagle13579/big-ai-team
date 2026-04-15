@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Button, Paper, Typography, TextField, List, ListItem, ListItemText, ListItemSecondaryAction, IconButton, CircularProgress, Alert, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import { PlayArrow, Stop, Delete, Refresh } from '@mui/icons-material';
+import { validateTaskQuery, sanitizeInput } from '../utils/security';
 
 interface Task {
   id: string;
@@ -64,8 +65,10 @@ const TaskManagement: React.FC = () => {
   };
 
   const handleCreateTask = async () => {
-    if (!newTaskQuery.trim()) {
-      setError('Please enter a task query');
+    // 验证任务查询
+    const validation = validateTaskQuery(newTaskQuery);
+    if (!validation.isValid) {
+      setError(validation.message || 'Invalid task query');
       return;
     }
 
@@ -73,12 +76,15 @@ const TaskManagement: React.FC = () => {
     setError(null);
 
     try {
+      // 清理输入
+      const sanitizedQuery = sanitizeInput(newTaskQuery);
+      
       // 实际项目中应该调用 API 创建任务
       await new Promise(resolve => setTimeout(resolve, 1000)); // 模拟网络延迟
 
       const newTask: Task = {
         id: Date.now().toString(),
-        query: newTaskQuery,
+        query: sanitizedQuery,
         status: 'pending',
         startTime: new Date().toISOString()
       };
